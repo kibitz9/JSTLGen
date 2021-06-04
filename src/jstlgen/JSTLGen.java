@@ -16,12 +16,27 @@ public class JSTLGen {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        int threadCount = 8;
-        
+        int threadCount = 4;
+        System.out.println(threadCount);
         long start = System.currentTimeMillis();
+        double epsilon = .0000001;
+        //SignedDistanceField3d c = new SDFSphere(1.0);
+        SignedDistanceField3d c = new SDFBox(new Vector3d(1.0,1.0,1.0));
+        SignedDistanceField3d c2 = new SDFSphere(1.2);
         
-        SDFSphere c = new SDFSphere(1.0);
-        Solid s = Solid.HedronTriangulate(c, .05, .05, .000001, threadCount);
+        c=new SDFSmoothDifference(c,c2,.2);
+        Solid s = Solid.HedronTriangulate(c, .05, .05, epsilon, threadCount);
+        
+        double threshold = .05;
+        int refinements = 5;
+        for (int a=0;a<refinements;a++){
+            s=s.ShrinkTowardsSlope(c, epsilon, threadCount, true);
+            s=s.ShrinkTowardsSlope(c, epsilon, threadCount, true);
+            s=s.SideSplitStressedFaces(c, epsilon, threadCount, threshold);
+            s=s.ShrinkTowardsSlope(c, epsilon, threadCount, true);
+            s=s.ShrinkTowardsSlope(c, epsilon, threadCount, true);
+        }
+        
         
         long end = System.currentTimeMillis();
         System.out.println((end-start));

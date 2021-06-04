@@ -56,12 +56,21 @@ public class ThreadSubdivideHedron extends ThreadBase{
             List<FractalHedron> temp = new ArrayList<FractalHedron>();
             for (int a = 0; a < threadCount; a++)
             {
+                System.out.println("Starting thread "+a);
                 activeThreads.add(new ThreadSubdivideHedron(threadCount, a, hedronPool, sdf, lineLength, epsilon, finalCull));
                 //work begins immediately
             }
-            
+           
             for (ThreadBase t : activeThreads){
-                t.Join();
+                while(true){
+                    
+                    t.Join();
+
+                    if (t.Done){
+                        break;
+                    }
+                    
+                }
             }
             
             //for (ThreadSubdivideHedron s in )
@@ -69,6 +78,8 @@ public class ThreadSubdivideHedron extends ThreadBase{
 //            System.out.println("******************************************");
 //            //}
            
+            
+
             for (ThreadBase g : activeThreads)
             {
                 temp.addAll((List<FractalHedron>)(g.results));

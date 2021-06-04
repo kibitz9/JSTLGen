@@ -101,9 +101,10 @@ public abstract class ThreadBase {
     
     public void AlertDone() {
         boolean done = true;
-        for (ThreadBase g : activeThreads)
-        {
-
+        for (int a=0;a<activeThreads.size();a++){
+//        for (ThreadBase g : activeThreads)
+//        {
+            ThreadBase g = activeThreads.get(a);
             // g.t.Join();
             if (!g.Done)
             {
