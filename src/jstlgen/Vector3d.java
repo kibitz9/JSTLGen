@@ -204,8 +204,15 @@ public class Vector3d {
         public void ShrinkTowardsSlopeNoBurn(SignedDistanceField3d sdf, double epsilon)
         {
             Vector3d slope = sdf.GetSlope(this, epsilon);
+            
+           
+            
+            
             Vector3d normal = slope.GetUnitVector();
             double dist = sdf.GetDistance(this) * (1 - epsilon);
+//            if (dist<-epsilon){
+//                return;
+//            }
             normal.ScaleNoBurn(dist);
             normal.NegateNoBurn();
             AddNoBurn(normal);

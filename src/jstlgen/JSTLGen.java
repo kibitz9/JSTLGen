@@ -21,13 +21,14 @@ public class JSTLGen {
         long start = System.currentTimeMillis();
         double epsilon = .0000001;
         //SignedDistanceField3d c = new SDFSphere(1.0);
-        SignedDistanceField3d c = new SDFBox(new Vector3d(1.0,1.0,1.0));
-        SignedDistanceField3d c2 = new SDFSphere(1.2);
+        SignedDistanceField3d c = new SDFBox(new Vector3d(1.0001,1.0001,1.0001));
+        SignedDistanceField3d c2 = new SDFSphere(1.20001);
+        c2 = new SDFAxisCut(c2,SDFAxisCut.Axis.Z,0,false);
         
         c=new SDFSmoothDifference(c,c2,.2);
         
-        //c = new SDFDistortionRatio(c,.99999);
-        Solid s = Solid.HedronTriangulate(c, .125, .125, epsilon, threadCount);
+        //c = new SDFDistortionRatio(c,.9999999);
+        Solid s = Solid.HedronTriangulate(c, .08, .08, epsilon, threadCount);
         
         
         double threshold = .05;

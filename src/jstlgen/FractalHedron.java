@@ -122,7 +122,7 @@ public abstract class FractalHedron {
 
 
         }
-        protected static boolean CHECKLINES = true;//.here
+        protected static boolean CHECKLINES = false;//.here
         protected abstract int GetSDFState(SignedDistanceField3d sdf, double marginalDist, double epsilon);
         public int GetSpanningState(SignedDistanceField3d sdf, double marginalDist, double epsilon)
         {
