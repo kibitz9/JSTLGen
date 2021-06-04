@@ -49,6 +49,12 @@ public class Solid  {
 //        }
 
 
+        public Solid SideSplitStressedFaces(SignedDistanceField3d sdf, double epsilon, int threadCount, double threshold){
+            Face[] newFaces = ThreadSideSplitStressedFaces.SideSplitStressedFaces(sdf, epsilon, threadCount, faces, threshold);
+            return new Solid(newFaces);
+        }
+        
+        
         public Solid ShrinkTowardsSlope(SignedDistanceField3d sdf,double epsilon, int threadCount, boolean noBurnShrink)
         {
             

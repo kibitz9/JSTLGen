@@ -122,6 +122,7 @@ public class Vector3d {
         {
             return GetComponentwiseMax(max);
         }
+        
         public Vector3d Min(double min)
         {
             return ComponentwiseMin(min);

@@ -20,7 +20,7 @@ public class ThreadShrinkTowardsSlope extends ThreadBase{
         //}
         //public bool Done = false;
         //public Face[] results = null;
-        public List<Face> results = new ArrayList<Face>();
+        //public List<Face> results = new ArrayList<Face>();
         Face[] facePool = null;
         SignedDistanceField3d sdf;
         double epsilon;
@@ -61,13 +61,16 @@ public class ThreadShrinkTowardsSlope extends ThreadBase{
                 activeThreads.add(new ThreadShrinkTowardsSlope(threadCount, a, faces, sdf, epsilon));
             }
 
-            try
-            {
-                Thread.currentThread().wait();
-            }
-            catch(java.lang.InterruptedException wake)
-            {
+            for (ThreadBase t : activeThreads){
+                while(true){
+                    
+                    t.Join();
 
+                    if (t.Done){
+                        break;
+                    }
+                    
+                }
             }
             //bool done = false;
             //while (!done)
@@ -194,7 +197,9 @@ public class ThreadShrinkTowardsSlope extends ThreadBase{
                 //{
                 Face ff = facePool[a];
 
-
+//                if (ff==null){
+//                    String test = "what?";
+//                }
 
                 //Vector3d slope1 = sdf.Slope(ff.One, epsilon);
                 //Vector3d normal1 = slope1.UnitVector;
