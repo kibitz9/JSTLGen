@@ -673,7 +673,7 @@ public class Vector3d {
             TOX,FROMX,TOY,FROMY,TOZ,FROMZ
             ,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t
         );
-        private static final double BIGSIZE = 1000000000;
+        private static final double BIGSIZE = 10000000;
 
         public static Vector3d BIG_X = new Vector3d(BIGSIZE, 0, 0);
         public static Vector3d BIG_NEG_X = new Vector3d(-BIGSIZE, 0, 0);

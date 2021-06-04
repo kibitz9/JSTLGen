@@ -25,11 +25,15 @@ public class JSTLGen {
         SignedDistanceField3d c2 = new SDFSphere(1.2);
         
         c=new SDFSmoothDifference(c,c2,.2);
-        Solid s = Solid.HedronTriangulate(c, .05, .05, epsilon, threadCount);
+        
+        //c = new SDFDistortionRatio(c,.99999);
+        Solid s = Solid.HedronTriangulate(c, .125, .125, epsilon, threadCount);
+        
         
         double threshold = .05;
         int refinements = 5;
         for (int a=0;a<refinements;a++){
+            System.out.println("Refinement "+a);
             s=s.ShrinkTowardsSlope(c, epsilon, threadCount, true);
             s=s.ShrinkTowardsSlope(c, epsilon, threadCount, true);
             s=s.SideSplitStressedFaces(c, epsilon, threadCount, threshold);
