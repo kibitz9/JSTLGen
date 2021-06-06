@@ -75,7 +75,7 @@ public class ThreadSubdivideHedron extends ThreadBase{
             
             //for (ThreadSubdivideHedron s in )
            
-//            System.out.println("******************************************");
+            System.out.println("******************************************");
 //            //}
            
             

@@ -558,19 +558,26 @@ public class Solid  {
         public Solid(List<Face> faces)
         {
             this.faces = new Face[faces.size()];
-            this.faces = faces.toArray(this.faces);
+            for (int a=0;a<faces.size();a++){
+                this.faces[a]=new Face(faces.get(a));//clone it!
+            }
+            //this.faces = faces.toArray(this.faces);
         }
 
         public Solid(Face[] faces)
         {
-            this.faces = faces;
+            this.faces = new Face[faces.length];
+            for (int a=0;a<faces.length;a++){
+                this.faces[a]=new Face(faces[a]);//clone it!
+            }
+           
         }
         public Solid(Solid toCopy)
         {
             Face[] newFaces = new Face[toCopy.faces.length];
             for (int a = 0; a < newFaces.length; a++) {
 
-                newFaces[a] = toCopy.faces[a];
+                newFaces[a] = new Face(toCopy.faces[a]);
             }
             this.faces = newFaces;
         }

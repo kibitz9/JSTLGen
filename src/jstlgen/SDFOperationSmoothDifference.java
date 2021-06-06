@@ -9,12 +9,12 @@ package jstlgen;
  *
  * @author Christopher.Miller
  */
-public class SDFSmoothDifference extends SignedDistanceField3d{
+public class SDFOperationSmoothDifference extends SignedDistanceField3d{
     private final SignedDistanceField3d one;
     private final SignedDistanceField3d two;
     private final double k;
     private final double oneSixthOverK;
-    public SDFSmoothDifference(SignedDistanceField3d one, SignedDistanceField3d two,double k)
+    public SDFOperationSmoothDifference(SignedDistanceField3d one, SignedDistanceField3d two,double k)
     {
         this.one = one;
         this.two = two;
@@ -35,6 +35,6 @@ public class SDFSmoothDifference extends SignedDistanceField3d{
     @Override
     public SignedDistanceField3d Clone()
     {
-        return new SDFSmoothDifference(one.Clone(), two.Clone(), k);
+        return new SDFOperationSmoothDifference(one.Clone(), two.Clone(), k);
     }
 }

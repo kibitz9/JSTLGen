@@ -130,6 +130,11 @@ public class Vector2d {
 
         private int hashCode = 0;
        
+        public double MaximumComponent()
+        {
+            return Math.max(this.x,this.y);
+        }
+       
 
         public Vector2d ComponentwiseMax(double max)
         {
@@ -144,7 +149,15 @@ public class Vector2d {
                 one.x*two.y - one.y*two.x
                 );
         }
+        public static Vector2d ComponentwiseMultiply(Vector2d one, Vector2d two)
+        {
+            return new Vector2d(one.x * two.x, one.y * two.y);
+        }
 
+        public Vector2d ComponentwiseMultiply(Vector2d other)
+        {
+            return ComponentwiseMultiply(this, other);
+        }
         public static double DotProduct(Vector2d one, Vector2d two)
         {
             return one.x * two.x + one.y * two.y;

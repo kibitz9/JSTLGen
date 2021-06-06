@@ -113,14 +113,14 @@ public class Vector3d {
 //            return Rotate(q);
 //        }
 
-        public Vector3d GetComponentwiseMax(double max)
+        public Vector3d ComponentwiseMax(double max)
         {
             return new Vector3d(Math.max(this.x, max), Math.max(this.y, max), Math.max(this.z, max));
         }
 
         public Vector3d Max(double max)
         {
-            return GetComponentwiseMax(max);
+            return ComponentwiseMax(max);
         }
         
         public Vector3d Min(double min)
@@ -601,6 +601,15 @@ public class Vector3d {
         {
             return Scale(this, scalar);
         }
+        public Vector3d InverseScale(double scalar){
+            return Scale(this, 1.0/scalar);
+        }
+        public Vector3d Multiply(double scalar){
+            return Scale(this, scalar);
+        }
+        public Vector3d Divide(double scalar){
+            return Scale(this, 1.0/scalar);
+        }
         public void ScaleNoBurn(double scalar)
         {
             this.x *= scalar;
@@ -673,7 +682,7 @@ public class Vector3d {
             TOX,FROMX,TOY,FROMY,TOZ,FROMZ
             ,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t
         );
-        private static final double BIGSIZE = 1000000000;
+        private static final double BIGSIZE = 100000000;
 
         public static Vector3d BIG_X = new Vector3d(BIGSIZE, 0, 0);
         public static Vector3d BIG_NEG_X = new Vector3d(-BIGSIZE, 0, 0);

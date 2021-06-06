@@ -9,11 +9,11 @@ package jstlgen;
  *
  * @author Christopher.Miller
  */
-public class SDFCapsule extends SignedDistanceField3d {
+public class SDF3dPrimitiveCapsule extends SignedDistanceField3d {
      private double height = 0;
         private double radius = 0;
         
-        public SDFCapsule(double height, double radius)
+        public SDF3dPrimitiveCapsule(double height, double radius)
         {
             this.height = height;
             this.radius = radius;
@@ -32,7 +32,7 @@ public class SDFCapsule extends SignedDistanceField3d {
         @Override
         public SignedDistanceField3d Clone()
         {
-            return new SDFCapsule(height, radius);
+            return new SDF3dPrimitiveCapsule(height, radius);
         }
         //float sdVerticalCapsule(vec3 p, float h, float r)
         //{

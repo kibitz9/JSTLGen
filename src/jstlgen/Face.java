@@ -23,6 +23,13 @@ public class Face {
          this(one, two, three, null);
         //this.normal = surfaceNormal();//let's lazy load this.
     }
+    
+    
+    public Face(Face toClone){
+        this.one = toClone.one.Clone();
+        this.two=toClone.two.Clone();
+        this.three=toClone.three.Clone();
+    }
     public double Min(double one, double two)
     {
         if (one < two)
@@ -266,6 +273,8 @@ public class Face {
             return returnValue;
         }
 
+        
+        
         public Face[] SideSplitOnTension(SignedDistanceField3d sdf, double epsilon, double threshold)
         {
             boolean splitOneTwo = GetSDFTension(sdf, one, two, epsilon) > threshold;
@@ -351,6 +360,8 @@ public class Face {
             };
         }
 
+        
+       
         public List<Face> CenterSplitOnTension(SignedDistanceField3d sdf, double epsilon, double threshold)
         {
             double tension = GetSDFTension(sdf, epsilon);

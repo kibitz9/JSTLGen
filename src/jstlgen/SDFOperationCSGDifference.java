@@ -9,10 +9,10 @@ package jstlgen;
  *
  * @author Christopher.Miller
  */
-public class SDFDifference extends SignedDistanceField3d{
+public class SDFOperationCSGDifference extends SignedDistanceField3d{
     private SignedDistanceField3d one;
     private SignedDistanceField3d two;
-    public SDFDifference(SignedDistanceField3d one, SignedDistanceField3d two)
+    public SDFOperationCSGDifference(SignedDistanceField3d one, SignedDistanceField3d two)
     {
         this.one = one;
         this.two = two;
@@ -25,6 +25,6 @@ public class SDFDifference extends SignedDistanceField3d{
     @Override
     public SignedDistanceField3d Clone()
     {
-        return new SDFDifference(one.Clone(), two.Clone());
+        return new SDFOperationCSGDifference(one.Clone(), two.Clone());
     }
 }

@@ -9,10 +9,10 @@ package jstlgen;
  *
  * @author Christopher.Miller
  */
-public class SDFSphere extends SignedDistanceField3d {
+public class SDF3dPrimitiveSphere extends SignedDistanceField3d {
 
     private final double radius;
-    public SDFSphere(double radius)
+    public SDF3dPrimitiveSphere(double radius)
     {
         this.radius = radius;
     }
@@ -24,7 +24,7 @@ public class SDFSphere extends SignedDistanceField3d {
      @Override
     public SignedDistanceField3d Clone()
     {
-        return new SDFSphere(radius);
+        return new SDF3dPrimitiveSphere(radius);
     }
 
   

@@ -9,13 +9,13 @@ package jstlgen;
  *
  * @author Christopher.Miller
  */
-public class SDFBox extends SignedDistanceField3d{
+public class SDF3dPrimitiveBox extends SignedDistanceField3d{
      private Vector3d box;
-        public SDFBox(Vector3d positiveHalfDiagonal)
+        public SDF3dPrimitiveBox(Vector3d positiveHalfDiagonal)
         {
             this.box = positiveHalfDiagonal;
         }
-        public SDFBox(double radiusx, double radiusy, double radiusz)
+        public SDF3dPrimitiveBox(double radiusx, double radiusy, double radiusz)
         {
             this.box = new Vector3d(radiusx, radiusy, radiusz);
         }
@@ -45,7 +45,7 @@ public class SDFBox extends SignedDistanceField3d{
         @Override
         public SignedDistanceField3d Clone()
         {
-            return new SDFBox(this.box);
+            return new SDF3dPrimitiveBox(this.box);
         }
 
         //float sdBox(vec3 p, vec3 b)

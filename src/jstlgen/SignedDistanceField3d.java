@@ -9,48 +9,12 @@ package jstlgen;
  *
  * @author Christopher.Miller
  */
-public abstract class SignedDistanceField3d {
+public abstract class SignedDistanceField3d  extends SignedDistanceField{
     public abstract double GetRawDistance(Vector3d p);
     public abstract SignedDistanceField3d Clone();
+    
     public double GetDistance(Vector3d p){
         return GetRawDistance(p);
-    }
-    
-    protected static double clamp(double value, double min, double max){
-        if (value<min){
-            return min;
-        }
-        if (value>max){
-            return max;
-        }
-        return value;
-    }
-    protected static double min(double val1, double val2){
-        if (val1<val2){
-            return val1;
-        }
-        return val2;
-    }
-    protected static double max(double val1, double val2){
-        if (val1>val2){
-            return val1;
-        }
-        return val2;
-    }
-    protected static Vector3d max(Vector3d vect, double val){
-        return vect.GetComponentwiseMax(val);
-    }
-    protected static double max(Vector3d vect){
-        return vect.MaximumComponent();
-    }
-    protected static double length(Vector3d vect){
-        return vect.GetMagnitude();
-    }
-    protected static Vector3d abs(Vector3d vect){
-        return vect.Abs();
-    }
-    protected static double abs(double val){
-        return Math.abs(val);
     }
     
    
