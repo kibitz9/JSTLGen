@@ -19,7 +19,7 @@ public class JSTLGen {
         int threadCount =12;
         System.out.println(threadCount);
         long start = System.currentTimeMillis();
-        double epsilon = .0000000000001;
+        double epsilon = .00000000001;
         //double epsilon = .00001;
         //SignedDistanceField3d c = new SDFSphere(1.0);
         
@@ -53,15 +53,49 @@ public class JSTLGen {
         
         //phull = new SDF3dPrimitiveTorus(50,10);
         //interesting and pretty good...
-        SignedDistanceField3d final1 = phull;
+        
+        SDF3dPrimitivePoint p1 = new SDF3dPrimitivePoint(new Vector3d(1,0,1));
+        SDF3dPrimitivePoint p2 = new SDF3dPrimitivePoint(new Vector3d(-1,0,1));
+        SDF3dPrimitivePoint p3 = new SDF3dPrimitivePoint(new Vector3d(1,0,-1));
+        SDF3dPrimitivePoint p4 = new SDF3dPrimitivePoint(new Vector3d(-1,0,-1));
+        
+
+        SignedDistanceField3d r1 = new SDFOperationRoundEdges(p1,.5);
+        SignedDistanceField3d r2 = new SDFOperationRoundEdges(p2,.5);
+        SignedDistanceField3d r3 = new SDFOperationRoundEdges(p3,.5);
+        SignedDistanceField3d r4 = new SDFOperationRoundEdges(p4,.5);
+        
+        SignedDistanceField3d u1 = new SDFOperationSmoothUnion(r1,r2,3);
+        SignedDistanceField3d u2 = new SDFOperationSmoothUnion(r3,r4,3);
+        SignedDistanceField3d u3 = new SDFOperationSmoothUnion(u1,u2,3);
+        
+        
+        SignedDistanceField3d final1 = u3;
+        final1 = new SDFOperationOnion(final1,.01);
+        final1 = new SDFOperationAxisCut(final1,SDFOperationAxisCut.Axis.Z,0,false);
         double splitThreshold = .125;
 
-        Solid s = Solid.Triangulate(final1, 10, epsilon, threadCount,.5,2);
+        //Solid s = Solid.Triangulate(final1, 1, epsilon, threadCount,.5,2);
         
         //final1 = new SDF3dPrimitiveSphere(160);
         //Solid s = Solid.Triangulate(final1, 40, 40, .00000001, 12, 1,.001);
-//        Solid s = Solid.HedronTriangulate(final1,40, 10, epsilon, threadCount);
+        Solid s = Solid.HedronTriangulate(final1,.125, .125, epsilon, threadCount);
+        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+        s=s.SideSplitStressedFaces(final1, epsilon, threadCount, splitThreshold);
+        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
 //        s=s.SideSplitStressedFaces(final1, epsilon, threadCount, splitThreshold);
+//        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+//         s=s.SideSplitStressedFaces(final1, epsilon, threadCount, splitThreshold);
+//        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+//         s=s.SideSplitStressedFaces(final1, epsilon, threadCount, splitThreshold);
+        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
 //        s=s.SideSplitStressedFaces(final1, epsilon, threadCount, splitThreshold);
 //        s=s.SideSplitStressedFaces(final1, epsilon, threadCount, splitThreshold);
 //        s=s.SideSplitStressedFaces(final1, epsilon, threadCount, splitThreshold);

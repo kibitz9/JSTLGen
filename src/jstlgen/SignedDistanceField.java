@@ -30,6 +30,9 @@ public class SignedDistanceField {
 
     }
     
+    protected static double fract(double value){
+        return value - (Math.floor(value));
+    }
     
     protected static double sin(double angle){
         return Math.sin(angle);
