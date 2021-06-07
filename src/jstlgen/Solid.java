@@ -341,10 +341,81 @@ public class Solid  {
 //            return x;// new Solid(newFaces);
 //        }
 
+        
+        public static Solid Triangulate(SignedDistanceField3d sdf, double initialLength, double epsilon, int threadcount, double splitThreshold, double initialMargin){
+            SignedDistanceField3d round = new SDFOperationRoundEdges(sdf,initialMargin);
+            Solid s = Solid.HedronTriangulate(round, initialLength, initialLength, epsilon, threadcount);
+            //s=s.Subdivide(); 
+            //round = new SDFOperationRoundEdges(sdf,initialMargin/2);
+            s=s.ShrinkTowardsSlope(round, epsilon, threadcount, true);
+//            s=s.Subdivide();
+//            s=s.Subdivide();
+//            s=s.ShrinkTowardsSlope(sdf, epsilon, threadcount, true);
+//            s=s.SideSplitStressedFaces(sdf, epsilon, threadcount, splitThreshold);
+//            s=s.ShrinkTowardsSlope(sdf, epsilon, threadcount, true);
+//            s=s.SideSplitStressedFaces(sdf, epsilon, threadcount, splitThreshold);
+//            s=s.ShrinkTowardsSlope(sdf, epsilon, threadcount, true);
+//            s=s.SideSplitStressedFaces(sdf, epsilon, threadcount, splitThreshold);
+//            s=s.ShrinkTowardsSlope(sdf, epsilon, threadcount, true);
+//            s=s.SideSplitStressedFaces(sdf, epsilon, threadcount, splitThreshold);
+//            s=s.ShrinkTowardsSlope(sdf, epsilon, threadcount, true);
+//            s=s.SideSplitStressedFaces(sdf, epsilon, threadcount, splitThreshold);
+//            s=s.ShrinkTowardsSlope(sdf, epsilon, threadcount, true);
+//            s=s.SideSplitStressedFaces(sdf, epsilon, threadcount, splitThreshold);
+//            s=s.ShrinkTowardsSlope(sdf, epsilon, threadcount, true);
+//            s=s.SideSplitStressedFaces(sdf, epsilon, threadcount, splitThreshold);
+//            s=s.ShrinkTowardsSlope(sdf, epsilon, threadcount, true);
+            //s=s.ShrinkTowardsSlope(sdf, epsilon, threadcount, true);
+            return s;
+            
+        }
        
 
+//        public static Solid Triangulate(SignedDistanceField3d sdf, double initialLineLength, double minimumLineLength, double epsilon, int threadCount, double splitThreshold, double margin){
+//            Line boundingBox = sdf.GetBoundingBox(1);
+//            double sizex = boundingBox.end.x - boundingBox.start.x;
+//            double sizey = boundingBox.end.y - boundingBox.start.y;
+//            double sizez = boundingBox.end.z - boundingBox.start.z;
+//
+//            double max = Math.max(sizex, Math.max(sizey, sizez));
+//            
+//            //double initialDistance = max;
+//            
+//            SignedDistanceField3d round = sdf;//new SDFOperationRoundEdges(sdf,initialDistance);
+//            
+//            Solid s = HedronTriangulate(round,initialLineLength,minimumLineLength,epsilon,threadCount);
+//            int count=0;
+//            while (initialDistance>margin){
+//                System.out.println(initialDistance);
+//                s.ShrinkTowardsSlope(round, epsilon, threadCount, true);
+//                s=s.SideSplitStressedFaces(round, epsilon, 12,splitThreshold);
+//                s.ShrinkTowardsSlope(round, epsilon, threadCount, true);
+////                s=s.SideSplitStressedFaces(round, epsilon, 12,splitThreshold);
+////                s.ShrinkTowardsSlope(round, epsilon, threadCount, true);
+////                s=s.SideSplitStressedFaces(round, epsilon, 12,splitThreshold);
+////                s.ShrinkTowardsSlope(round, epsilon, threadCount, true);
+////                s=s.SideSplitStressedFaces(round, epsilon, 12,splitThreshold);
+////                s.ShrinkTowardsSlope(round, epsilon, threadCount, true);
+////                s=s.SideSplitStressedFaces(round, epsilon, 12,splitThreshold);
+////                s.ShrinkTowardsSlope(round, epsilon, threadCount, true);
+//                //s=s.SideSplitStressedFaces(round, epsilon, 12,splitThreshold);
+//                
+//                //s.ShrinkTowardsSlope(round, epsilon, threadCount, true);
+//                initialDistance/=2;
+//                //round = new SDFOperationRoundEdges(sdf,initialDistance);
+//                count++;
+//                if (count>9){
+//                    break;
+//                }
+//            }
+//            return s;
+//            
+//        }
+//        
         public static Solid HedronTriangulate(SignedDistanceField3d sdf, double initialLineLength, double minimumLineLength, double epsilon, int threadCount)
         {
+            //sdf = new SDFOperationTranslate(sdf,.00000007,.00000011,.00000013);
+            
             Line boundingBox = sdf.GetBoundingBox(1);
             double sizex = boundingBox.end.x - boundingBox.start.x;
             double sizey = boundingBox.end.y - boundingBox.start.y;
