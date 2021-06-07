@@ -205,7 +205,7 @@ public class Vector3d {
         {
             Vector3d slope = sdf.GetSlope(this, epsilon);
             Vector3d normal = slope.GetUnitVector();
-            double dist = sdf.GetDistance(this) * (1 - epsilon);
+            double dist = sdf.GetDistance(this) * (1 - (epsilon));
             normal.ScaleNoBurn(dist);
             normal.NegateNoBurn();
             AddNoBurn(normal);
@@ -233,7 +233,7 @@ public class Vector3d {
             double dist = sdf.GetDistance(this)+ insideoutsideEpsilon;
             if (dist < 0)
             {
-                if (dist < -closeDist)
+                if (dist > -closeDist)
                 {
                     return -1; 
                 }

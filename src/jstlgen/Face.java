@@ -265,12 +265,58 @@ public class Face {
             return Math.max(d12, Math.max(d23, d31));
 
         }
+        private static boolean advanced = true;
+        private static double midPointDistanceSplitDist=.001;
+        private static boolean centerDistanceOnly=true;
+        private static boolean advanced2 = false;
+        
         private double GetSDFTension (SignedDistanceField3d sdf, Vector3d a, Vector3d b, double epsilon)
         {
+            
+            if (advanced2){
+                Vector3d sa = sdf.GetSlope(a, epsilon).GetUnitVector();
+                Vector3d sb = sdf.GetSlope(b, epsilon).GetUnitVector();
+                Vector3d sc = sdf.GetSlope(a.Midpoint(b), epsilon).GetUnitVector();
+                
+                double returnValue1 = Math.abs(sa.Subtract(sb).GetMagnitude());//original return value.
+                double returnValue2 = Math.abs(sb.Subtract(sc).GetMagnitude());
+                double returnValue3 = Math.abs(sc.Subtract(sa).GetMagnitude());
+                return returnValue1+returnValue2+returnValue3;
+                
+                
+            }      
+            
+            if (advanced){
+                
+                Vector3d midpoint = a.Midpoint(b);
+//               
+//                double dist3 = Math.abs(sdf.GetDistance(midpoint));
+//                if (dist3>midPointDistanceSplitDist){
+//                    return 10;
+//                }
+                //return dist3;
+//                double returnValue4=0;
+//                if (dist3>midPointDistanceSplitRatio*dist1||dist3>midPointDistanceSplitRatio*dist2){
+//                    returnValue4=2;
+//                }
+//                if (centerDistanceOnly){
+//                    return returnValue4;
+//                }
+
+                Vector3d sa = sdf.GetSlope(a, epsilon).GetUnitVector();
+                Vector3d sb = sdf.GetSlope(b, epsilon).GetUnitVector();
+                Vector3d smid = sdf.GetSlope(b.Midpoint(a),epsilon).GetUnitVector();
+
+                double returnValue1 = Math.abs(sa.Subtract(sb).GetMagnitude());//original return value.
+                double returnValue2 = Math.abs(sa.Subtract(smid).GetMagnitude());
+                double returnValue3 = Math.abs(sb.Subtract(smid).GetMagnitude());
+                return returnValue1+returnValue2+returnValue3;
+            }
+            
             Vector3d sa = sdf.GetSlope(a, epsilon).GetUnitVector();
             Vector3d sb = sdf.GetSlope(b, epsilon).GetUnitVector();
-            double returnValue = sa.Subtract(sb).GetMagnitude();
-            return returnValue;
+            return Math.abs(sa.Subtract(sb).GetMagnitude());
+            
         }
 
         
@@ -323,12 +369,24 @@ public class Face {
                 //now split...
                 Vector3d m = t1.Midpoint(t2);
                 Vector3d n = t1.Midpoint(t3);
-                return new Face[]
-                {
-                    new Face(t1,m,n),
-                    new Face(m,t2,n),
-                    new Face(n,t2,t3),
-                };
+                double m1 = n.Subtract(t2).GetMagnitudeSquared();
+                double m2 = m.Subtract(t3).GetMagnitudeSquared();
+                if (m1>m2){
+                     return new Face[]
+                    {
+                        new Face(t1,m,n),
+                        new Face(m,t3,n),
+                        new Face(m,t2,t3),
+                    };
+                }
+                else{
+                    return new Face[]
+                    {
+                        new Face(t1,m,n),
+                        new Face(m,t2,n),
+                        new Face(n,t2,t3),
+                    };
+                }
 
 
             }
