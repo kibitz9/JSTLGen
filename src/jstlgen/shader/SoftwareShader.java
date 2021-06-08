@@ -64,7 +64,21 @@ public abstract class SoftwareShader {
     }
     
     
-    
+    public Vector5d rayMarch(SignedDistanceField3d sdf, Vector3d point, Vector3d ray, double epsilon, double iters, double maxDist, double moveRatio){
+        double distance = sdf.GetDistance(point);
+        int steps = 0;
+        while (
+                distance>epsilon
+                &&steps++<iters
+                &&distance<maxDist){
+            
+           
+            point = point.Add(ray.Scale(distance*moveRatio));
+            distance = sdf.GetDistance(point);
+            
+        }
+        return new Vector5d(point,distance,(double)steps);
+    }
     
     public SoftwareShader(javax.swing.JPanel target, int softwareThreads){
         this.target=target;

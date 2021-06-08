@@ -37,6 +37,10 @@ public class SignedDistanceField {
     protected static double sin(double angle){
         return Math.sin(angle);
     }
+    protected static Vector3d sin(Vector3d v){
+        return new Vector3d(Math.sin(v.x),Math.sin(v.y), Math.sin(v.z));
+    }
+    
     protected static double cos(double angle){
         return Math.cos(angle);
     }
