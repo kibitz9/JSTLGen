@@ -34,7 +34,7 @@ public class TestShader extends SoftwareShader {
 
     
     public TestShader(javax.swing.JPanel target, int softwareThreads){
-        super(target,softwareThreads);
+        super(target,softwareThreads,1);
     }
     
     

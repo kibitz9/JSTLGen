@@ -20,8 +20,8 @@ public class DEShader extends SoftwareShader{
     
     
     
-    public DEShader(javax.swing.JPanel target, int softwareThreads){
-        super(target,softwareThreads);
+    public DEShader(javax.swing.JPanel target, int softwareThreads, int aaLevel){
+        super(target,softwareThreads,aaLevel);
         test = new SDF3dPrimitiveSphere(10);
         test = new SDFOperationOnion(test,4);
         test = new SDFOperationOnion(test,1);
@@ -31,7 +31,7 @@ public class DEShader extends SoftwareShader{
         test = new SDFOperationSmoothAxisCut(test,SDFOperationSmoothAxisCut.Axis.X,-5,false,2.0);
         //test = new SDFDistortionSin(test,4,.25);
         
-        test = new SDFOperationRepeatX(test,1,1,9);
+       // test = new SDFOperationRepeatX(test,1,1,9);
         //test = new SDFOperationRoundEdges(test,1);
     }
     
@@ -40,10 +40,10 @@ public class DEShader extends SoftwareShader{
     public Vector4d mainImage(Vector2d fragCoord) {
         double x1 = fragCoord.x;
         double y1 = fragCoord.y;
-        x1-=halfWidthd;
-        y1-=halfHeightd;
-        x1/=widthd;
-        y1/=widthd;//we scale according to one axis only
+        x1-=iHalfResolution.x;
+        y1-=iHalfResolution.y;
+        x1/=iResolution.x;
+        y1/=iResolution.x;//we scale according to one axis only
         
         Vector3d ray = new Vector3d(x1,y1,lense.z).Subtract(eye).GetUnitVector();
         Vector3d lightSource = new Vector3d(100,100,100);
@@ -138,7 +138,7 @@ public class DEShader extends SoftwareShader{
         }
         if (distance>distanceMax){
             //steps *=4;
-            return vec4(0,si,0,1.0);
+            return vec4(0,0,si,1.0);
         }
         return vec4(0,0,0,1);
     }

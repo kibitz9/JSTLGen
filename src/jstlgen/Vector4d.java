@@ -136,7 +136,7 @@ public class Vector4d {
        }
        public Vector4d ComponentwiseMin(double max)
        {
-           return new Vector4d(Math.min(this.w,max),Math.min(this.x, max), Math.min(this.y, max), Math.min(this.z, max));
+           return new Vector4d(Math.min(this.x, max), Math.min(this.y, max), Math.min(this.z, max),Math.min(this.w,max));
        }
        public Vector2d GetXY()
        {
@@ -236,7 +236,7 @@ public class Vector4d {
 
        public Vector4d Clone()
        {
-           return new Vector4d(this.w,this.x, this.y, this.z);
+           return new Vector4d(this.x, this.y, this.z, this.w);
        }
 
 
@@ -255,11 +255,11 @@ public class Vector4d {
 
        public Vector4d Subtract(Vector4d toSubtract)
        {
-           return new Vector4d(w-toSubtract.w,x - toSubtract.x,y - toSubtract.y, z - toSubtract.z);
+           return new Vector4d(x - toSubtract.x,y - toSubtract.y, z - toSubtract.z,w-toSubtract.w);
        }
        public Vector4d Negate()
        {
-           return new Vector4d(-w,-x,-y, -z);
+           return new Vector4d(-x,-y, -z,-w);
        }
        public void NegateNoBurn()
        {
@@ -311,7 +311,7 @@ public class Vector4d {
                {
                    return new Vector4d(1, 0, 0,0);//a kludge
                }
-               unitVector= new Vector4d(this.w/m,this.x / m, this.y / m, this.z / m);
+               unitVector= new Vector4d(this.x / m, this.y / m, this.z / m,this.w/m);
            }
            return unitVector;
 
@@ -355,7 +355,7 @@ public class Vector4d {
 
        public Vector4d Abs()
        {
-           return new Vector4d(Math.abs(w),Math.abs(x),Math.abs(y),Math.abs(z));
+           return new Vector4d(Math.abs(x),Math.abs(y),Math.abs(z), Math.abs(w));
        }
 
 
@@ -397,7 +397,7 @@ public class Vector4d {
 
        public static Vector4d Scale(Vector4d one, double two)
        {
-           return new Vector4d(one.w*two,one.x * two, one.y * two, one.z * two);
+           return new Vector4d(one.x * two, one.y * two, one.z * two,one.w*two);
        }
 
 

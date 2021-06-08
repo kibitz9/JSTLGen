@@ -25,6 +25,7 @@ import jstlgen.*;
 public abstract class SoftwareShader {
     
     protected Vector3d iResolution;
+    protected Vector3d iHalfResolution;
     protected Vector4d iMouse;
     
     
@@ -32,13 +33,13 @@ public abstract class SoftwareShader {
     protected int softwareThreads;
     boolean running = false;
     protected java.awt.image.BufferedImage b;
-    protected int width=0;
-    protected int height=0;
-    protected double widthd;
-    protected double heightd;
+    private int width=0;
+    private int height=0;
+    private double widthd;
+    private double heightd;
     
-    protected double halfWidthd;
-    protected double halfHeightd;
+    //protected double halfWidthd;
+    //protected double halfHeightd;
     
     protected java.awt.Graphics2D g;
     protected int[] array;
@@ -46,6 +47,10 @@ public abstract class SoftwareShader {
     protected java.lang.Thread t;
     
     protected double iTime;
+    protected int aaLevel;
+    private double aaLevelSquared;
+    private double aaLevelSquaredInverted;
+    
     
     
     public Vector2d vec2(double x,double y){
@@ -80,9 +85,10 @@ public abstract class SoftwareShader {
         return new Vector5d(point,distance,(double)steps);
     }
     
-    public SoftwareShader(javax.swing.JPanel target, int softwareThreads){
+    public SoftwareShader(javax.swing.JPanel target, int softwareThreads, int aaLevel){
         this.target=target;
         this.softwareThreads=softwareThreads;
+        this.aaLevel = aaLevel;
         
     }
     public void start(){
@@ -104,9 +110,12 @@ public abstract class SoftwareShader {
             this.g = (java.awt.Graphics2D) target.getGraphics();
             this.widthd = (double)width;
             this.heightd = (double)height;
-            this.halfWidthd = widthd/2.0;
-            this.halfHeightd = heightd/2.0;
-            this.iResolution = new Vector3d(widthd,heightd,32);
+            //this.halfWidthd = widthd/2.0;
+            //this.halfHeightd = heightd/2.0;
+            this.iResolution = new Vector3d(widthd*aaLevel,heightd*aaLevel,32);
+            this.iHalfResolution = iResolution.Scale(.5);
+            this.aaLevelSquared = aaLevel*aaLevel;
+            this.aaLevelSquaredInverted = 1/aaLevelSquared;
         }
     }
     public void pause(){
@@ -120,7 +129,7 @@ public abstract class SoftwareShader {
             long millisPerFrame = 1000/60;//30 frames a second
             long startTimeInNanos = System.nanoTime();
             double startTimeInMicros = startTimeInNanos/1000;
-            double startTimeInSeconds = startTimeInMicros/1000000d;
+            //double startTimeInSeconds = startTimeInMicros/1000000d;
             ParallelThread[] ts = new ParallelThread[softwareThreads];
             while(running){
                 long frameStartTime=System.nanoTime();
@@ -135,7 +144,7 @@ public abstract class SoftwareShader {
                 }
                 
                 for (int a=0;a<softwareThreads;a++){
-                    boolean done = false;
+                    //boolean done = false;
                     while (true){
                        
                         try{
@@ -150,7 +159,10 @@ public abstract class SoftwareShader {
                     }
                         
                 }
+                
                 b.setRGB(0,0,width,height,array,0,width);
+                
+               
                 g.drawImage(b,0,0,null);
                 
                 //process();
@@ -182,7 +194,16 @@ public abstract class SoftwareShader {
             
             for (int x=threadNumber;x<width;x+=threadCount){
                 for(int y=0;y<height;y++){
-                    Vector4d pixel = mainImage(new Vector2d(x,y));
+                    //double aaX = x*aaLevel;
+                   // double aaY = y*aaLevel;
+                    Vector4d pixel = new Vector4d(0,0,0,0);
+                    for (double aax = x*aaLevel; aax<x*aaLevel+aaLevel;aax++){
+                        for (double aay = y*aaLevel; aay<y*aaLevel+aaLevel;aay++){
+                            pixel = pixel.Add(mainImage(new Vector2d(aax,aay)));
+                        }
+                    }
+                    pixel=pixel.Scale(aaLevelSquaredInverted);
+                    
                     array[y*scansize + x]=pixel.ToARGBInt();
                 }
             }
