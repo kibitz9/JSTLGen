@@ -63,7 +63,9 @@ public class Vector2d {
 
         }
        
-       
+        public Vector2d Divide(Vector2d other){
+            return new Vector2d(this.x/other.x, this.y/other.y);
+        }
       
 
         private Vector2d unitVector = null;
@@ -100,6 +102,10 @@ public class Vector2d {
             this.y = toCopy.y;
         }
       
+        
+        public Vector3d GetXYX(){
+            return new Vector3d(x,y,x);
+        }
        
 
      

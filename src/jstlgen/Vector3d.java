@@ -141,10 +141,22 @@ public class Vector3d {
             return new Vector2d(x, y);
             
         }
+        public Vector2d GetYX()
+        {
+            
+            return new Vector2d(y, x);
+            
+        }
         public Vector2d GetXZ()
         {
            
             return new Vector2d(x, z);
+       
+        }
+         public Vector2d GetZX()
+        {
+           
+            return new Vector2d(z, x);
        
         }
 
@@ -152,7 +164,29 @@ public class Vector3d {
         {
             return new Vector2d(y, z);
         }
+        public Vector2d GetZY()
+        {
+            return new Vector2d(z, y);
+        }
+        
+        public Vector2d GetXX()
+        {
+            return new Vector2d(x, x);
+        }
+        
+        public Vector2d GetYY()
+        {
+            return new Vector2d(y, y);
+        }
+        
+        public Vector2d GetZZ()
+        {
+            return new Vector2d(z, z);
+        }
 
+        
+        
+        
         public Vector3d ShrinkWrap(SignedDistanceField3d sdf)
         {
             //move towards the origin the distance specified by sdf.
@@ -390,6 +424,10 @@ public class Vector3d {
                 unitVector.NegateNoBurn();
             }
         }
+        
+        public Vector3d Add(double scalar){
+            return new Vector3d(this.x+scalar, this.y+scalar, this.z+scalar);
+        }
         public Vector3d Add(Vector3d toAdd)
         {
             return this.Subtract(toAdd.Negate());
@@ -609,6 +647,10 @@ public class Vector3d {
         }
         public Vector3d Divide(double scalar){
             return Scale(this, 1.0/scalar);
+        }
+        
+        public Vector3d Divide(Vector3d other){
+            return new Vector3d(this.x/other.x, this.y/other.y, this.z/other.z);
         }
         public void ScaleNoBurn(double scalar)
         {

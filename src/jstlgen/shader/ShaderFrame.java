@@ -17,7 +17,8 @@ public class ShaderFrame extends javax.swing.JFrame {
     private SoftwareShader s;
     public ShaderFrame() {
         initComponents();
-        s = new DEShader(this.jPanel1,12);
+        s = new DEShader(this.jPanel1,8);
+        //s = new TestShader(this.jPanel1,4);
         s.start();
     }
 

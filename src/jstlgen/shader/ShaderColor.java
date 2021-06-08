@@ -10,23 +10,23 @@ package jstlgen.shader;
  * @author Christopher.Miller
  */
 public class ShaderColor {
-    public int alpha;
-    public int red;
-    public int green;
-    public int blue;
-    private int ff = 255;
+    public double alpha;
+    public double red;
+    public double green;
+    public double blue;
+    //private int ff = 255;
     private double colorScale = 255;
-    public ShaderColor(int alpha, int red, int green, int blue){
+    public ShaderColor(double alpha, double red, double green, double blue){
         this.red=red;
         this.green=green;
         this.blue=blue;
         this.alpha=alpha;
     }
-    public int ToInt(){
-        int color = (alpha<<24)&0xff000000;
-        color +=(red<<16)&0x00ff0000;
-        color +=(green<<8)&0x0000ff00;
-        color +=(blue)&0x000000ff;
-        return color;
+    private int min(int one, int two){
+        if (one<two){
+            return one;
+        }
+        return two;
     }
+    
 }
