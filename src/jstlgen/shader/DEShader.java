@@ -20,6 +20,16 @@ public class DEShader extends SoftwareShader{
     
     
     
+    
+    
+
+    Vector3d lightSource = new Vector3d(100,100,100);
+    Vector3d lightColor = new Vector3d(.75,.5,1);
+     
+    Vector3d lightSource2 = new Vector3d(-100,100,100);
+    Vector3d lightColor2 = new Vector3d(1,.9,.8);
+     
+    double epsilon = .0000001;
     public DEShader(javax.swing.JPanel target, int softwareThreads, int aaLevel){
         super(target,softwareThreads,aaLevel);
         test = new SDF3dPrimitiveSphere(10);
@@ -31,8 +41,8 @@ public class DEShader extends SoftwareShader{
         test = new SDFOperationSmoothAxisCut(test,SDFOperationSmoothAxisCut.Axis.X,-5,false,2.0);
         //test = new SDFDistortionSin(test,4,.25);
         
-       // test = new SDFOperationRepeatX(test,1,1,9);
-        //test = new SDFOperationRoundEdges(test,1);
+        test = new SDFOperationRepeatX(test,1,1,9);
+        test = new SDFOperationRoundEdges(test,1);
     }
     
     
@@ -46,14 +56,11 @@ public class DEShader extends SoftwareShader{
         y1/=iResolution.x;//we scale according to one axis only
         
         Vector3d ray = new Vector3d(x1,y1,lense.z).Subtract(eye).GetUnitVector();
-        Vector3d lightSource = new Vector3d(100,100,100);
-        Vector3d lightColor = new Vector3d(.75,.5,1);
-        
-        Vector3d lightSource2 = new Vector3d(-100,100,100);
-        Vector3d lightColor2 = new Vector3d(1,.9,.8);
+       
+  
         //lightColor2 = new Vector3d(0,0,0);
-        double epsilon = .0000001;
-        Vector3d point = eye.Clone();
+       
+        Vector3d point = eye;
         
         
         SignedDistanceField3d test2 = new SDFOperationTrigRotateY(test,fract(iTime/10)*3.14159265*2);
