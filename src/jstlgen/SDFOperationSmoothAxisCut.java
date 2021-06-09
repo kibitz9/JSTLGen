@@ -65,4 +65,47 @@ public class SDFOperationSmoothAxisCut extends SignedDistanceField3d{
      {
          return new SDFOperationSmoothAxisCut(toCut.Clone(), axis, offset, clipPositiveSide,k);
      }
+     @Override 
+     public ShaderString toShaderString(String parmValue){
+         String k = ShaderString.nextVariableName("k");
+         String a = ShaderString.nextVariableName("a");
+         String b = ShaderString.nextVariableName("b");
+         String h = ShaderString.nextVariableName("h");
+         String zz = ShaderString.nextVariableName("zz");// 
+         
+         
+         String oneSixthOverk = ShaderString.nextVariableName("z");
+         
+         String temp = parmValue+".x";
+         if (axis == Axis.Y)
+         {
+             temp = parmValue+".y";
+         }
+         else if (axis == Axis.Z)
+         {
+             temp = parmValue+".z";
+         }
+
+         if (!clipPositiveSide)
+         {
+             temp="-"+temp;
+         }
+         temp=temp+"+"+this.offset;
+                 
+         ShaderString toCt = toCut.toShaderString(parmValue);
+         
+         String defines ="\r\n\tfloat "+a+"="+temp+";";
+         defines +="\r\n\tfloat "+b+"="+toCt.code+";";
+         defines += "\r\n\tfloat "+k+"="+this.k+";";
+         defines += "\r\n\tfloat "+h+"=max("+k+"-abs("+a+"-"+b+"),0.0);";
+         defines +="\r\n\tfloat "+zz+"= (1.0 / 6.0) / ("+k+"*"+k+");";
+         String c = "max("+a+","+b+")+"+h+"*"+h+"*"+h+"*"+zz;
+         
+        
+         defines = toCt.defines+defines;
+         return new ShaderString(defines,c);
+         
+         
+         
+     }
 }

@@ -27,6 +27,18 @@ public class SDF3dPrimitiveSphere extends SignedDistanceField3d {
         return new SDF3dPrimitiveSphere(radius);
     }
 
+    @Override
+    public ShaderString toShaderString(String parmValue){
+       
+        String varName2 = ShaderString.nextVariableName("radius");
+        
+        String d = "\r\n\tfloat "+varName2+" ="+radius+";";
+        String c = "length(<parm>)-"+varName2;
+        c=c.replace("<parm>", parmValue);
+        
+        return new ShaderString(d,c);
+        
+    }
   
     
 }

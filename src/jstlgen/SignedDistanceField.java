@@ -105,4 +105,11 @@ public class SignedDistanceField {
         return vect.Abs();
     }
    
+    
+    public ShaderString toShaderString(String parmValue){
+        ShaderString returnValue = new ShaderString("","");
+       
+        return returnValue;
+    }
+    
 }

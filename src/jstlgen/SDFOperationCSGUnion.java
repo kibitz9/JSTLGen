@@ -28,4 +28,14 @@ public class SDFOperationCSGUnion extends SignedDistanceField3d{
     {
         return min(one.GetDistance(translatedp), two.GetDistance(translatedp));
     } 
+    @Override
+    public ShaderString toShaderString(String parmValue){
+        
+        ShaderString o = one.toShaderString(parmValue);
+        ShaderString t = two.toShaderString(parmValue);
+        String d = o.defines+t.defines;
+        String c = "min("+o.code+","+t.code+")";
+        
+        return new ShaderString(d,c);
+    }
 }

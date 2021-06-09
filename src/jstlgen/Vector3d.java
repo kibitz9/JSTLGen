@@ -626,6 +626,9 @@ public class Vector3d {
             return new Vector3d(one.x * two, one.y * two, one.z * two);
         }
 
+        public String toShaderString(){
+            return "vec3("+this.x+","+this.y+","+this.z+")";
+        }
       
         public Vector3d CrossProduct(Vector3d secondVector)
         {

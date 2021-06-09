@@ -34,4 +34,14 @@ public class SDFOperationTranslate extends SignedDistanceField3d{
         {
             return new SDFOperationTranslate(toTranslate.Clone(), negativeTranslation.Negate());
         }
+        @Override
+        public ShaderString toShaderString(String parmValue){
+            String translatedP = ShaderString.nextVariableName("q");
+            String d = "\r\n\tvec3 "+translatedP+"=<parm>+"+negativeTranslation.toShaderString()+";";
+            d=d.replace("<parm>", parmValue);
+            ShaderString ss = toTranslate.toShaderString(translatedP);
+            d+=ss.defines;
+            return new ShaderString(d,ss.code);
+            
+        }
 }

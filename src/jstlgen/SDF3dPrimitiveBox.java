@@ -47,6 +47,21 @@ public class SDF3dPrimitiveBox extends SignedDistanceField3d{
         {
             return new SDF3dPrimitiveBox(this.box);
         }
+        
+        @Override
+        public ShaderString toShaderString(String parmValue){
+            String varName = ShaderString.nextVariableName("box");
+            String varName2 = ShaderString.nextVariableName("q");
+            
+            String d = "\r\n\tvec3 "+varName+"="+box.toShaderString()+";";
+            d+="\r\n\tvec3 "+varName2+"=abs(<parm>)-"+varName+";";
+            
+            
+            String c = "length(max("+varName2+",0.0))+min(max("+varName2+".x,max("+varName2+".y,"+varName2+".z)),0.0)";
+            
+            d=d.replace("<parm>", parmValue);
+            return new ShaderString(d,c);
+        }
 
         //float sdBox(vec3 p, vec3 b)
         //{
