@@ -56,11 +56,15 @@ public class _ShaderStringTest {
         SignedDistanceField3d test8b = new SDFOperationSmoothDifference(test8,test8a,.1);
         SignedDistanceField3d test9 = new SDFOperationTrigRotateY(test8b,.24);
         
-        test = new SDFOperationCSGUnion(test,test5);
-        test = new SDFOperationCSGUnion(test,test7);
-        test =  new SDFOperationCSGUnion(test,test9);
+        test = new SDFOperationSmoothUnion(test,test5,.1);
+        test = new SDFOperationSmoothUnion(test,test7,.1);
+        test =  new SDFOperationSmoothUnion(test,test9,.1);
         
+        SignedDistanceField3d bx1 = new SDF3dPrimitiveBox(new Vector3d(10,1,1));
+        
+        test = new SDFOperationSmoothIntersection(bx1,test,1.4);
         SignedDistanceField3d final1=test;
+        
         
         
         
