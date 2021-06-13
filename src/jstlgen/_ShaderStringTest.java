@@ -34,7 +34,7 @@ public class _ShaderStringTest {
 //        
 //        ShaderString ss = t2.toShaderString("p");
         
-        
+        /*
         SignedDistanceField3d test = new SDF3dPrimitiveSphere(10);
         test = new SDFOperationOnion(test,4);
         test = new SDFOperationOnion(test,1);
@@ -64,10 +64,41 @@ public class _ShaderStringTest {
         
         test = new SDFOperationSmoothIntersection(bx1,test,1.4);
         SignedDistanceField3d final1=test;
+        */
+        /*brainthing
+        SignedDistanceField3d gyr = new SDFDistortionGyroid(.5,.5,0,0);
+        
+        SignedDistanceField3d gyr2 = new SDFDistortionGyroid(.133,.133,0,0);
+        
+        SignedDistanceField3d o1 = new SDFOperationOnion(gyr2,.01);
+        
+        SignedDistanceField3d diff1 = new SDFOperationSmoothDifference(gyr,o1,1);
+        
+       
+        
+        SignedDistanceField3d xx = new SDF3dPrimitiveSphere(5);
+        SignedDistanceField3d xxx = new SDFOperationSmoothIntersection(xx,diff1,1);
+        
+       SignedDistanceField3d xxxx = new SDFOperationUniformScale(xxx,2);
+*/
+        
+        
+        SDF3dPrimitiveBox box = new SDF3dPrimitiveBox(new Vector3d(1000,10,1000));
+        SDFOperationTranslate t = new SDFOperationTranslate(box,new Vector3d(0,-20,0));
+        
+        SDF3dPrimitiveBox box2 = new SDF3dPrimitiveBox(new Vector3d(5,5,5));
+        SDFOperationTranslate t2 = new SDFOperationTranslate(box2,new Vector3d(0,-4,0));
+        
+        SDFOperationRoundEdges round = new SDFOperationRoundEdges(t2,1);
+        
+        SDFOperationCSGUnion u = new SDFOperationCSGUnion(t,round);
         
         
         
-        
+        //SDFOperationTrigRotateX rotx = new SDFOperationTrigRotateX(u,-.2);  
+                
+                
+        SignedDistanceField3d final1 = u;
         ShaderString ss = final1.toShaderString("p");
         //test = new SDFDistortionSin(test,4,.25);
         System.out.println(ss.generateString());

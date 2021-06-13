@@ -44,6 +44,9 @@ public class SignedDistanceField {
     protected static double cos(double angle){
         return Math.cos(angle);
     }
+    protected static Vector3d cos(Vector3d v){
+        return new Vector3d(Math.cos(v.x),Math.cos(v.y), Math.cos(v.z));
+    }
     
     protected static double sign(double number){
         return Math.signum(number);

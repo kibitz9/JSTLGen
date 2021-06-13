@@ -27,4 +27,17 @@ public class SDFOperationRoundEdges extends SignedDistanceField3d{
     {
         return new SDFOperationRoundEdges(toRound.Clone(), amount);
     }
+    
+    @Override 
+    public ShaderString toShaderString(String parmName){
+        String ra = ShaderString.nextVariableName("roundAmnt");
+        String d = "\r\n\tfloat "+ra+"="+this.amount+";";
+        
+        ShaderString xx = toRound.toShaderString(parmName);
+        
+        String c = "("+xx.code+")-"+ra;
+        
+        return new ShaderString(xx.defines+d,c);
+    }
+    
 }

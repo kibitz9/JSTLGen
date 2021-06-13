@@ -184,7 +184,9 @@ public class Vector3d {
             return new Vector2d(z, z);
         }
 
-        
+        public Vector3d GetYZX(){
+            return new Vector3d(y,z,x);
+        }
         
         
         public Vector3d ShrinkWrap(SignedDistanceField3d sdf)
