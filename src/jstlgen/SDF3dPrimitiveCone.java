@@ -25,7 +25,7 @@ public class SDF3dPrimitiveCone extends SignedDistanceField3d {
     @Override
     public double GetRawDistance(Vector3d p){
         //Vector2d q = new Vector2d(sin/cos,-1.0).Scale(height);
-        Vector2d q = new Vector2d(sin,cos).Scale(1/cos);
+        Vector2d q = new Vector2d(sin,cos).Scale(1/cos).Scale(height);
         Vector2d w = new Vector2d(p.GetXZ().GetMagnitude(),p.y);
         double dotwq = w.DotProduct(q);
         double dotqq = q.GetMagnitudeSquared();//same as dot(q,q);
@@ -45,6 +45,34 @@ public class SDF3dPrimitiveCone extends SignedDistanceField3d {
     @Override
     public SignedDistanceField3d Clone() {
         return new SDF3dPrimitiveCone(angleInRadians, height);
+    }
+    
+    @Override
+    public ShaderString toShaderString(String parm){
+        String h = ShaderString.nextVariableName("h");
+        String sc =ShaderString.nextVariableName("sc");
+        String q = ShaderString.nextVariableName("q");
+        String w = ShaderString.nextVariableName("w");
+        String dd = ShaderString.nextVariableName("dd");
+        String a = ShaderString.nextVariableName("a");
+        String b = ShaderString.nextVariableName("b");
+        String k = ShaderString.nextVariableName("k");
+        String d = ShaderString.nextVariableName("d");
+        String s = ShaderString.nextVariableName("s");
+        
+        String ddd = "\r\n\tfloat "+h+"="+height+";";
+        ddd +="\r\n\tfloat "+sc+"="+sin/cos+";";
+        ddd += "\r\n\tvec2 "+q+"="+h+"*vec2("+sc+",-1.0);";//)*1.0/"+cos+";";
+        ddd+="\r\n\tvec2 "+w+"=vec2(length(<parm>.xz),<parm>.y);";
+        ddd+="\r\n\tfloat "+dd+"=dot("+w+","+q+")/dot("+q+","+q+");";
+        ddd+="\r\n\tvec2 "+a+"="+w+"-"+q+"*clamp("+dd+",0.0,1.0);";
+        ddd+="\r\n\tvec2 "+b+"="+w+"-"+q+"*vec2(clamp("+w+".x/"+q+".x,0.0,1.0),1.0);";     
+        ddd+="\r\n\tfloat "+k+"=sign("+q+".y);";
+        ddd+="\r\n\tfloat "+d+"=min(dot("+a+","+a+"),dot("+b+","+b+"));";
+        ddd+="\r\n\tfloat "+s+"=max("+k+"*("+w+".x*"+q+".y-"+w+".y*"+q+".x),"+k+"*("+w+".y-"+q+".y));";
+        String c = "sqrt("+d+")*sign("+s+")";
+        ddd=ddd.replace("<parm>", parm);
+        return new ShaderString(ddd,c);
     }
     
 }

@@ -34,6 +34,12 @@ public class SDF3dPrimitiveCapsule extends SignedDistanceField3d {
         {
             return new SDF3dPrimitiveCapsule(height, radius);
         }
+        @Override
+        public ShaderString toShaderString(String parm){
+            String c = "length(vec3(<parm>.x,<parm>.y-clamp(<parm>.y,0.0,"+this.height+"),<parm>.z))-"+this.radius;
+            c=c.replace("<parm>", parm);
+            return new ShaderString("",c);
+        }
         //float sdVerticalCapsule(vec3 p, float h, float r)
         //{
         //    p.y -= clamp(p.y, 0.0, h);

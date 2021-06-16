@@ -27,4 +27,13 @@ public class SDFOperationCSGIntersection extends SignedDistanceField3d{
     {
         return new SDFOperationCSGIntersection(one.Clone(), two.Clone());
     }
+    @Override
+    public ShaderString toShaderString(String parm){
+        ShaderString ss1 = one.toShaderString(parm);
+        ShaderString ss2 = two.toShaderString(parm);
+        String defines = ss1.defines+ss2.defines;
+        String code = "max("+ss1.code+","+ss2.code+")";
+        return new ShaderString(defines,code);
+    }
+    
 }
