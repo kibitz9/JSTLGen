@@ -46,8 +46,6 @@ public class SDFOperationRepeatX extends SDFOperationRepeat{
 
             double px2 =GetScaledFrac(px, width);
 
-
-           
             double dist1 = toRepeat.GetDistance(new Vector3d(px2, p.y, p.z)); 
             double dist2 = dontrepeatleft ? Double.MAX_VALUE : toRepeat.GetDistance(new Vector3d(px2 + width, p.y, p.z));
             double dist3 = dontrepeatright ? Double.MAX_VALUE : toRepeat.GetDistance(new Vector3d(px2 - width, p.y, p.z));
@@ -55,4 +53,13 @@ public class SDFOperationRepeatX extends SDFOperationRepeat{
             return min(dist1, min(dist2, dist3));
             
         }
+    
+//    @Override
+//    public ShaderString toShaderString(String parm){
+//        String pxV = ShaderString.nextVariableName("px");
+//        String dontrepeatleftV = ShaderString.nextVariableName("dontrepeatleft");
+//        String dontrepeatrightV = ShaderString.nextVariableName("dontrepeatright");
+//        return null;
+//        
+//    }
 }

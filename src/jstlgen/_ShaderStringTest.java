@@ -82,7 +82,7 @@ public class _ShaderStringTest {
        SignedDistanceField3d xxxx = new SDFOperationUniformScale(xxx,2);
 */
         
-        /* box and sphere
+        /* box and sphere */
         SDF3dPrimitiveBox box = new SDF3dPrimitiveBox(new Vector3d(1000,10,1000));
         SDFOperationTranslate t = new SDFOperationTranslate(box,new Vector3d(0,-20,0));
         
@@ -97,7 +97,11 @@ public class _ShaderStringTest {
         
         SDFOperationCSGUnion u = new SDFOperationCSGUnion(t,round);
         SDFOperationCSGUnion u2 = new SDFOperationCSGUnion(u,t3);
-        */
+        
+        SDF3dPrimitiveTorus torus = new SDF3dPrimitiveTorus(6,1);
+        SDFOperationCSGUnion u3 = new SDFOperationCSGUnion(torus,u2);
+        
+        /**/
         
         
         //SDFOperationTrigRotateX rotx = new SDFOperationTrigRotateX(u,-.2);  
@@ -107,16 +111,16 @@ public class _ShaderStringTest {
 
         */
         
-        SignedDistanceField3d cone = new SDF3dPrimitiveCone(3.14159264/4,3);
-        SignedDistanceField3d rot = new SDFOperationTrigRotateX(cone,15.0);
-
-        SignedDistanceField3d sa = new SDF3dPrimitiveSolidAngle(3.14159264/4,3);
-        sa = new SDFOperationTranslate(sa,new Vector3d(3,3,3));
-        SignedDistanceField3d uu = new SDFOperationCSGUnion(sa,rot);
-        
-        uu = new SDFOperationTrigRotateY(uu,1.0);
-        uu = new SDFOperationTrigRotateZ(uu,3.0);
-        SignedDistanceField3d final1 = uu;
+//        SignedDistanceField3d cone = new SDF3dPrimitiveCone(3.14159264/4,3);
+//        SignedDistanceField3d rot = new SDFOperationTrigRotateX(cone,15.0);
+//
+//        SignedDistanceField3d sa = new SDF3dPrimitiveSolidAngle(3.14159264/4,3);
+//        sa = new SDFOperationTranslate(sa,new Vector3d(3,3,3));
+//        SignedDistanceField3d uu = new SDFOperationCSGUnion(sa,rot);
+//        
+//        uu = new SDFOperationTrigRotateY(uu,1.0);
+//        uu = new SDFOperationTrigRotateZ(uu,3.0);
+        SignedDistanceField3d final1 = u3;
         ShaderString ss = final1.toShaderString("p");
         //test = new SDFDistortionSin(test,4,.25);
         System.out.println(ss.generateString());

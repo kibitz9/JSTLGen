@@ -32,9 +32,16 @@ public class SDF3dPrimitiveTorus extends SignedDistanceField3d {
 
     @Override
     public ShaderString toShaderString(String parmValue){
-        String v = "length(vec2(length(<parm>.xz)-"+primaryRadius+",<parm>.y))-"+secondaryRadius;
+        String primaryRadiusV = ShaderString.nextVariableName("primaryRadius");
+        String secondaryRadiusV =ShaderString.nextVariableName("secondaryRadius");
+        String comment = ShaderString.nextVariableName("\r\n\t//Torus");
+        
+        String d = comment;
+        d+="\r\n\tfloat "+primaryRadiusV+"="+this.primaryRadius+";";
+        d+="\r\n\tfloat "+secondaryRadiusV+"="+this.secondaryRadius+";";
+        String v = "length(vec2(length(<parm>.xz)-"+primaryRadiusV+",<parm>.y))-"+secondaryRadiusV;
         v=v.replace("<parm>", parmValue);
-        return new ShaderString("",v);
+        return new ShaderString(d,v);
     }
     
 }

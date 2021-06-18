@@ -33,8 +33,17 @@ public class SDFOperationCSGUnion extends SignedDistanceField3d{
         
         ShaderString o = one.toShaderString(parmValue);
         ShaderString t = two.toShaderString(parmValue);
+        
+        String left = ShaderString.nextVariableName("unionleft");
+        String right = ShaderString.nextVariableName("unionRight");
+        
+        
         String d = o.defines+t.defines;
-        String c = "min("+o.code+","+t.code+")";
+        d+="\r\n\tfloat "+left+"="+o.code+";";
+        d+="\r\n\tfloat "+right+"="+t.code+";";
+        
+        
+        String c = "min("+left+","+right+")";
         
         return new ShaderString(d,c);
     }

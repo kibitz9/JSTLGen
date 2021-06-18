@@ -43,8 +43,9 @@ public class SDF3dPrimitiveSolidAngle extends SignedDistanceField3d{
         String m = ShaderString.nextVariableName("m");
         String sc = ShaderString.nextVariableName("sc");
         String rad = ShaderString.nextVariableName("rad");
-        
-        String d="\r\n\tvec2 "+q+"=vec2(length(<parm>.xz),<parm>.y);";
+        String comment = ShaderString.nextVariableName("\r\n\t//SolidAngle");
+        String d = comment;
+        d+="\r\n\tvec2 "+q+"=vec2(length(<parm>.xz),<parm>.y);";
         d+="\r\n\tvec2 "+sc+"=vec2("+sincos.x+","+sincos.y+");";
         d+="\r\n\tfloat "+rad+"="+radius+";";        
         d+="\r\n\tfloat "+l+"=length("+q+")-"+rad+";";

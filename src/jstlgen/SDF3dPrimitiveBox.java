@@ -52,8 +52,9 @@ public class SDF3dPrimitiveBox extends SignedDistanceField3d{
         public ShaderString toShaderString(String parmValue){
             String varName = ShaderString.nextVariableName("box");
             String varName2 = ShaderString.nextVariableName("q");
-            
-            String d = "\r\n\tvec3 "+varName+"="+box.toShaderString()+";";
+            String comment = ShaderString.nextVariableName("\r\n\t//Box");
+            String d = comment;
+            d+="\r\n\tvec3 "+varName+"="+box.toShaderString()+";";
             d+="\r\n\tvec3 "+varName2+"=abs(<parm>)-"+varName+";";
             
             

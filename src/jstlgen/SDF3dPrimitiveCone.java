@@ -60,7 +60,10 @@ public class SDF3dPrimitiveCone extends SignedDistanceField3d {
         String d = ShaderString.nextVariableName("d");
         String s = ShaderString.nextVariableName("s");
         
-        String ddd = "\r\n\tfloat "+h+"="+height+";";
+        String comment = ShaderString.nextVariableName("\r\n\t//Cone");
+        String ddd = comment;
+        
+        ddd += "\r\n\tfloat "+h+"="+height+";";
         ddd +="\r\n\tfloat "+sc+"="+sin/cos+";";
         ddd += "\r\n\tvec2 "+q+"="+h+"*vec2("+sc+",-1.0);";//)*1.0/"+cos+";";
         ddd+="\r\n\tvec2 "+w+"=vec2(length(<parm>.xz),<parm>.y);";
