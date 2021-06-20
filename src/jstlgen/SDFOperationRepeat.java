@@ -20,7 +20,9 @@ public abstract class SDFOperationRepeat extends SignedDistanceField3d{
     protected double outsideMoveAfter;
     protected SignedDistanceField3d toRepeat;
     
-    SDFOperationRepeat(SignedDistanceField3d toRepeat, double repeatsBefore, double repeatsAfter, double width){
+    protected boolean calcNeighbors = false;
+    
+    SDFOperationRepeat(SignedDistanceField3d toRepeat, double repeatsBefore, double repeatsAfter, double width, boolean calcNeighbors){
         this.repeatsBefore = repeatsBefore;
         this.repeatsAfter = repeatsAfter;
         this.width = width;
@@ -30,6 +32,7 @@ public abstract class SDFOperationRepeat extends SignedDistanceField3d{
         this.boundrymax = width * repeatsAfter + halfWidth;
         this.outsideMoveBefore = width * repeatsBefore;
         this.outsideMoveAfter = -(width * repeatsAfter);
+        this.calcNeighbors=calcNeighbors;
     }
     
     

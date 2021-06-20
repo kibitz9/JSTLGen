@@ -53,7 +53,7 @@ public class SDFOperationTrigRotateZ extends SDFOperationTrigRotate {
         defines=defines.replace("<parm>", parm);
         ShaderString c = toRotate.toShaderString(vectorVar);
         
-        return new ShaderString(defines+c.defines,c.code);
+        return new ShaderString(defines+c.defines,c.code,c.functions);
         
         
                 

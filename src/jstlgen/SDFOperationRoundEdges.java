@@ -37,7 +37,7 @@ public class SDFOperationRoundEdges extends SignedDistanceField3d{
         
         String c = "("+xx.code+")-"+ra;
         
-        return new ShaderString(xx.defines+d,c);
+        return new ShaderString(xx.defines+d,c,xx.functions);
     }
     
 }

@@ -41,7 +41,7 @@ public class DEShader extends SoftwareShader{
         test = new SDFOperationSmoothAxisCut(test,SDFOperationSmoothAxisCut.Axis.X,-5,false,2.0);
         //test = new SDFDistortionSin(test,4,.25);
         
-        test = new SDFOperationRepeatX(test,1,1,9);
+        test = new SDFOperationRepeatX(test,1,1,9,true);
         test = new SDFOperationRoundEdges(test,1);
     }
     

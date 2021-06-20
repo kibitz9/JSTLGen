@@ -38,7 +38,7 @@ public class SDFOperationUniformScale extends SignedDistanceField3d{
         String d = "\r\n\tvec3 "+newVar+"=<parm>/"+scale+";";
         d=d.replace("<parm>", parmValue);
         ShaderString x = toScale.toShaderString(newVar);
-        return new ShaderString(d+x.defines,"("+x.code+")*"+scale);
+        return new ShaderString(d+x.defines,"("+x.code+")*"+scale,x.functions);
     }
     //float opScale(in vec3 p, in float s, in sdf3d primitive)
     //{

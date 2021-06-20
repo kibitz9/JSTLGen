@@ -36,7 +36,7 @@ public class SDFOperationOnion extends SignedDistanceField3d{
         String d = "\r\n\tfloat "+varName1+"="+thickness+";";
         ShaderString sd = toOnion.toShaderString(parmValue);
         String c = "abs("+sd.code+")-"+varName1;
-        return new ShaderString(d+sd.defines,c);
+        return new ShaderString(d+sd.defines,c,sd.functions);
     }
 
 }

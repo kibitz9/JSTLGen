@@ -83,8 +83,7 @@ public class _ShaderStringTest {
 */
         
         /* box and sphere */
-        SDF3dPrimitiveBox box = new SDF3dPrimitiveBox(new Vector3d(1000,10,1000));
-        SDFOperationTranslate t = new SDFOperationTranslate(box,new Vector3d(0,-20,0));
+        
         
         SDF3dPrimitiveBox box2 = new SDF3dPrimitiveBox(new Vector3d(5,5,5));
         SDFOperationTranslate t2 = new SDFOperationTranslate(box2,new Vector3d(0,-4,0));
@@ -95,12 +94,33 @@ public class _ShaderStringTest {
         
         SDFOperationRoundEdges round = new SDFOperationRoundEdges(t2,1);
         
-        SDFOperationCSGUnion u = new SDFOperationCSGUnion(t,round);
-        SDFOperationCSGUnion u2 = new SDFOperationCSGUnion(u,t3);
+        //SDFOperationCSGUnion u = new SDFOperationCSGUnion(t,round);
+        SDFOperationCSGUnion u2 = new SDFOperationCSGUnion(round,t3);
         
-        SDF3dPrimitiveTorus torus = new SDF3dPrimitiveTorus(6,1);
-        SDFOperationCSGUnion u3 = new SDFOperationCSGUnion(torus,u2);
+        SDF3dPrimitiveTorus torus = new SDF3dPrimitiveTorus(7,1);
         
+        SDF3dPrimitiveTorus torus3 = new SDF3dPrimitiveTorus(7,1);
+        SDFOperationTrigRotateX rotx = new SDFOperationTrigRotateX(torus3,Math.PI/2);
+        
+        
+        
+        SDFOperationCSGUnion u3 = new SDFOperationCSGUnion(torus,rotx);
+        SDFOperationCSGUnion u4 = new SDFOperationCSGUnion(u3,u2);
+        
+        
+        SDFOperationRepeatZ repeatZ = new SDFOperationRepeatZ(u4,5,5,25,false);
+        SDFOperationRepeatY repeatY = new SDFOperationRepeatY(repeatZ,5,5,25,false);
+        SDFOperationRepeatX repeatX = new SDFOperationRepeatX(repeatY,5,5,25,false);
+        
+        SDF3dPrimitiveSphere b = new SDF3dPrimitiveSphere(90);
+        SDFOperationCSGUnion u = new SDFOperationCSGUnion(b,repeatX);
+        //SDFOperationRepeatY repeatY = new SDFOperationRepeatY(repeatX,2,2,20);
+        //SDFOperationRepeatZ repeatZ = new SDFOperationRepeatZ(repeatY,2,2,20);
+        
+        //SDF3dPrimitiveBox box = new SDF3dPrimitiveBox(new Vector3d(1000,10,1000));
+        //SDFOperationTranslate t = new SDFOperationTranslate(box,new Vector3d(0,-20,0));
+        //SDFOperationCSGUnion u = new SDFOperationCSGUnion(t,repeatX);
+        //SignedDistanceField3d u = repeatX;
         /**/
         
         
@@ -120,10 +140,11 @@ public class _ShaderStringTest {
 //        
 //        uu = new SDFOperationTrigRotateY(uu,1.0);
 //        uu = new SDFOperationTrigRotateZ(uu,3.0);
-        SignedDistanceField3d final1 = u3;
-        ShaderString ss = final1.toShaderString("p");
+        SignedDistanceField3d final1 = u;
+        String initialVarName = "p";
+        ShaderString ss = final1.toShaderString(initialVarName);
         //test = new SDFDistortionSin(test,4,.25);
-        System.out.println(ss.generateString());
+        System.out.println(ss.generateString("map1",initialVarName));
         
     }
 }

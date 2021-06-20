@@ -59,7 +59,7 @@ public class SDFOperationSmoothIntersection extends SignedDistanceField3d {
          
 
          defines = twoSS.defines+oneSS.defines+defines;
-         return new ShaderString(defines,c);
+         return new ShaderString(defines,c,oneSS.functions+"\r\n"+twoSS.functions);
     }
     
     

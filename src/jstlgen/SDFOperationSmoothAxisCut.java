@@ -103,7 +103,7 @@ public class SDFOperationSmoothAxisCut extends SignedDistanceField3d{
          
         
          defines = toCt.defines+defines;
-         return new ShaderString(defines,c);
+         return new ShaderString(defines,c,toCt.functions);
          
          
          

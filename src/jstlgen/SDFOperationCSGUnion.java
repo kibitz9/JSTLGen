@@ -45,6 +45,6 @@ public class SDFOperationCSGUnion extends SignedDistanceField3d{
         
         String c = "min("+left+","+right+")";
         
-        return new ShaderString(d,c);
+        return new ShaderString(d,c,o.functions+"\r\n"+t.functions);
     }
 }
