@@ -14,6 +14,7 @@ public class SDF3dPrimitiveSolidAngle extends SignedDistanceField3d{
     double radius;
     double sin;
     double cos;
+    //todo this seems double the actual angle
     Vector2d sincos;
     public SDF3dPrimitiveSolidAngle(double angleInRadians, double radiusOfSphericalSection)
     {

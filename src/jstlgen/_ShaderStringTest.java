@@ -84,7 +84,7 @@ public class _ShaderStringTest {
         
         /* box and sphere */
         
-        
+        /*
         SDF3dPrimitiveBox box2 = new SDF3dPrimitiveBox(new Vector3d(5,5,5));
         SDFOperationTranslate t2 = new SDFOperationTranslate(box2,new Vector3d(0,-4,0));
 
@@ -114,6 +114,10 @@ public class _ShaderStringTest {
         
         SDF3dPrimitiveSphere b = new SDF3dPrimitiveSphere(90);
         SDFOperationCSGUnion u = new SDFOperationCSGUnion(b,repeatX);
+        
+        */
+        
+        
         //SDFOperationRepeatY repeatY = new SDFOperationRepeatY(repeatX,2,2,20);
         //SDFOperationRepeatZ repeatZ = new SDFOperationRepeatZ(repeatY,2,2,20);
         
@@ -140,7 +144,11 @@ public class _ShaderStringTest {
 //        
 //        uu = new SDFOperationTrigRotateY(uu,1.0);
 //        uu = new SDFOperationTrigRotateZ(uu,3.0);
-        SignedDistanceField3d final1 = u;
+        
+        SDF3dPrimitiveSolidAngle a = new SDF3dPrimitiveSolidAngle(3.14159/4.0,160);
+        SignedDistanceField3d uu = new SDFOperationTrigRotateZ(a,3.14159265/2.0);
+    
+        SignedDistanceField3d final1 = uu;
         String initialVarName = "p";
         ShaderString ss = final1.toShaderString(initialVarName);
         //test = new SDFDistortionSin(test,4,.25);
