@@ -145,12 +145,22 @@ public class _ShaderStringTest {
 //        uu = new SDFOperationTrigRotateY(uu,1.0);
 //        uu = new SDFOperationTrigRotateZ(uu,3.0);
         
-        SDF3dPrimitiveSolidAngle a = new SDF3dPrimitiveSolidAngle(3.14159/4.0,160);
-        SignedDistanceField3d uu = new SDFOperationTrigRotateZ(a,3.14159265/2.0);
+        SDF3dPrimitiveSolidAngle a = new SDF3dPrimitiveSolidAngle(3.14159/4.0,40);
+        SDF3dPrimitivePlane p = new SDF3dPrimitivePlane(new Vector3d(0.,1.0,0.0),0);
+        SDF3dPrimitivePlane p2 = new SDF3dPrimitivePlane(new Vector3d(1.0,0,0.0),0);
+        SDF3dPrimitivePlane p3 = new SDF3dPrimitivePlane(new Vector3d(0.0,0,1.0),0);
+        SDFOperationSmoothUnion u1 = new SDFOperationSmoothUnion(p,p2,10.);
+        SDFOperationSmoothUnion u2 = new SDFOperationSmoothUnion(u1,p3,10.);
+  
+        //SDFOperationCSGDifference diff = new SDFOperationCSGDifference(p,a);
+        //SignedDistanceField3d uu = new SDFOperationTrigRotateZ(diff,3.14159265/2.0);
     
-        SignedDistanceField3d final1 = uu;
+        SDF3dPrimitiveSphere s = new SDF3dPrimitiveSphere(10);
+        SDFOperationSmoothIntersection i = new SDFOperationSmoothIntersection(u2,s,1.0);
+        SignedDistanceField3d final1 = i;
         String initialVarName = "p";
-        ShaderString ss = final1.toShaderString(initialVarName);
+        ShaderString ss = i.toShaderString(initialVarName);
+        
         //test = new SDFDistortionSin(test,4,.25);
         System.out.println(ss.generateString("map1",initialVarName));
         

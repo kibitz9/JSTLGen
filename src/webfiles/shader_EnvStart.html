@@ -1,0 +1,1126 @@
+<!DOCTYPE HTML> 
+<html> 
+	<head> 
+		<meta charset="utf-8"> 
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<title>Spinny Thing</title> 
+		
+		<style> 
+			html, body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+				width: 100%;
+				height: 100%;
+			}
+			canvas {
+				width: 100%;
+				height: 100%;
+			}
+		</style> 
+	</head> 
+	<body> 
+ 
+		<canvas></canvas>
+		<div id="info"></div> 
+ 
+		<script id="vs" type="x-shader/vertex"> 
+ 
+			attribute vec3 position;
+ 
+			void main() {
+ 
+				gl_Position = vec4( position, 1.0 );
+ 
+			}
+ 
+		</script> 
+ 
+		<script id="fs" type="x-shader/fragment"> 
+ 
+			uniform float iTime;
+			uniform vec2 resolution;
+                        uniform vec3 iResolution;
+                        
+                        float round(in float x){
+                            return floor(x+.5);
+                        }
+                        
+                        vec2 round(in vec2 v){
+                            return vec2(floor(v.x+.5),floor(v.y+.5));
+                        }
+                        //******************************opening tag   ****************//
+                        
+            
+
+const float GLOBAL_EPSILON = .005;
+const vec2 GLOBAL_PN = vec2(1,-1);
+const vec3 GLOBAL_PN_XYY=GLOBAL_PN.xyy;
+const vec3 GLOBAL_PN_YYX=GLOBAL_PN.yyx;
+const vec3 GLOBAL_PN_YXY=GLOBAL_PN.yxy;
+const vec3 GLOBAL_PN_XXX=GLOBAL_PN.xxx;
+
+const vec3 GLOBAL_PN_XYY_EPS=GLOBAL_PN_XYY*GLOBAL_EPSILON;
+const vec3 GLOBAL_PN_YYX_EPS=GLOBAL_PN_YYX*GLOBAL_EPSILON;
+const vec3 GLOBAL_PN_YXY_EPS=GLOBAL_PN_YXY*GLOBAL_EPSILON;
+const vec3 GLOBAL_PN_XXX_EPS=GLOBAL_PN_XXX*GLOBAL_EPSILON;
+
+
+
+float df3(in vec3 p){
+
+	//Torus1
+	float primaryRadius1=7.0;
+	float secondaryRadius1=1.0;
+	float cosTheta1=6.123234E-17;
+	float sinTheta1=1.0;
+	vec3 rot1=vec3(p.x,p.y*cosTheta1+p.z*sinTheta1,p.z*cosTheta1+p.y*-sinTheta1);
+	//Torus2
+	float primaryRadius2=7.0;
+	float secondaryRadius2=1.0;
+	float unionleft1=length(vec2(length(p.xz)-primaryRadius1,p.y))-secondaryRadius1;
+	float unionRight1=length(vec2(length(rot1.xz)-primaryRadius2,rot1.y))-secondaryRadius2;
+	vec3 q1=p+vec3(-0.0,4.0,-0.0);
+	//Box1
+	vec3 box1=vec3(5.0,5.0,5.0);
+	vec3 q2=abs(q1)-box1;
+	float roundAmnt1=1.0;
+	vec3 q3=p+vec3(-0.0,-4.0,-0.0);
+	//Sphere2
+	float radius2 =3.0;
+	float unionleft2=(length(max(q2,0.0))+min(max(q2.x,max(q2.y,q2.z)),0.0))-roundAmnt1;
+	float unionRight2=length(q3)-radius2;
+	float unionleft3=min(unionleft1,unionRight1);
+	float unionRight3=min(unionleft2,unionRight2);
+
+	return min(unionleft3,unionRight3);
+}
+float df2(in vec3 p){
+
+	float boundrymin3=-137.5;
+	float boundrymax3=137.5;
+	float width3=25.0;
+	float pz1=p.z;
+	float outsidemovebefore3=125.0;
+	float outsidemoveafter3=-125.0;
+	float calcbefore3=1.0-max(sign(pz1-boundrymin3),0.0);
+	float calcafter3=1.0-max(sign(boundrymax3-pz1),0.0);
+	float calcoutside3=calcbefore3+calcafter3;
+	float calcinside3=1.0-calcoutside3;
+	float calcleftrep3=max(sign((boundrymin3+width3)-pz1),0.0);
+	float calcrightrep3=max(sign(pz1-(boundrymax3-width3)),0.0);
+	float pz21=calcoutside3*pz1+calcinside3*(pz1-round(pz1/width3)*width3);
+	float result3=df3(vec3(p.x,p.y,pz21+outsidemovebefore3*calcbefore3+outsidemoveafter3*calcafter3));
+
+	return result3;
+}
+float df1(in vec3 p){
+
+	float boundrymin2=-137.5;
+	float boundrymax2=137.5;
+	float width2=25.0;
+	float py1=p.y;
+	float outsidemovebefore2=125.0;
+	float outsidemoveafter2=-125.0;
+	float calcbefore2=1.0-max(sign(py1-boundrymin2),0.0);
+	float calcafter2=1.0-max(sign(boundrymax2-py1),0.0);
+	float calcoutside2=calcbefore2+calcafter2;
+	float calcinside2=1.0-calcoutside2;
+	float calcleftrep2=max(sign((boundrymin2+width2)-py1),0.0);
+	float calcrightrep2=max(sign(py1-(boundrymax2-width2)),0.0);
+	float py21=calcoutside2*py1+calcinside2*(py1-round(py1/width2)*width2);
+	float result2=df2(vec3(p.x,py21+outsidemovebefore2*calcbefore2+outsidemoveafter2*calcafter2,p.z));
+
+	return result2;
+}
+float map1(vec3 p){
+
+	//Sphere1
+	float radius1 =130.0;
+	float boundrymin1=-137.5;
+	float boundrymax1=137.5;
+	float width1=25.0;
+	float px1=p.x;
+	float outsidemovebefore1=125.0;
+	float outsidemoveafter1=-125.0;
+	float calcbefore1=1.0-max(sign(px1-boundrymin1),0.0);
+	float calcafter1=1.0-max(sign(boundrymax1-px1),0.0);
+	float calcoutside1=calcbefore1+calcafter1;
+	float calcinside1=1.0-calcoutside1;
+	float calcleftrep1=max(sign((boundrymin1+width1)-px1),0.0);
+	float calcrightrep1=max(sign(px1-(boundrymax1-width1)),0.0);
+	float px21=calcoutside1*px1+calcinside1*(px1-round(px1/width1)*width1);
+	float result1=df1(vec3(px21+outsidemovebefore1*calcbefore1+outsidemoveafter1*calcafter1,p.y,p.z));
+	float unionleft4=length(p)-radius1;
+	float unionRight4=result1;
+	return min(unionleft4,unionRight4);
+}
+
+
+
+
+
+
+	
+
+float map2(vec3 p){
+
+	float cosTheta1=1.7948966E-9;
+	float sinTheta1=1.0;
+	vec3 rot1=vec3(p.x*cosTheta1+p.y*-sinTheta1,p.y*cosTheta1+p.x*sinTheta1,p.z);
+	//SolidAngle1
+	vec2 q1=vec2(length(rot1.xz),rot1.y);
+	vec2 sc1=vec2(0.7071063120935576,0.7071072502792263);
+	float rad1=160.0;
+	float l1=length(q1)-rad1;
+	float m1=length(q1-(sc1*clamp(dot(q1,sc1),0.0,rad1)));
+	return max(l1,m1*sign(sc1.y*q1.x-sc1.x*q1.y))-20.0;
+}
+
+
+///***********************
+
+
+
+float getDistASpinny(in vec3 q){
+
+    //a simple test object
+    vec3 p = vec3(
+        q.x*cos(iTime/7.0)+q.z*-sin(iTime/7.0),
+        q.y
+        ,q.z*cos(iTime/7.0)+q.x*sin(iTime/7.0)
+        );
+
+    //float s = length(p) - 1.0;
+   // return s;
+	vec3 scale1=p/0.5;
+	float onion1=0.25;
+	float onion2=1.0;
+	float onion3=4.0;
+	float radius1 =10.0;
+	float a2=scale1.x+0.0;
+	float b2=abs(abs(abs(length(scale1)-radius1)-onion3)-onion2)-onion1;
+	float k2=2.0;
+	float h2=max(k2-abs(a2-b2),0.0);
+	float zz2= (1.0 / 6.0) / (k2*k2);
+	float a1=-scale1.x+-5.0;
+	float b1=max(a2,b2)+h2*h2*h2*zz2;
+	float k1=2.0;
+	float h1=max(k1-abs(a1-b1),0.0);
+	float zz1= (1.0 / 6.0) / (k1*k1);
+	float cosTheta1=cos(iTime/2.0);
+	float sinTheta1=sin(iTime/2.0);
+	vec3 rot1=vec3(p.x,p.y*cosTheta1+p.z*sinTheta1,p.z*cosTheta1+p.y*-sinTheta1);
+	vec3 box1=vec3(100.0,0.5,100.0);
+	vec3 q1=abs(rot1)-box1;
+	float a3=-(length(max(q1,0.0))+min(max(q1.x,max(q1.y,q1.z)),0.0));
+	float b3=length(vec2(length(rot1.xz)-10.0,rot1.y))-1.0;
+	float k3=0.1;
+	float h3=max(k3-abs(a3-b3),0.0);
+	float zz3= (1.0 / 6.0) / (k3*k3);
+	float cosTheta2=cos(iTime/3.0);
+	float sinTheta2=sin(iTime/3.0);
+	vec3 rot2=vec3(p.x*cosTheta2+p.y*-sinTheta2,p.y*cosTheta2+p.x*sinTheta2,p.z);
+	float cosTheta3=cos(iTime/10.0);
+	float sinTheta3=sin(iTime/10.0);
+    vec3 rot3=vec3(p.x*cosTheta3+p.z*+sinTheta3,p.y,p.z*cosTheta3+p.x*-sinTheta3);
+	vec3 box2=vec3(100.0,100.0,1.0);
+	vec3 q2=abs(rot3)-box2;
+	float a4=-(length(max(q2,0.0))+min(max(q2.x,max(q2.y,q2.z)),0.0));
+	float b4=length(vec2(length(rot3.xz)-4.0,rot3.y))-0.25;
+	float k4=0.1;
+	float h4=max(k4-abs(a4-b4),0.0);
+	float zz4= (1.0 / 6.0) / (k4*k4);
+	float returnValue= min(min(min((max(a1,b1)+h1*h1*h1*zz1)*0.5,max(a3,b3)+h3*h3*h3*zz3),length(vec2(length(rot2.xz)-8.0,rot2.y))-0.5),max(a4,b4)+h4*h4*h4*zz4);
+    //returnValue = (returnValue)+.125;
+    return returnValue*1.0;
+}
+
+
+float getDistABrainThing(in vec3 q){
+
+    //another simple test object 
+    vec3 p = vec3(
+        q.x*cos(iTime/7.0)+q.z*-sin(iTime/7.0),
+        q.y
+        ,q.z*cos(iTime/7.0)+q.x*sin(iTime/7.0)
+        );
+
+    //float s = length(p) - 1.0;
+   // return s;
+	vec3 scale1=p/2.0;
+	float onion1=0.01;
+	float scaleA2=7.518796992481203;
+	float scaleB2=7.518796992481203;
+	float offsetA2=0.0;
+	float offsetB2=0.0;
+	float scaleA1=2.0;
+	float scaleB1=2.0;
+	float offsetA1=0.0;
+	float offsetB1=0.0;
+	float a2=-(abs(dot(sin(scale1.xyz*scaleA2+offsetA2),cos(scale1.yzx*scaleB2+offsetB2)))-onion1);
+	float b2=dot(sin(scale1.xyz*scaleA1+offsetA1),cos(scale1.yzx*scaleB1+offsetB1));
+	float k2=1.0;
+	float h2=max(k2-abs(a2-b2),0.0);
+	float zz2= (1.0 / 6.0) / (k2*k2);
+	float radius1 =5.0;
+	float a1=(max(a2,b2)+h2*h2*h2*zz2);
+	float b1=length(scale1)-radius1;
+	float k1=1.0;
+	float h1=max(k1-abs(a1-b1),0.0);
+	float zz1= (1.0 / 6.0) / (k1*k1);
+	float returnValue= (max(a1,b1)+h1*h1*h1*zz1)*2.0;
+    return returnValue;
+    //returnValue = (returnValue)+.125;
+    //return returnValue*1.0;
+}
+
+float map(in vec3 q){
+
+    //return 1.0;
+    vec3 p=q;
+
+    float lookDown=.2;
+    p=vec3(p.x,p.y*cos(lookDown)+p.z*-sin(lookDown),p.z*cos(lookDown)+p.y*sin(lookDown));
+
+    float rot = 4.25;
+
+     p =vec3(
+        p.x*cos(iTime/rot)+p.z*-sin(iTime/rot),
+        p.y
+        ,p.z*cos(iTime/rot)+p.x*sin(iTime/rot)
+        );
+
+    p=p+vec3(0.,-2.,0.);
+    
+
+    return map1(p)*1.;
+ }
+    
+    
+
+//float getDist(in vec3 q){
+//    return (map(q)*0.5);
+//}
+
+
+
+//float getDist(in vec3 q, in float addl){
+    //return (getDistA(q)*0.75)+addl;
+//    return map(q);
+//}
+
+//float MAX_STEPS = 80.0;
+float MAX_DIST = 800.0;
+
+
+
+vec3 getSurfaceNormal2(vec3 p, float epsilon){
+
+    float epsilon2 = epsilon/5.0;
+    vec3 xPlus = vec3(p.x+epsilon2,p.y,p.z);
+    vec3 xMinus = vec3(p.x-epsilon2,p.y,p.z);
+    vec3 yPlus = vec3(p.x,p.y+epsilon2,p.z);
+    vec3 yMinus = vec3(p.x,p.y-epsilon2,p.z);
+    vec3 zPlus = vec3(p.x,p.y,p.z+epsilon2);
+    vec3 zMinus = vec3(p.x,p.y,p.z-epsilon2);
+    
+    float slopex = map(xPlus)-map(xMinus);
+    float slopey = map(yPlus)-map(yMinus);
+    float slopez = map(zPlus)-map(zMinus);
+    return normalize(vec3(slopex,slopey,slopez));
+}
+
+
+vec3 getSurfaceNormal( in vec3 p, float epsilon ) // for function f(p)
+{
+    //const float h = 0.0001; // replace by an appropriate value
+    //const vec2 k = vec2(1,-1);
+   // return normalize( k.xyy*map( p + k.xyy*epsilon ) + 
+   //                   k.yyx*map( p + k.yyx*epsilon ) + 
+   //                   k.yxy*map( p + k.yxy*epsilon ) + 
+    //                  k.xxx*map( p + k.xxx*epsilon ) );
+    
+    return normalize(
+        GLOBAL_PN_XYY*map(p+GLOBAL_PN_XYY_EPS) +
+        GLOBAL_PN_YYX*map(p+GLOBAL_PN_YYX_EPS) +
+        GLOBAL_PN_YXY*map(p+GLOBAL_PN_YXY_EPS) +
+        GLOBAL_PN_XXX*map(p+GLOBAL_PN_XXX_EPS) 
+    
+    );
+}
+
+
+void rayMarch(
+    in vec3 origin, 
+    in vec3 ray, 
+    in float epsilon,
+    in float maxSteps,
+    
+    out vec3 marchPoint,//intersection point or off somehwhere in space
+    out float marchPointDist,//distance of the end of our ray from the nearest object
+    out float stepsTaken//how many steps it took to determine what happened.
+
+
+){
+    //raymarcher will always attempt to go the entire distance.
+    //if the distance field is not even, reduce the distance returned
+    //from that field by a resonable percentage to avoid any overstep.
+    
+  
+    
+    stepsTaken = 0.0;
+    marchPoint=origin;
+    float h = map(marchPoint);//calculate initial distance
+    for (float xxxx=0.;xxxx<9999999.;xxxx+=0.){
+    //while (h>epsilon&&stepsTaken++<maxSteps&&h<MAX_DIST){
+        if (h<=epsilon||xxxx>=maxSteps||h>=MAX_DIST){
+            break;
+        //if (!(h>epsilon&&xxxx<maxSteps&&h<MAX_DIST)){
+            break;
+        }
+        marchPoint+=ray*h;       
+        h=map(marchPoint);
+    }   
+    marchPointDist=h;
+}
+
+/*
+void rayMarch(
+    in vec3 origin, 
+    in vec3 ray, 
+    in float epsilon,
+    in float maxSteps,
+    in float addl,
+    
+    out vec3 marchPoint,//intersection point or off somehwhere in space
+    out float marchPointDist,//distance of the end of our ray from the nearest object
+    out float stepsTaken//how many steps it took to determine what happened.
+
+
+){
+    //raymarcher will always attempt to go the entire distance.
+    //if the distance field is not even, reduce the distance returned
+    //from that field by a resonable percentage to avoid any overstep.
+    
+  
+    
+    stepsTaken = 0.0;
+    marchPoint=origin;
+    float h = map(marchPoint);//calculate initial distance
+    for (int xxxx=0;xxxx<9999999;xxxx++){
+    //while (h>epsilon&&stepsTaken++<maxSteps&&h<MAX_DIST){
+        if (!(h>epsilon&&stepsTaken++<maxSteps&&h<MAX_DIST)){
+            break;
+        }
+        stepsTaken++;
+        marchPoint+=ray*h;       
+        h=map(marchPoint);
+    }   
+    marchPointDist=h;
+}
+
+*/
+/*
+float gd(vec3 p, vec3 lightSource, float lightRadius){
+    return length(lightSource-p)-lightRadius;
+}
+vec3 lightFieldNormal(vec3 p, vec3 lightSource, float lightRadius,float epsilon){
+float epsilon2 = epsilon*8.0;//we may be far away!
+   vec3 xp = vec3(p.x+epsilon2,p.y,p.z);
+   vec3 xm = vec3(p.x-epsilon2,p.y,p.z);
+   
+   vec3 yp = vec3(p.x,p.y+epsilon2,p.z);
+   vec3 ym = vec3(p.x,p.y-epsilon2,p.z);
+   
+   vec3 zp = vec3(p.x,p.y,p.z+epsilon2);
+   vec3 zm = vec3(p.x,p.y,p.z-epsilon2);
+   
+   float dx = gd(xp,lightSource,lightRadius)-gd(xm,lightSource,lightRadius);
+   float dy = gd(yp,lightSource,lightRadius)-gd(ym,lightSource,lightRadius);
+   float dz = gd(zp,lightSource,lightRadius)-gd(zm,lightSource,lightRadius);
+   
+   return normalize(vec3(dx,dy,dz));
+   
+   
+}
+*/
+/*
+float softShadowExperimental(vec3 p, vec3 lightSource, float epsilon, float k){
+    
+    float maxSteps = 900.0;
+   
+    vec3 marchPoint;
+    float marchPointDist;
+    float steps;
+    vec3 ray = normalize(lightSource-p);
+    rayMarch(p,ray,epsilon,maxSteps,marchPoint,marchPointDist,steps);
+    if (marchPointDist<=epsilon||steps>=maxSteps){
+        return 0.0;
+    }
+    
+    return max(1.-(max(steps-k*5.,0.)*k/maxSteps),.0);
+  
+}
+
+float softShadowExperimental7(vec3 p, vec3 lightSource, float epsilon, float k){
+    
+    float maxSteps = 900.0;
+   
+    vec3 marchPoint;
+    float marchPointDist;
+    float steps;
+    vec3 ray = normalize(lightSource-p);
+    float addl=-1.5;
+    rayMarch(p,ray,epsilon,maxSteps,0.,marchPoint,marchPointDist,steps);
+    float first;
+    float second;
+    if (marchPointDist<=epsilon||steps>=maxSteps){
+        first=0.0;
+    }
+    else{
+        first=1.;
+    }
+    rayMarch(p,ray,epsilon,maxSteps,-addl,marchPoint,marchPointDist,steps);
+    if (marchPointDist<=epsilon||steps>=maxSteps){
+        second=0.0;
+    }
+    else{
+        second=1.;
+    }
+    //return second;
+    return (first+second)/2.;
+    //return max(1.-(max(steps-k*5.,0.)*k/maxSteps),.0);
+  
+}
+*/
+float softShadowBalanced(vec3 surface, vec3 light, float radius){
+    //surface=surface point
+    //light=light position
+    //radius=light radius (as if it where a radiating sphere) - larger radius creates softer shadows.
+    //based on Inigo Quilez's soft shadow routine, but includes interior distances.
+    //only slighty more expensive.
+    
+    //Think of an inverted cone where the point is at the origin and the circle is at the light, the size
+    //of the circle is the radius of the light source. Part of the cone will be blocked by the object.
+    //We are caclulating how much of it is blocked. The center of the cone may even travel through the object.
+    //but if part of the cone is outside, there will still be light at the point on the object's surface.
+    //because the light source is not a single point.
+    
+   
+      
+    vec3 surfaceToLight = light-surface;
+    float distanceToLight=length(surfaceToLight);
+    vec3 ray =normalize(surfaceToLight);
+    float artifactCompensation = 2.0;//TODO base this off of distance to observer. max about 6 for best but slowest.
+    float minDist = .001;//think about this.
+    
+    float travelled = minDist;
+    float xx=1.0;
+    
+    //while (travelled < distanceToLight){//no need to march beyond the light.
+    for (int xxxx=0;xxxx<9999999;xxxx+=0){
+        if (!(travelled < distanceToLight)){
+            break;
+        }
+        float ratioTravelled=travelled/distanceToLight;
+        
+        //a cone with point at surface and circle at light with radius = light radius...
+        float relativeRadius=ratioTravelled*radius;
+        
+        float dist=map(surface+ray*travelled);
+         
+        if (dist<-relativeRadius){
+            return 0.0;
+        }
+        float relativeDiameter=relativeRadius*2.0;
+        
+        float dist2=dist+relativeRadius;
+        xx = min(xx,dist2/relativeDiameter);
+        // travelled +=max(abs(dist/8.),minDist);
+       
+       
+        
+        //travelled +=max(abs(oneSixthRadius*dist/radius),minDist);
+        travelled +=max(abs(dist/artifactCompensation),minDist);
+        
+        
+    }
+       
+   return xx;
+    
+
+    
+}
+
+/*
+
+float shadow(vec3 p, vec3 lightSource, float epsilon){
+    
+    float maxSteps = 900.0;
+   
+    vec3 marchPoint;
+    float marchPointDist;
+    float steps;
+    vec3 ray = normalize(lightSource-p);
+    rayMarch(p,ray,epsilon,maxSteps,marchPoint,marchPointDist,steps);
+    if (marchPointDist<=epsilon){//||steps>=maxSteps){
+        return 0.0;
+    }
+    
+    return 1.0;
+  
+}
+*/
+vec3 power(vec3 vec, float power){
+    return vec3(pow(vec.x,power),pow(vec.y,power),pow(vec.z,power));
+}
+
+/*
+//https://iquilezles.org/www/articles/rmshadows/rmshadows.htm
+float softshadow( in vec3 ro, in vec3 rd, float mint, float maxt, float k )
+{
+    float res = 1.0;
+    for( float t=mint; t<maxt; )
+    {
+        float h = map(ro + rd*t);
+        if( h<0.001 )
+            return 0.0;
+        res = min( res, k*h/t );
+        t += h;
+    }
+    return res;
+}
+
+*/
+
+void calcLight(
+    in vec3 surfacePoint, 
+    in float shineAtPosition,//look up material first
+    in vec3 lightPosition,
+    in vec3 observationPosition,
+    in vec3 lightColor,
+    in float lightBrightness,
+    in vec3 surfaceNormal,
+    in float epsilon,
+    out vec3 diffuse, 
+    out vec3 specular){
+    
+    //float ambientO=1.0-((stepsTaken/maxSteps)*(stepsTaken/maxSteps));
+     
+    vec3 col0 = lightColor;
+    
+    
+    vec3 surfaceToLight=lightPosition-surfacePoint;
+    vec3 normalToLight=normalize(surfaceToLight);
+    
+    float oneOverDistToLightSquared = lightBrightness/dot(surfaceToLight,surfaceToLight);
+    
+    
+    
+    float dp = dot(normalToLight,surfaceNormal);
+    //float specBlocked = dp<0.5?0.0:1.0;
+    dp=max(dp,0.0);
+    
+    //dp+=1.0;
+    //dp/=2.0;
+    
+    diffuse=dp*lightColor*oneOverDistToLightSquared;
+    
+    
+    vec3 rayToObs=normalize(observationPosition-surfacePoint);
+    vec3 avg = normalize(normalToLight+rayToObs);
+    float spec = dot(avg,surfaceNormal);
+    spec = max(spec,0.0);
+    
+    spec = pow(spec,shineAtPosition);
+    /*
+    spec*=spec;//this is shinyness
+    spec*=spec;//ultimately this needs to become part of the object def not the light.
+    spec*=spec;
+    spec*=spec;
+    spec*=spec;
+    spec*=spec;
+    */
+    specular=lightColor*spec*oneOverDistToLightSquared;//work in shinyness here
+    
+    float shadowAdjust = 1.0;
+    
+    //float s = softShadowExperimental(surfacePoint,lightPosition,epsilon,10.);
+    //float s = softshadow(surfacePoint,normalToLight,1.2,length(surfaceToLight),20.);
+    //float s = softshadow(surfacePoint,normalToLight,1.2,1000.,20.);
+    
+    float s = softShadowBalanced(surfacePoint,lightPosition,50.0);
+    //s=shadow(surfacePoint,lightPosition,epsilon);
+    
+    diffuse*=s*shadowAdjust;
+
+    specular*=s*shadowAdjust;
+    //specular=vec3(0,0,0);
+    
+    
+    
+    
+}
+
+
+void mainImage1( out vec4 fragColor, in vec2 fragCoord )
+{
+
+
+    vec3 eye = vec3(0.0,0.0,-.5);
+    vec3 lense = vec3(0.0,0.0,.5);
+    float xxx = 200.;
+    vec3 cameraPosition = vec3(0.,0.,-(280.+xxx)+sin(iTime/10.)*xxx);
+    float specAmt = 0.0;
+
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 uv = fragCoord/iResolution.xy;
+    float epsilon1 = GLOBAL_EPSILON;//.0005;
+    
+   
+    vec3 objColor=vec3(1,1,1);
+    
+    //vec3 lightPosition1 = vec3(600.0,400.0,-400.0);
+   // vec3 lightColor1 = vec3(0,0,0);
+    
+   // vec3 lightPosition2 = vec3(-400.0,400.0,-400.0);
+   // vec3 lightColor2 = vec3(1.0,.9,.9);
+    
+    
+    vec2 ar = (fragCoord/iResolution.x)
+        -vec2(.5,iResolution.y/(2.0*iResolution.x));
+    vec3 lenseIntersection = vec3(ar,lense.z);
+    
+    vec3 ray = normalize(lenseIntersection-eye);
+   
+    
+    float stepsTaken;
+    vec3 finalPosition;
+    float finalDistance;
+
+    float maxSteps = 4000.0;
+    
+    rayMarch(eye+cameraPosition,ray,epsilon1,maxSteps,finalPosition,finalDistance,stepsTaken);
+    
+    
+    
+    //float dpl1 = dot(normalize(lightPosition1),normal);//inifinite distance light
+    //dpl1+=1.0;
+    //dpl1/=2.0;
+    //float dpl1Spec = dpl1*dpl1*dpl1*dpl1*dpl1*dpl1;
+    //dpl1+=dpl1Spec*specAmt;
+    
+    
+    //float dpl2 = dot(normalize(lightPosition2),normal);//inifinite distance light
+    //dpl2+=1.0;
+    //dpl2/=2.0;
+    //float dpl2Spec = dpl2*dpl2*dpl2*dpl2*dpl2*dpl2;
+    //dpl2+=dpl2Spec*specAmt;
+    
+    float objectShine=7.;
+    
+    
+    vec3 diffuse1;
+    vec3 specular1;
+
+    vec3 diffuse2;
+    vec3 specular2;
+
+    vec3 diffuse3;
+    vec3 specular3;
+
+    vec3 diffuse4;
+    vec3 specular4;
+    if (finalDistance<epsilon1){
+    
+        //we hit something. let's do a bit more work...
+        //back off a slight bit...
+        finalPosition = finalPosition+(ray*epsilon1*-2.0);
+        vec3 normal = getSurfaceNormal(finalPosition,epsilon1);
+        
+       
+        
+        float lightBrightness = 70000.;
+        float specMult = 2.0;
+        
+        calcLight(
+            finalPosition,
+            objectShine,
+            vec3(600.0,800.0,-800.0),//lightposition
+            eye+cameraPosition,//observation position
+            vec3(.5,.5,1)*.5,//light color
+            lightBrightness*20.,//light bright
+            normal,
+            epsilon1,
+            diffuse1,
+            specular1
+        );
+        
+        calcLight(
+            finalPosition,
+            objectShine,
+            vec3(-600.0,300.0,-400.0),//lightposition
+            eye+cameraPosition,//observation position
+            vec3(1,.5,.1)*.5,//light color
+            lightBrightness*10.,//light bright
+            normal,
+            epsilon1,
+            diffuse2,
+            specular2
+        );
+        
+        /*
+        calcLight(
+            finalPosition,
+            objectShine,
+            vec3(130.0,30.0,-40.0),//lightposition
+            eye+cameraPosition,//observation position
+            vec3(.3,.7,.3)*.5,//light color
+            lightBrightness/5.,//light bright
+            normal,
+            epsilon1,
+            diffuse3,
+            specular3
+        );
+        */
+        
+        /*
+        calcLight(
+            finalPosition,
+            objectShine,
+            vec3(0.0,10.0,-5.0),//lightposition
+            eye+cameraPosition,//observation position
+            vec3(1.,.8,.5)*.5,//light color
+            lightBrightness/20000.,//light bright
+            normal,
+            epsilon1,
+            diffuse4,
+            specular4
+        );
+    */
+    
+    
+        vec3 col1=objColor*max(diffuse1,0.0);
+        col1+=specular1*specMult;
+        
+        vec3 col2=objColor*max(diffuse2,0.0);
+        col2+=specular2*specMult;
+        
+        vec3 col3=objColor*max(diffuse3,0.0);
+        col3+=specular3*specMult;
+        
+        vec3 col4=objColor*max(diffuse4,0.0);
+        col4+=specular4*specMult;
+        
+        
+        //col1*=ambientO;                
+        //col1 *=shadow(finalPosition,lightPosition1,epsilon1,8.);
+        
+        //col2*=max(dpl2,0.0);
+        //col2*=ambientO;      
+        
+        //col2 *=shadow(finalPosition,lightPosition2,epsilon1,8.);
+        
+        //col1*=1.0;
+       // col2*=1.0;
+        
+        //vec3 colFinal = min(col1+col2,1.0);
+        vec3 colFinal = min(col1+col2+col3+col4,1.);
+        colFinal=power(colFinal,.9);
+        fragColor = vec4(colFinal,1.0);
+        
+    }
+    else{
+        fragColor = vec4(0,0,0,1.0);
+
+    }
+    
+    
+    
+    //fragColor = vec4(vec3(diffuse1),1.0);
+    
+
+
+    // Time varying pixel color
+    //vec3 col = 0.5 + 0.5*cos(iTime+uv.xyx+vec3(0,2,4));
+
+    // Output to screen
+    
+}
+
+
+void AntiAlias2( out vec4 fragColor, in vec2 fragCoord){
+    vec2 uv = fragCoord/iResolution.xy;
+    
+    vec3 halfPixel = vec3(.5,.5,0.0);
+    vec4 fragColor1;
+    vec4 fragColor2;
+    vec4 fragColor3;
+    vec4 fragColor4;
+    
+    mainImage1(fragColor1,fragCoord+halfPixel.zz);
+    mainImage1(fragColor2,fragCoord+halfPixel.xz);
+    mainImage1(fragColor3,fragCoord+halfPixel.zy);
+    mainImage1(fragColor4,fragCoord+halfPixel.xy);
+    
+    fragColor = fragColor1+fragColor2+fragColor3+fragColor4;
+    fragColor/=4.0;
+    //fragColor = fragColor4;
+    
+}
+
+/*
+void AntiAlias3( out vec4 fragColor, in vec2 fragCoord, float aaLevel){
+    vec2 uv = fragCoord/iResolution.xy;
+    
+    float subPixel = 1.0/aaLevel;
+    vec4 result = vec4(0,0,0,1);
+    for (float x=fragCoord.x;x<fragCoord.x+1.0;x+=subPixel){
+        for (float y=fragCoord.y;y<fragCoord.y+1.0;y+=subPixel){
+            vec4 temp;
+            mainImage1(temp,vec2(x,y));
+            result+=temp;
+        }
+    }
+    
+   
+    
+    
+    fragColor = result/(aaLevel*aaLevel);
+    //agColor/=4.0;
+    //fragColor = fragColor4;
+    
+}
+*/
+void mainImage ( out vec4 fragColor, in vec2 fragCoord){
+    mainImage1(fragColor,fragCoord);
+//AntiAlias2(fragColor, fragCoord);//,1.);
+    //AntiAlias3(fragColor, fragCoord,2.);
+}
+               
+                        
+                        
+                        
+                        //******************************closing   **********************//
+                        
+                        
+                      
+			void main( void ) {
+                            
+				//vec2 position = - 1.0 + 2.0 * gl_FragCoord.xy / resolution.xy;
+				//float red = abs( sin( position.x * position.y + iTime / 5.0 ) );
+				//float green = abs( sin( position.x * position.y + iTime / 4.0 ) );
+				//float blue = abs( sin( position.x * position.y + iTime / 3.0 ) );
+				//gl_FragColor = vec4( red, green, blue, 1.0 );
+                                mainImage(gl_FragColor,gl_FragCoord.xy);
+                                
+			}
+                        
+                   
+ 
+		</script> 
+ 
+		<script> 
+ 
+			/**
+			 * Provides requestAnimationFrame in a cross browser way.
+			 * paulirish.com/2011/requestanimationframe-for-smart-animating/
+			 */
+			window.requestAnimationFrame = window.requestAnimationFrame || ( function() {
+
+				return  window.webkitRequestAnimationFrame ||
+				        window.mozRequestAnimationFrame ||
+				        window.oRequestAnimationFrame ||
+				        window.msRequestAnimationFrame ||
+				        function(  callback, element ) {
+					        window.setTimeout( callback, 1000 / 60 );
+				        };
+
+			})();
+
+ 
+			var canvas, 
+			    gl, 
+			    buffer, 
+			    vertex_shader, fragment_shader, 
+			    currentProgram,
+			    vertex_position,
+			    timeLocation,
+			    resolutionLocation,
+                            iResolutionLocation,
+			    parameters = {  start_time  : new Date().getTime(), 
+			                    iTime        : 0, 
+			                    screenWidth : 0, 
+			                    screenHeight: 0 };
+ 
+			init();
+			animate();
+ 
+			function init() {
+ 
+				vertex_shader = document.getElementById('vs').textContent;
+				fragment_shader = document.getElementById('fs').textContent;
+ 
+
+ 
+				canvas = document.querySelector( 'canvas' );
+
+ 
+				// Initialise WebGL
+ 
+				try {
+ 
+                                        var opts = { 
+                                            alpha: false ,
+                                            depth: false, 
+                                            stencil: false, 
+                                            premultipliedAlpha: false, 
+                                            antialias: false, 
+                                            preserveDrawingBuffer: false, 
+                                            powerPreference: "high-performance",  
+                                       };
+                                        
+					gl = canvas.getContext( "webgl2",opts);
+                                        if( gl === null){
+                                            gl = canvas.getContext( "experimental-webgl2" ,opts);
+                                        }
+                                        if( gl === null){
+                                            gl = canvas.getContext( "webgl",opts );
+                                        }
+                                        if( gl === null){
+                                            gl = canvas.getContext( "experimental-webgl",opts );
+                                        }
+ 
+				} catch( error ) { }
+ 
+				if ( !gl ) {
+ 
+					throw "cannot create webgl context";
+ 
+				}
+ 
+				// Create Vertex buffer (2 triangles)
+ 
+				buffer = gl.createBuffer();
+				gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
+				gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( [ - 1.0, - 1.0, 1.0, - 1.0, - 1.0, 1.0, 1.0, - 1.0, 1.0, 1.0, - 1.0, 1.0 ] ), gl.STATIC_DRAW );
+ 
+				// Create Program
+ 
+				currentProgram = createProgram( vertex_shader, fragment_shader );
+
+				timeLocation = gl.getUniformLocation( currentProgram, 'iTime' );
+				resolutionLocation = gl.getUniformLocation( currentProgram, 'resolution' );
+                                iResolutionLocation = gl.getUniformLocation(currentProgram, 'iResolution' );
+ 
+			}
+ 
+			function createProgram( vertex, fragment ) {
+ 
+				var program = gl.createProgram();
+ 
+				var vs = createShader( vertex, gl.VERTEX_SHADER );
+				var fs = createShader( '#ifdef GL_ES\nprecision highp float;\n#endif\n\n' + fragment, gl.FRAGMENT_SHADER );
+ 
+				if ( vs == null || fs == null ) return null;
+ 
+				gl.attachShader( program, vs );
+				gl.attachShader( program, fs );
+ 
+				gl.deleteShader( vs );
+				gl.deleteShader( fs );
+ 
+				gl.linkProgram( program );
+ 
+				if ( !gl.getProgramParameter( program, gl.LINK_STATUS ) ) {
+ 
+					alert( "ERROR:\n" +
+					"VALIDATE_STATUS: " + gl.getProgramParameter( program, gl.VALIDATE_STATUS ) + "\n" +
+					"ERROR: " + gl.getError() + "\n\n" +
+					"- Vertex Shader -\n" + vertex + "\n\n" +
+					"- Fragment Shader -\n" + fragment );
+ 
+					return null;
+ 
+				}
+ 
+				return program;
+ 
+			}
+ 
+			function createShader( src, type ) {
+ 
+				var shader = gl.createShader( type );
+ 
+				gl.shaderSource( shader, src );
+				gl.compileShader( shader );
+ 
+				if ( !gl.getShaderParameter( shader, gl.COMPILE_STATUS ) ) {
+ 
+					alert( ( type == gl.VERTEX_SHADER ? "VERTEX" : "FRAGMENT" ) + " SHADER:\n" + gl.getShaderInfoLog( shader ) );
+					return null;
+ 
+				}
+ 
+				return shader;
+ 
+			}
+ 
+			function resizeCanvas( event ) {
+ 
+				if ( canvas.width != canvas.clientWidth ||
+					 canvas.height != canvas.clientHeight ) {
+
+					canvas.width = canvas.clientWidth;
+					canvas.height = canvas.clientHeight;
+
+					parameters.screenWidth = canvas.width;
+					parameters.screenHeight = canvas.height;
+
+					gl.viewport( 0, 0, canvas.width, canvas.height );
+
+				}
+ 
+			}
+ 
+			function animate() {
+ 
+				resizeCanvas();
+				render();
+				requestAnimationFrame( animate );
+ 
+			}
+ 
+			function render() {
+ 
+				if ( !currentProgram ) return;
+ 
+				parameters.iTime = new Date().getTime() - parameters.start_time;
+ 
+				gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
+ 
+				// Load program into GPU
+ 
+				gl.useProgram( currentProgram );
+ 
+				// Set values to program variables
+ 
+				gl.uniform1f( timeLocation, parameters.iTime / 1000 );
+				gl.uniform2f( resolutionLocation, parameters.screenWidth, parameters.screenHeight );
+                                gl.uniform3f( iResolutionLocation, parameters.screenWidth, parameters.screenHeight, 32. );
+ 
+				// Render geometry
+ 
+				gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
+				gl.vertexAttribPointer( vertex_position, 2, gl.FLOAT, false, 0, 0 );
+				gl.enableVertexAttribArray( vertex_position );
+				gl.drawArrays( gl.TRIANGLES, 0, 6 );
+				gl.disableVertexAttribArray( vertex_position );
+ 
+			}
+ 
+		</script> 
+ 
+	</body> 
+</html>
