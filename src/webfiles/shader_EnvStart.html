@@ -37,7 +37,13 @@
 		</script> 
  
 		<script id="fs" type="x-shader/fragment"> 
- 
+                        #version 300 es
+                        #ifdef GL_ES
+                            precision highp float;
+                            precision highp int;
+                            precision mediump sampler3D;
+                        #endif
+                        
 			uniform float iTime;
                         uniform vec4 iMouse;
 			uniform vec2 resolution;

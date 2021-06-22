@@ -3,7 +3,7 @@
 	<head> 
 		<meta charset="utf-8"> 
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-		<title>WebGL Boilerplate</title> 
+		<title>Shader Template</title> 
 		
 		<style> 
 			html, body {
@@ -56,7 +56,9 @@
                         #endif
                         
                         //shadertoy compatible items.
+                        #define HW_PERFORMANCE 0//TODO do something with this
 			uniform float iTime;
+                        uniform int iFrame;
                         uniform vec4 iMouse;
 			uniform vec2 resolution;
                         uniform vec3 iResolution;
@@ -252,6 +254,7 @@
 				currentProgram = createProgram( vertex_shader_source, fragment_shader_source, vertex_header_source, fragment_header_source,vertex_footer_source,fragment_footer_source );
 
 				timeLocation = gl.getUniformLocation( currentProgram, 'iTime' );
+                                frameLocation = gl.getUniformLocation( currentProgram, 'iFrame' );
 				resolutionLocation = gl.getUniformLocation( currentProgram, 'resolution' );
                                 iResolutionLocation = gl.getUniformLocation(currentProgram, 'iResolution' );
                                 iMouseLocation = gl.getUniformLocation(currentProgram,'iMouse');
@@ -337,7 +340,7 @@
 				requestAnimationFrame( animate );
  
 			}
- var xxx = 0;
+                        
 			function render() {
  
 				if ( !currentProgram ) 
@@ -350,7 +353,7 @@
                                 window.mouseevents.mMousePosY=window.mouseevents.mMousePosY||0;
                                 window.mouseevents.mMouseOriX=window.mouseevents.mMouseOriX||0;
                                 window.mouseevents.mMouseOriY=window.mouseevents.mMouseOriY||0;
-                               
+                                window.frameCounter = window.frameCounter||1;
                                
                                 let mouse = [  window.mouseevents.mMousePosX, window.mouseevents.mMousePosY, window.mouseevents.mMouseOriX, window.mouseevents.mMouseOriY ];
                                  
@@ -366,6 +369,7 @@
 				// Set values to program variables
  
 				gl.uniform1f( timeLocation, parameters.iTime / 1000 );
+                                gl.uniform1i( frameLocation, window.frameCounter++);
 				gl.uniform2f( resolutionLocation, parameters.screenWidth, parameters.screenHeight );
                                 gl.uniform3f( iResolutionLocation, parameters.screenWidth, parameters.screenHeight, 32. );
                                 gl.uniform4f( iMouseLocation, window.mouseevents.mMousePosX, window.mouseevents.mMousePosY,window.mouseevents.mMouseOriX, window.mouseevents.mMouseOriY);
