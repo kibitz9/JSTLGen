@@ -39,6 +39,7 @@
 		<script id="fs" type="x-shader/fragment"> 
  
 			uniform float iTime;
+                        uniform vec4 iMouse;
 			uniform vec2 resolution;
                         uniform vec3 iResolution;
                         
@@ -894,8 +895,8 @@ void AntiAlias3( out vec4 fragColor, in vec2 fragCoord, float aaLevel){
 }
 */
 void mainImage ( out vec4 fragColor, in vec2 fragCoord){
-    mainImage1(fragColor,fragCoord);
-//AntiAlias2(fragColor, fragCoord);//,1.);
+    //mainImage1(fragColor,fragCoord);
+AntiAlias2(fragColor, fragCoord);//,1.);
     //AntiAlias3(fragColor, fragCoord,2.);
 }
                
