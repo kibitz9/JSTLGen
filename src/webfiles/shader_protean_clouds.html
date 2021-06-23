@@ -1,0 +1,514 @@
+<!DOCTYPE HTML> 
+<html> 
+	<head> 
+		<meta charset="utf-8"> 
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<title>Shader Template</title> 
+		
+		<style> 
+			html, body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+				width: 100%;
+				height: 100%;
+			}
+			canvas {
+				width: 100%;
+				height: 100%;
+			}
+		</style> 
+	</head> 
+	<body> 
+ 
+		<canvas></canvas>
+		<div id="info"></div> 
+ 
+               
+                
+                 <script id="vsHeader" type="x-shader/vertex">#version 300 es
+                        #ifdef GL_ES
+                            precision highp float;
+                            precision highp int;
+                            precision mediump sampler3D;
+                        #endif
+ 
+		</script> 
+                
+                <script id="vs" type="x-shader/vertex">
+                        layout(location = 0) in vec2 pos;
+			void main() {
+ 
+				gl_Position = vec4( pos.xy,0.0, 1.0 );
+                                
+			}
+		</script> 
+                <script id="vsFooter" type="x-shader/vertex">
+                        //nop
+		</script> 
+                
+                
+                <script id="fsHeader" type="x-shader/fragment">#version 300 es
+                        #ifdef GL_ES
+                            precision highp float;
+                            precision highp int;
+                            precision mediump sampler3D;
+                        #endif
+                        
+                        //shadertoy compatible items.
+                        #define HW_PERFORMANCE 0//TODO do something with this
+			uniform float iTime;
+                        uniform int iFrame;
+                        uniform vec4 iMouse;
+			uniform vec2 resolution;
+                        uniform vec3 iResolution;
+                        
+                     
+                        
+		</script> 
+                
+
+		<script id="fs" type="x-shader/fragment"> 
+                
+                       
+                        //******************************opening tag   ****************//
+                        //******************************opening tag   ****************//
+              
+                    // Protean clouds by nimitz (twitter: @stormoid)
+// https://www.shadertoy.com/view/3l23Rh
+// License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
+// Contact the author for other licensing options
+
+/*
+	Technical details:
+
+	The main volume noise is generated from a deformed periodic grid, which can produce
+	a large range of noise-like patterns at very cheap evalutation cost. Allowing for multiple
+	fetches of volume gradient computation for improved lighting.
+
+	To further accelerate marching, since the volume is smooth, more than half the the density
+	information isn't used to rendering or shading but only as an underlying volume	distance to 
+	determine dynamic step size, by carefully selecting an equation	(polynomial for speed) to 
+	step as a function of overall density (not necessarialy rendered) the visual results can be 
+	the	same as a naive implementation with ~40% increase in rendering performance.
+
+	Since the dynamic marching step size is even less uniform due to steps not being rendered at all
+	the fog is evaluated as the difference of the fog integral at each rendered step.
+
+*/
+
+mat2 rot(in float a){float c = cos(a), s = sin(a);return mat2(c,s,-s,c);}
+const mat3 m3 = mat3(0.33338, 0.56034, -0.71817, -0.87887, 0.32651, -0.15323, 0.15162, 0.69596, 0.61339)*1.93;
+float mag2(vec2 p){return dot(p,p);}
+float linstep(in float mn, in float mx, in float x){ return clamp((x - mn)/(mx - mn), 0., 1.); }
+float prm1 = 0.;
+vec2 bsMo = vec2(0);
+
+vec2 disp(float t){ return vec2(sin(t*0.22)*1., cos(t*0.175)*1.)*2.; }
+
+vec2 map(vec3 p)
+{
+    vec3 p2 = p;
+    p2.xy -= disp(p.z).xy;
+    p.xy *= rot(sin(p.z+iTime)*(0.1 + prm1*0.05) + iTime*0.09);
+    float cl = mag2(p2.xy);
+    float d = 0.;
+    p *= .61;
+    float z = 1.;
+    float trk = 1.;
+    float dspAmp = 0.1 + prm1*0.2;
+    for(int i = 0; i < 5; i++)
+    {
+		p += sin(p.zxy*0.75*trk + iTime*trk*.8)*dspAmp;
+        d -= abs(dot(cos(p), sin(p.yzx))*z);
+        z *= 0.57;
+        trk *= 1.4;
+        p = p*m3;
+    }
+    d = abs(d + prm1*3.)+ prm1*.3 - 2.5 + bsMo.y;
+    return vec2(d + cl*.2 + 0.25, cl);
+}
+
+vec4 render( in vec3 ro, in vec3 rd, float time )
+{
+	vec4 rez = vec4(0);
+    const float ldst = 8.;
+	vec3 lpos = vec3(disp(time + ldst)*0.5, time + ldst);
+	float t = 1.5;
+	float fogT = 0.;
+	for(int i=0; i<130; i++)
+	{
+		if(rez.a > 0.99)break;
+
+		vec3 pos = ro + t*rd;
+        vec2 mpv = map(pos);
+		float den = clamp(mpv.x-0.3,0.,1.)*1.12;
+		float dn = clamp((mpv.x + 2.),0.,3.);
+        
+		vec4 col = vec4(0);
+        if (mpv.x > 0.6)
+        {
+        
+            col = vec4(sin(vec3(5.,0.4,0.2) + mpv.y*0.1 +sin(pos.z*0.4)*0.5 + 1.8)*0.5 + 0.5,0.08);
+            col *= den*den*den;
+			col.rgb *= linstep(4.,-2.5, mpv.x)*2.3;
+            float dif =  clamp((den - map(pos+.8).x)/9., 0.001, 1. );
+            dif += clamp((den - map(pos+.35).x)/2.5, 0.001, 1. );
+            col.xyz *= den*(vec3(0.005,.045,.075) + 1.5*vec3(0.033,0.07,0.03)*dif);
+        }
+		
+		float fogC = exp(t*0.2 - 2.2);
+		col.rgba += vec4(0.06,0.11,0.11, 0.1)*clamp(fogC-fogT, 0., 1.);
+		fogT = fogC;
+		rez = rez + col*(1. - rez.a);
+		t += clamp(0.5 - dn*dn*.05, 0.09, 0.3);
+	}
+	return clamp(rez, 0.0, 1.0);
+}
+
+float getsat(vec3 c)
+{
+    float mi = min(min(c.x, c.y), c.z);
+    float ma = max(max(c.x, c.y), c.z);
+    return (ma - mi)/(ma+ 1e-7);
+}
+
+//from my "Will it blend" shader (https://www.shadertoy.com/view/lsdGzN)
+vec3 iLerp(in vec3 a, in vec3 b, in float x)
+{
+    vec3 ic = mix(a, b, x) + vec3(1e-6,0.,0.);
+    float sd = abs(getsat(ic) - mix(getsat(a), getsat(b), x));
+    vec3 dir = normalize(vec3(2.*ic.x - ic.y - ic.z, 2.*ic.y - ic.x - ic.z, 2.*ic.z - ic.y - ic.x));
+    float lgt = dot(vec3(1.0), ic);
+    float ff = dot(dir, normalize(ic));
+    ic += 1.5*dir*sd*ff*lgt;
+    return clamp(ic,0.,1.);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{	
+	vec2 q = fragCoord.xy/iResolution.xy;
+    vec2 p = (gl_FragCoord.xy - 0.5*iResolution.xy)/iResolution.y;
+    bsMo = (iMouse.xy - 0.5*iResolution.xy)/iResolution.y;
+    
+    float time = iTime*3.;
+    vec3 ro = vec3(0,0,time);
+    
+    ro += vec3(sin(iTime)*0.5,sin(iTime*1.)*0.,0);
+        
+    float dspAmp = .85;
+    ro.xy += disp(ro.z)*dspAmp;
+    float tgtDst = 3.5;
+    
+    vec3 target = normalize(ro - vec3(disp(time + tgtDst)*dspAmp, time + tgtDst));
+    ro.x -= bsMo.x*2.;
+    vec3 rightdir = normalize(cross(target, vec3(0,1,0)));
+    vec3 updir = normalize(cross(rightdir, target));
+    rightdir = normalize(cross(updir, target));
+	vec3 rd=normalize((p.x*rightdir + p.y*updir)*1. - target);
+    rd.xy *= rot(-disp(time + 3.5).x*0.2 + bsMo.x);
+    prm1 = smoothstep(-0.4, 0.4,sin(iTime*0.3));
+	vec4 scn = render(ro, rd, time);
+		
+    vec3 col = scn.rgb;
+    col = iLerp(col.bgr, col.rgb, clamp(1.-prm1,0.05,1.));
+    
+    col = pow(col, vec3(.55,0.65,0.6))*vec3(1.,.97,.9);
+
+    col *= pow( 16.0*q.x*q.y*(1.0-q.x)*(1.0-q.y), 0.12)*0.7+0.3; //Vign
+    
+	fragColor = vec4( col, 1.0 );
+}
+                        
+                   
+                        //******************************closing   **********************//
+                        //******************************closing   **********************//
+                        
+                       
+                        
+                        
+                   
+ 
+		</script> 
+ 
+                <script id="fsFooter" type="x-shader/fragment">
+                        out vec4 outColor;
+			void main() {
+                                vec4 tempColor = vec4(0.0,0.0,0.0,1.0);
+                                mainImage(tempColor,gl_FragCoord.xy);
+                                outColor = max(tempColor,vec4(0.0,0.0,0.0,1.0));
+                                outColor = min(tempColor,vec4(1.0,1.0,1.0,1.0));
+			}
+		</script> 
+                
+                
+                
+		<script> 
+ 
+			/**
+			 * Provides requestAnimationFrame in a cross browser way.
+			 * paulirish.com/2011/requestanimationframe-for-smart-animating/
+			 */
+			window.requestAnimationFrame = window.requestAnimationFrame || ( function() {
+
+				return  window.webkitRequestAnimationFrame ||
+				        window.mozRequestAnimationFrame ||
+				        window.oRequestAnimationFrame ||
+				        window.msRequestAnimationFrame ||
+				        function(  callback, element ) {
+					        window.setTimeout( callback, 1000 / 60 );
+				        };
+
+			})();
+
+ 
+			var 
+                            
+                            canvas, 
+			    gl, 
+			    buffer, 
+			    vertex_shader, fragment_shader, 
+			    currentProgram,
+			    vertex_position,
+			    timeLocation,
+			    resolutionLocation,
+                            iResolutionLocation,
+                            iMouseLocation,
+			    parameters = {  start_time  : new Date().getTime(), 
+			                    iTime        : 0, 
+			                    screenWidth : 0, 
+			                    screenHeight: 0 };
+                        window.mouseevents = window.mouseevents ||  function(){};
+			init();
+			animate();
+                        
+                        function addMouseEvents(cv){
+                          
+                            //shadertoy compatible mouse events.
+                            
+                            mouseevents.canvas = cv;
+                        
+                            mouseevents.canvas.onmousedown = function(ev)
+                            {
+                                var rect = mouseevents.canvas.getBoundingClientRect();
+                                mouseevents.mMouseOriX = Math.floor((ev.clientX-rect.left)/(rect.right-rect.left)*mouseevents.canvas.width);
+                                mouseevents.mMouseOriY = Math.floor(mouseevents.canvas.height - (ev.clientY-rect.top)/(rect.bottom-rect.top)*mouseevents.canvas.height);
+                                mouseevents.mMousePosX = mouseevents.mMouseOriX;
+                                mouseevents.mMousePosY = mouseevents.mMouseOriY;
+                                mouseevents.mMouseIsDown = true;
+                                        mouseevents.mMouseSignalDown = true;
+                                        //window.alert(mouseevents.mMouseOriX);
+                                        //window.alert(window.mouseevents.mMouseOriX);
+                                        //window.alert(Math.floor((ev.clientX-rect.left)/(rect.right-rect.left)*mouseevents.canvas.width));
+                                
+                            }
+                             
+                            mouseevents.canvas.onmousemove = function(ev)
+                            {
+                                if( mouseevents.mMouseIsDown )
+                                {
+                                    var rect = mouseevents.canvas.getBoundingClientRect();
+                                    mouseevents.mMousePosX = Math.floor((ev.clientX-rect.left)/(rect.right-rect.left)*mouseevents.canvas.width);
+                                    mouseevents.mMousePosY = Math.floor(mouseevents.canvas.height - (ev.clientY-rect.top)/(rect.bottom-rect.top)*mouseevents.canvas.height);
+                                   //window.alert(mouseevents.mMousePosX);
+                                }
+                            }
+
+                            mouseevents.canvas.onmouseup = function(ev)
+                            {
+                                mouseevents.mMouseIsDown = false;
+                                if( mouseevents.mIsPaused ) mouseevents.mForceFrame = true;
+                            }
+                            /*
+                            */
+                        }
+			function init() {
+ 
+                                vertex_header_source = document.getElementById('vsHeader').textContent;
+                                fragment_header_source=document.getElementById('fsHeader').textContent;
+				vertex_shader_source = document.getElementById('vs').textContent;
+				fragment_shader_source = document.getElementById('fs').textContent;
+                                vertex_footer_source = document.getElementById('vsFooter').textContent;
+                                fragment_footer_source = document.getElementById('fsFooter').textContent;
+ 
+				canvas = document.querySelector( 'canvas' );
+                                
+                                
+                                addMouseEvents(canvas);
+                                
+ 
+				// Initialise WebGL
+ 
+				try {
+ 
+                                        var opts = { alpha: false ,
+                                        depth: false, 
+                                        stencil: false, 
+                                        premultipliedAlpha: false, 
+                                        antialias: false, 
+                                        preserveDrawingBuffer: false, 
+                                        powerPreference: "high-performance",  // "low_power", "high_performance", "default"
+                                       };
+                                        
+					gl = canvas.getContext( "webgl2",opts);
+                                        if( gl === null) gl = canvas.getContext( "experimental-webgl2" );
+                                        if( gl === null) gl = canvas.getContext( "webgl",opts );
+                                        if( gl === null) gl = canvas.getContext( "experimental-webgl",opts );
+ 
+				} catch( error ) { }
+ 
+				if ( !gl ) {
+ 
+					throw "cannot create webgl context";
+ 
+				}
+ 
+                                
+                                
+				// Create Vertex buffer (2 triangles)
+ 
+				buffer = gl.createBuffer();
+				gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
+				gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( [ - 1.0, - 1.0, 1.0, - 1.0, - 1.0, 1.0, 1.0, - 1.0, 1.0, 1.0, - 1.0, 1.0 ] ), gl.STATIC_DRAW );
+ 
+                               
+                                
+                                
+				currentProgram = createProgram( vertex_shader_source, fragment_shader_source, vertex_header_source, fragment_header_source,vertex_footer_source,fragment_footer_source );
+
+				timeLocation = gl.getUniformLocation( currentProgram, 'iTime' );
+                                frameLocation = gl.getUniformLocation( currentProgram, 'iFrame' );
+				resolutionLocation = gl.getUniformLocation( currentProgram, 'resolution' );
+                                iResolutionLocation = gl.getUniformLocation(currentProgram, 'iResolution' );
+                                iMouseLocation = gl.getUniformLocation(currentProgram,'iMouse');
+                                
+                                
+                                
+ 
+			}
+ 
+			function createProgram( vertex, fragment, vertexheader, fragmentheader, vertexfooter, fragmentfooter ) {
+ 
+				var program = gl.createProgram();
+ 
+				 
+                                var vs = createShader( vertexheader+"\r\n"+vertex+"\r\n"+vertexfooter, gl.VERTEX_SHADER);
+                                var fs = createShader( fragmentheader+"\r\n"+fragment+"\r\n"+fragmentfooter, gl.FRAGMENT_SHADER);
+                                
+				if ( vs == null || fs == null ) return null;
+ 
+				gl.attachShader( program, vs );
+				gl.attachShader( program, fs );
+ 
+				gl.deleteShader( vs );
+				gl.deleteShader( fs );
+ 
+				gl.linkProgram( program );
+ 
+				if ( !gl.getProgramParameter( program, gl.LINK_STATUS ) ) {
+ 
+					alert( "ERROR:\n" +
+					"VALIDATE_STATUS: " + gl.getProgramParameter( program, gl.VALIDATE_STATUS ) + "\n" +
+					"ERROR: " + gl.getError() + "\n\n" +
+					"- Vertex Shader -\n" + vertex + "\n\n" +
+					"- Fragment Shader -\n" + fragment );
+ 
+					return null;
+ 
+				}
+ 
+				return program;
+ 
+			}
+ 
+			function createShader( src, type ) {
+ 
+				var shader = gl.createShader( type );
+ 
+				gl.shaderSource( shader, src );
+				gl.compileShader( shader );
+ 
+				if ( !gl.getShaderParameter( shader, gl.COMPILE_STATUS ) ) {
+ 
+					alert( ( type == gl.VERTEX_SHADER ? "VERTEX" : "FRAGMENT" ) + " SHADER:\n" + gl.getShaderInfoLog( shader ) );
+					return null;
+ 
+				}
+ 
+				return shader;
+ 
+			}
+ 
+			function resizeCanvas( event ) {
+ 
+				if ( canvas.width != canvas.clientWidth ||
+					 canvas.height != canvas.clientHeight ) {
+
+					canvas.width = canvas.clientWidth;
+					canvas.height = canvas.clientHeight;
+
+					parameters.screenWidth = canvas.width;
+					parameters.screenHeight = canvas.height;
+
+					gl.viewport( 0, 0, canvas.width, canvas.height );
+
+				}
+ 
+			}
+ 
+			function animate() {
+ 
+				resizeCanvas();
+				render();
+				requestAnimationFrame( animate );
+ 
+			}
+                        
+			function render() {
+ 
+				if ( !currentProgram ) 
+                                {
+                                    return;
+                                }
+                              
+                                
+                                window.mouseevents.mMousePosX=window.mouseevents.mMousePosX||0;
+                                window.mouseevents.mMousePosY=window.mouseevents.mMousePosY||0;
+                                window.mouseevents.mMouseOriX=window.mouseevents.mMouseOriX||0;
+                                window.mouseevents.mMouseOriY=window.mouseevents.mMouseOriY||0;
+                                window.frameCounter = window.frameCounter||1;
+                               
+                                let mouse = [  window.mouseevents.mMousePosX, window.mouseevents.mMousePosY, window.mouseevents.mMouseOriX, window.mouseevents.mMouseOriY ];
+                                 
+
+				parameters.iTime = new Date().getTime() - parameters.start_time;
+ 
+				gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
+ 
+				// Load program into GPU
+ 
+				gl.useProgram( currentProgram );
+ 
+				// Set values to program variables
+ 
+				gl.uniform1f( timeLocation, parameters.iTime / 1000 );
+                                gl.uniform1i( frameLocation, window.frameCounter++);
+				gl.uniform2f( resolutionLocation, parameters.screenWidth, parameters.screenHeight );
+                                gl.uniform3f( iResolutionLocation, parameters.screenWidth, parameters.screenHeight, 32. );
+                                gl.uniform4f( iMouseLocation, window.mouseevents.mMousePosX, window.mouseevents.mMousePosY,window.mouseevents.mMouseOriX, window.mouseevents.mMouseOriY);
+                                
+                                
+				// Render geometry
+ 
+				gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
+				gl.vertexAttribPointer( vertex_position, 2, gl.FLOAT, false, 0, 0 );
+				gl.enableVertexAttribArray( vertex_position );
+				gl.drawArrays( gl.TRIANGLES, 0, 6 );
+				gl.disableVertexAttribArray( vertex_position );
+ 
+			}
+ 
+		</script> 
+ 
+	</body> 
+</html>
