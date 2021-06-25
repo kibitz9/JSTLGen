@@ -157,12 +157,27 @@ public class _ShaderStringTest {
     
         SDF3dPrimitiveSphere s = new SDF3dPrimitiveSphere(10);
         SDFOperationSmoothIntersection i = new SDFOperationSmoothIntersection(u2,s,1.0);
-        SignedDistanceField3d final1 = i;
+        double smooth = 5.;
+        
+        SDF3dPrimitiveInfiniteSpokesZAxis is = new SDF3dPrimitiveInfiniteSpokesZAxis(70,5.,31);
+        SDF3dPrimitiveInfiniteSpokesZAxis is2 = new SDF3dPrimitiveInfiniteSpokesZAxis(74,2.5,49);
+        SDF3dPrimitiveInfiniteSpokesZAxis is3 = new SDF3dPrimitiveInfiniteSpokesZAxis(78,1.25,67);
+        SDF3dPrimitiveInfiniteSpokesZAxis is4 = new SDF3dPrimitiveInfiniteSpokesZAxis(80,.625,101);
+        SDFOperationSmoothUnion u7 = new SDFOperationSmoothUnion(is,is2,is3,is4,smooth);
+        
+        
+        SDF3dPrimitiveSphere sss = new SDF3dPrimitiveSphere(180);
+        SDFOperationSmoothIntersection iii = new SDFOperationSmoothIntersection(u7,sss,smooth);
+        SDFOperationSmoothDifference uuu = new SDFOperationSmoothDifference(iii,new SDF3dPrimitiveSphere(175),smooth);
+        
+        SignedDistanceField3d final1 = uuu;
+        
+        
         String initialVarName = "p";
-        ShaderString ss = i.toShaderString(initialVarName);
+        ShaderString ss = final1.toShaderString(initialVarName);
         
         //test = new SDFDistortionSin(test,4,.25);
-        System.out.println(ss.generateString("map1",initialVarName));
+        System.out.println(ss.generateString("map7",initialVarName));
         
     }
 }

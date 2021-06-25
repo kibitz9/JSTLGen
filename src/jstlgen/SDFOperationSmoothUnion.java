@@ -21,6 +21,65 @@ public class SDFOperationSmoothUnion extends SignedDistanceField3d{
         this.k = k;
         this.oneSixthOverK = (1.0 / 6.0) / (k*k);
     }
+    
+    public SDFOperationSmoothUnion(SignedDistanceField3d one, SignedDistanceField3d two, SignedDistanceField3d three,double k){
+        this.one = one;
+        this.two = new SDFOperationSmoothUnion(two,three,k);
+        this.k = k;
+        this.oneSixthOverK = (1.0 / 6.0) / (k*k);
+    }
+    public SDFOperationSmoothUnion(SignedDistanceField3d one, SignedDistanceField3d two, SignedDistanceField3d three,SignedDistanceField3d four,double k){
+        this.one = new SDFOperationSmoothUnion(one,two,k);
+        this.two = new SDFOperationSmoothUnion(three,four,k);
+        this.k = k;
+        this.oneSixthOverK = (1.0 / 6.0) / (k*k);
+    }
+    public SDFOperationSmoothUnion(SignedDistanceField3d one, SignedDistanceField3d two, SignedDistanceField3d three,SignedDistanceField3d four
+        ,SignedDistanceField3d five,double k){
+        this.one = new SDFOperationSmoothUnion(one,two,k);
+        this.two = new SDFOperationSmoothUnion(three,new SDFOperationSmoothUnion(four,five,k),k);
+        this.k = k;
+        this.oneSixthOverK = (1.0 / 6.0) / (k*k);
+    }
+    public SDFOperationSmoothUnion(
+            SignedDistanceField3d one, SignedDistanceField3d two
+            ,SignedDistanceField3d three,SignedDistanceField3d four
+            ,SignedDistanceField3d five, SignedDistanceField3d six,double k){
+        
+        this.one = new SDFOperationSmoothUnion(one,new SDFOperationSmoothUnion(two,three,k),k);
+        this.two = new SDFOperationSmoothUnion(four,new SDFOperationSmoothUnion(five,six,k),k);
+        this.k = k;
+        this.oneSixthOverK = (1.0 / 6.0) / (k*k);
+    }
+    public SDFOperationSmoothUnion(
+            SignedDistanceField3d one, SignedDistanceField3d two
+            ,SignedDistanceField3d three,SignedDistanceField3d four
+            ,SignedDistanceField3d five, SignedDistanceField3d six
+            ,SignedDistanceField3d seven,double k){
+        this.one = new SDFOperationSmoothUnion(new SDFOperationSmoothUnion(one,two,k),new SDFOperationSmoothUnion(three,four,k),k);
+        this.two = new SDFOperationSmoothUnion(new SDFOperationSmoothUnion(five,six,k),seven,k);
+        this.k = k;
+        this.oneSixthOverK = (1.0 / 6.0) / (k*k);
+    }
+    public SDFOperationSmoothUnion(
+            SignedDistanceField3d one, SignedDistanceField3d two
+            ,SignedDistanceField3d three,SignedDistanceField3d four
+            ,SignedDistanceField3d five, SignedDistanceField3d six
+            ,SignedDistanceField3d seven, SignedDistanceField3d eight,double k){
+        this.one = new SDFOperationSmoothUnion(new SDFOperationSmoothUnion(one,two,k),new SDFOperationSmoothUnion(three,four,k),k);
+        this.two = new SDFOperationSmoothUnion(new SDFOperationSmoothUnion(five,six,k),new SDFOperationSmoothUnion(seven,eight,k),k);
+        this.k = k;
+        this.oneSixthOverK = (1.0 / 6.0) / (k*k);
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
     @Override
     public double GetRawDistance(Vector3d translatedp)
     {
