@@ -135,7 +135,7 @@ public class SDFOperationRepeatZ extends SDFOperationRepeat {
        
         //d = d+ distA1.defines+distB1.defines+distC1.defines;
         d=d.replace("<parm>", parm);
-        return new ShaderString(d,c,ss.functions+"\r\n"+f);
+        return new ShaderString(d,c,ss.constantsAndFunctions+"\r\n"+f);
 //       double dist1 = toRepeat.GetDistance(new Vector3d(px2, p.y, p.z)); 
 //            double dist2 = dontrepeatleft ? Double.MAX_VALUE : toRepeat.GetDistance(new Vector3d(px2 + width, p.y, p.z));
 //            double dist3 = dontrepeatright ? Double.MAX_VALUE : toRepeat.GetDistance(new Vector3d(px2 - width, p.y, p.z));

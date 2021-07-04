@@ -61,6 +61,10 @@ public class SignedDistanceField {
         }
         return value;
     }
+    
+    protected static Vector3d clamp(Vector3d v, double min, double max){
+        return new Vector3d(clamp(v.x,min,max),clamp(v.y,min,max),clamp(v.z,min,max));
+    }
     protected static double min(double val1, double val2){
         if (val1<val2){
             return val1;

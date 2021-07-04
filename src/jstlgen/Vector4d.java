@@ -397,7 +397,7 @@ public class Vector4d {
 
        public static Vector4d Scale(Vector4d one, double two)
        {
-           return new Vector4d(one.x * two, one.y * two, one.z * two,one.w*two);
+           return new Vector4d(one.x * two, one.y * two, one.z * two, one.w*two);
        }
 
 

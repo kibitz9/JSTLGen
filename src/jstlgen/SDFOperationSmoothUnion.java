@@ -118,6 +118,6 @@ public class SDFOperationSmoothUnion extends SignedDistanceField3d{
          
 
          defines = twoSS.defines+oneSS.defines+defines;
-         return new ShaderString(defines,c,oneSS.functions+"\r\n"+twoSS.functions);
+         return new ShaderString(defines,c,oneSS.constantsAndFunctions+"\r\n"+twoSS.constantsAndFunctions);
     }
 }

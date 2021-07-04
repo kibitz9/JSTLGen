@@ -24,8 +24,37 @@ public abstract class SDFOperationTrigRotate extends SignedDistanceField3d {
             this.negativeSinTheta = -this.sinTheta;//store negative so we don't always have to invert
             this.cosTheta = cos(radians);
         }
+        
+        public SDFOperationTrigRotate(SignedDistanceField3d toRotate, String rotationExpression)
+        {
+            this.toRotate = toRotate;
+            this.radians = 0.;
+            this.sinTheta = sin(radians);
+            this.negativeSinTheta = -this.sinTheta;//store negative so we don't always have to invert
+            this.cosTheta = cos(radians);
+            this.overrideExpression = rotationExpression;
+        }
 
-
+        protected String overrideExpression = null;
+        public String GetCosRotationExpression(){
+            if (overrideExpression==null){
+                return ""+((float)(this.cosTheta));
+            }
+            else{
+                return "cos("+overrideExpression+")";
+            }
+        }
+        
+        protected String overrideSinExpression = null;
+        public String GetSinRotationExpression(){
+            if (overrideExpression==null){
+                return ""+((float)(this.sinTheta));
+            }
+            else{
+                return "sin("+overrideExpression+")";
+            }
+        }
+        
         @Override
         public abstract double GetRawDistance(Vector3d translatedp);
         //{

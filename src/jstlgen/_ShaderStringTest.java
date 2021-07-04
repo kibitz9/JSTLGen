@@ -145,6 +145,8 @@ public class _ShaderStringTest {
 //        uu = new SDFOperationTrigRotateY(uu,1.0);
 //        uu = new SDFOperationTrigRotateZ(uu,3.0);
         
+
+/*
         SDF3dPrimitiveSolidAngle a = new SDF3dPrimitiveSolidAngle(3.14159/4.0,40);
         SDF3dPrimitivePlane p = new SDF3dPrimitivePlane(new Vector3d(0.,1.0,0.0),0);
         SDF3dPrimitivePlane p2 = new SDF3dPrimitivePlane(new Vector3d(1.0,0,0.0),0);
@@ -169,10 +171,76 @@ public class _ShaderStringTest {
         SDF3dPrimitiveSphere sss = new SDF3dPrimitiveSphere(180);
         SDFOperationSmoothIntersection iii = new SDFOperationSmoothIntersection(u7,sss,smooth);
         SDFOperationSmoothDifference uuu = new SDFOperationSmoothDifference(iii,new SDF3dPrimitiveSphere(175),smooth);
+      */
+      /* -- a cool ball */
+      
+        SignedDistanceField3d mb = new SDF3dPrimitiveMandelbox(10,-2.5,.5,1);
+        //SignedDistanceField3d mb2 = new SDF3dPrimitiveMandelbox(10,-2,.5,1);
         
-        SignedDistanceField3d final1 = uuu;
+        //mb2=new SDFOperationUniformScale(mb2,3.1);
+        mb=new SDFOperationUniformScale(mb,.75);
+        
+        mb=new SDFOperationTrigRotateX(mb,3.14159265/4.);
+        
+        double divs = 20;
+        mb = new SDFOperationSectorDuplicateZAxis(mb,divs);
+        mb = new SDFOperationSectorDuplicateYAxis(mb,divs);
+        mb = new SDFOperationSectorDuplicateZAxis(mb,divs);
+        //mb = new SDFOperationSectorDuplicateZAxis(mb,divs);
+       
+        //mb = new SDFOperationTrigRotateX(mb,3.14159265/4);
+        //mb2=new SDF3dPrimitiveSphere(3);
+        
+        //mb = new SDFOperationBoundingBox(mb,4);
+        mb=new SDFOperationBoundingSphere(mb,2.,.0001);
+        
+        SignedDistanceField3d sphere2 = new SDF3dPrimitiveSphere(1.9);
+        mb=new SDFOperationCSGUnion(mb,sphere2);
+        
+        mb=new SDFOperationUniformScale(mb,.3);
+        
+        mb= new SDFOperationTrigRotateY(mb,"iTime/5.");
+        //SignedDistanceField3d sph = new SDF3dPrimitiveSphere(3);
+        //sph=new SDFOperationTranslate(sph,new Vector3d(0,0,.1)); 
+        //mb = new SDFOperationCSGDifference(mb,sph);
+        //SDFOperationCSGIntersection i = new SDFOperationCSGIntersection(mb,mb2);
+        
+        mb = new SDFOperationTranslate(mb,new Vector3d(-1.5,0,0));
+      
+      
+        SignedDistanceField3d mb2 = new SDF3dPrimitiveMandelbox(10,-2.5,.5,1);
+        //mb2=new SDFOperationRoundEdges(mb2,.01);
         
         
+        SignedDistanceField3d box = new SDF3dPrimitiveBox(new Vector3d(.95,.95,.95));
+        SignedDistanceField3d surface = new SDFOperationSurfaceDetailOnion(box,mb2,.1);
+        
+        
+        surface = new SDFOperationUniformScale(surface,.5);
+        surface= new SDFOperationTrigRotateY(surface,"-iTime/5.");
+        
+        
+        SignedDistanceField3d ts = new SDF3dPrimitiveTorus(.55,.2);
+        SignedDistanceField3d mb3 = new SDF3dPrimitiveMandelbox(10,-2.9,.5,1);
+        
+        mb3 = new SDFOperationUniformScale(mb3,.7);
+        
+        ts = new SDFOperationSurfaceDetailOnion(ts,mb3,.05);
+        //ts = new SDFOperationCSGIntersection(mb3,ts);
+        
+        
+        ts = new SDFOperationSectorDuplicateYAxis(ts,12);
+        
+        ts=new SDFOperationTrigRotateX(ts,3.14159265/4.);
+        
+        ts=new SDFOperationTrigRotateY(ts,"iTime/5.");
+        ts = new SDFOperationTranslate(ts,new Vector3d(1.5,0,0));
+        
+        SignedDistanceField3d u1 = new SDFOperationCSGUnion(ts,surface);
+        
+        SignedDistanceField3d final1 = new SDFOperationCSGUnion(u1,mb);
+       
+        //SignedDistanceField3d final1 = mb2;
         String initialVarName = "p";
         ShaderString ss = final1.toShaderString(initialVarName);
         

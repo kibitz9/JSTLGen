@@ -16,11 +16,13 @@ public class ShaderString {
     
     public String defines;
     public String code;
-    public String functions="";
+    public String constantsAndFunctions="";
     
     public static int varCounter = 0;
     
     public static List<NameValue> globals = new ArrayList<NameValue>();
+    public static List<NameValue> globalFunctions = new ArrayList<NameValue>();
+    
     public static List<NameValue> oneups = new ArrayList<NameValue>();
     
     
@@ -48,7 +50,7 @@ public class ShaderString {
      public ShaderString(String defines, String code, String functions){
         this.defines=defines;
         this.code=code;
-        this.functions=functions;
+        this.constantsAndFunctions=functions;
     }
     
     
@@ -67,6 +69,12 @@ public class ShaderString {
             globals.add(new NameValue(name,value));
         }
     }
+    public static void AddGlobalFunction(String name, String value){
+        boolean found = find(globalFunctions,name)!=null;
+        if (!found){
+            globalFunctions.add(new NameValue(name,value));
+        }
+    }
     
     
     public String generateString(){
@@ -81,9 +89,15 @@ public class ShaderString {
         String returnString = "";
         for (int a=0;a<globals.size();a++){
             NameValue temp = globals.get(a);
-            returnString+="\r\n\t"+temp.getName()+"="+temp.getValue()+";";
+            returnString+="\r\n"+temp.getName()+"="+temp.getValue()+";";
         }
-        returnString+="\r\n\t"+functions+"\r\n";
+        
+        for (int a=0;a<globalFunctions.size();a++){
+            NameValue temp = globalFunctions.get(a);
+            returnString+="\r\n"+temp.getValue();
+        }
+        
+        returnString+="\r\n\t"+constantsAndFunctions+"\r\n";
         returnString+="float "+functionName+"(vec3 p){\r\n";
         returnString+=defines+"\r\n\treturn "+code+";";
         returnString+="\r\n}\r\n";

@@ -1,0 +1,470 @@
+<!DOCTYPE HTML> 
+<html> 
+	<head> 
+		<meta charset="utf-8"> 
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<title>Shader Template</title> 
+		
+		<style> 
+			html, body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+				width: 100%;
+				height: 100%;
+			}
+			canvas {
+				width: 100%;
+				height: 100%;
+			}
+		</style> 
+	</head> 
+	<body> 
+ 
+		<canvas></canvas>
+		<div id="info"></div> 
+ 
+               
+                
+                 <script id="vsHeader" type="x-shader/vertex">#version 300 es
+                        #ifdef GL_ES
+                            precision highp float;
+                            precision highp int;
+                            precision mediump sampler3D;
+                        #endif
+ 
+		</script> 
+                
+                <script id="vs" type="x-shader/vertex">
+                        layout(location = 0) in vec2 pos;
+			void main() {
+ 
+				gl_Position = vec4( pos.xy,0.0, 1.0 );
+                                
+			}
+		</script> 
+                <script id="vsFooter" type="x-shader/vertex">
+                        //nop
+		</script> 
+                
+                
+                <script id="fsHeader" type="x-shader/fragment">#version 300 es
+                        #ifdef GL_ES
+                            precision highp float;
+                            precision highp int;
+                            precision mediump sampler3D;
+                        #endif
+                        
+                        //shadertoy compatible items.
+                        #define HW_PERFORMANCE 0//TODO do something with this
+			uniform float iTime;
+                        uniform int iFrame;
+                        uniform vec4 iMouse;
+			uniform vec2 resolution;
+                        uniform vec3 iResolution;
+                        
+                     
+                        
+		</script> 
+                
+
+		<script id="fs" type="x-shader/fragment"> 
+                
+                       
+                        //******************************opening tag   ****************//
+                        //******************************opening tag   ****************//
+              
+                        
+                // Inspired by: https://twitter.com/jagarikin/status/1329610899976437765
+
+#define PI			3.14159265358979
+#define REPEAT		0.3
+#define HEIGHT		2.2
+#define THICKNESS	0.025
+#define COLOR_SPEED	0.04
+#define COLOR_DELAY	4.0
+#define OUTLINE		2.0
+#define DELTA		0.0001
+
+vec4 color (in float t) {
+	return vec4 (vec3 (abs (2.0 * fract (t * COLOR_SPEED) - 1.0)), 1.0);
+}
+
+float segDist (in vec2 p, in vec2 a, in vec2 b) {
+	p -= a;
+	b -= a;
+	return length (p - b * clamp (dot (p, b) / dot (b, b), 0.0, 1.0));
+}
+
+float charDist (in vec2 p, in float jump) {
+	p.y -= 0.25;
+	float d = length (p - vec2 (0.0, 0.1)) - 0.04;
+	d = min (d, segDist (p, vec2 (0.0, 0.1), vec2 (-0.02, -0.1)));
+	if (jump < 0.5) {
+		d = min (d, segDist (p, vec2 (-0.02, -0.1), vec2 (0.04, -0.15)));
+		d = min (d, segDist (p, vec2 (0.04, -0.15), vec2 (0.08, -0.22)));
+		d = min (d, segDist (p, vec2 (-0.02, -0.1), vec2 (-0.05, -0.16)));
+		d = min (d, segDist (p, vec2 (-0.05, -0.16), vec2 (-0.1, -0.2)));
+		d = min (d, segDist (p, vec2 (0.0, 0.04), vec2 (0.06, -0.03)));
+		d = min (d, segDist (p, vec2 (0.06, -0.03), vec2 (0.1, -0.05)));
+		d = min (d, segDist (p, vec2 (0.0, 0.04), vec2 (-0.08, -0.01)));
+		d = min (d, segDist (p, vec2 (-0.08, -0.01), vec2 (-0.09, -0.05)));
+	} else {
+		d = min (d, segDist (p, vec2 (-0.02, -0.1), vec2 (0.06, -0.1)));
+		d = min (d, segDist (p, vec2 (0.06, -0.1), vec2 (0.04, -0.2)));
+		d = min (d, segDist (p, vec2 (-0.02, -0.1), vec2 (-0.02, -0.18)));
+		d = min (d, segDist (p, vec2 (-0.02, -0.18), vec2 (-0.06, -0.24)));
+		d = min (d, segDist (p, vec2 (0.0, 0.04), vec2 (0.07, 0.15)));
+		d = min (d, segDist (p, vec2 (0.0, 0.04), vec2 (0.05, 0.02)));
+		d = min (d, segDist (p, vec2 (0.05, 0.02), vec2 (0.11, 0.06)));
+	}
+	return d - THICKNESS;
+}
+
+float charY (in float x) {
+	x = floor (x / REPEAT) * REPEAT;
+	return max (0.0, HEIGHT - mix (-x, x * x * 0.8, step (0.0, x)));
+}
+
+float frameDist (in vec2 p) {
+
+	// Vertical position of the character
+	float dy = charY (p.x);
+
+	// Distance to the stairs
+	float d = p.y;
+	if (p.x < -REPEAT * 0.5) {
+		float dx = ceil ((p.y - HEIGHT) / REPEAT) * REPEAT;
+		vec2 q = vec2 (dx - p.x, p.y - dy);
+		d = min (d, max (min (q.x, q.y), min (max (q.x, q.y), 0.0)));
+	}
+
+	// Check whether the character is in the air
+	float jump = step (-REPEAT, p.x) * step (DELTA, dy);
+
+	// Distance to the character
+	p.x = (fract (p.x / (2.0 * REPEAT)) - 0.75) * REPEAT * 2.0;
+	p.y -= dy;
+	return min (d, charDist (p, jump));
+}
+
+void mainImage (out vec4 fragColor, in vec2 p) {
+
+	// Normalization of the fragment coordinates
+	p = (2.0 * p - iResolution.xy) / iResolution.y;
+	p = 1.6 * p - vec2 (0.15, -1.2);
+
+	float halfPixel = 0.5 * dFdy (p.y);
+
+	// Background color
+	fragColor = vec4 (vec3 (0.5), 1.0);
+
+	// Display
+	vec4 c = color (float (iFrame));
+	float d = frameDist (p);
+	fragColor = mix (fragColor, c, smoothstep (halfPixel, -halfPixel, d));
+
+	if (iMouse.z < 0.5) {
+		vec2 n = normalize (vec2 (frameDist (p - vec2 (DELTA, 0.0)), frameDist (p - vec2 (0.0, DELTA))) - d);
+		vec2 v = normalize (vec2 (REPEAT, (charY (p.x) - charY (p.x - REPEAT)))) * step (2.0 * halfPixel * OUTLINE, p.y);
+		float f = dot (n, v);
+
+		c = color (float (iFrame) + COLOR_DELAY * sign (f));
+		d = abs (d - halfPixel * OUTLINE) - halfPixel * OUTLINE;
+		fragColor = mix (fragColor, c, abs (f) * smoothstep (halfPixel, -halfPixel, d));
+	}
+}
+                        
+                        
+                   
+                        //******************************closing   **********************//
+                        //******************************closing   **********************//
+                        
+                       
+                        
+                        
+                   
+ 
+		</script> 
+ 
+                <script id="fsFooter" type="x-shader/fragment">
+                        out vec4 outColor;
+			void main() {
+                                vec4 tempColor = vec4(0.0,0.0,0.0,1.0);
+                                mainImage(tempColor,gl_FragCoord.xy);
+                                outColor = max(tempColor,vec4(0.0,0.0,0.0,1.0));
+                                outColor = min(tempColor,vec4(1.0,1.0,1.0,1.0));
+			}
+		</script> 
+                
+                
+                
+		<script> 
+ 
+			/**
+			 * Provides requestAnimationFrame in a cross browser way.
+			 * paulirish.com/2011/requestanimationframe-for-smart-animating/
+			 */
+			window.requestAnimationFrame = window.requestAnimationFrame || ( function() {
+
+				return  window.webkitRequestAnimationFrame ||
+				        window.mozRequestAnimationFrame ||
+				        window.oRequestAnimationFrame ||
+				        window.msRequestAnimationFrame ||
+				        function(  callback, element ) {
+					        window.setTimeout( callback, 1000 / 60 );
+				        };
+
+			})();
+
+ 
+			var 
+                            
+                            canvas, 
+			    gl, 
+			    buffer, 
+			    vertex_shader, fragment_shader, 
+			    currentProgram,
+			    vertex_position,
+			    timeLocation,
+			    resolutionLocation,
+                            iResolutionLocation,
+                            iMouseLocation,
+			    parameters = {  start_time  : new Date().getTime(), 
+			                    iTime        : 0, 
+			                    screenWidth : 0, 
+			                    screenHeight: 0 };
+                        window.mouseevents = window.mouseevents ||  function(){};
+			init();
+			animate();
+                        
+                        function addMouseEvents(cv){
+                          
+                            //shadertoy compatible mouse events.
+                            
+                            mouseevents.canvas = cv;
+                        
+                            mouseevents.canvas.onmousedown = function(ev)
+                            {
+                                var rect = mouseevents.canvas.getBoundingClientRect();
+                                mouseevents.mMouseOriX = Math.floor((ev.clientX-rect.left)/(rect.right-rect.left)*mouseevents.canvas.width);
+                                mouseevents.mMouseOriY = Math.floor(mouseevents.canvas.height - (ev.clientY-rect.top)/(rect.bottom-rect.top)*mouseevents.canvas.height);
+                                mouseevents.mMousePosX = mouseevents.mMouseOriX;
+                                mouseevents.mMousePosY = mouseevents.mMouseOriY;
+                                mouseevents.mMouseIsDown = true;
+                                        mouseevents.mMouseSignalDown = true;
+                                        //window.alert(mouseevents.mMouseOriX);
+                                        //window.alert(window.mouseevents.mMouseOriX);
+                                        //window.alert(Math.floor((ev.clientX-rect.left)/(rect.right-rect.left)*mouseevents.canvas.width));
+                                
+                            }
+                             
+                            mouseevents.canvas.onmousemove = function(ev)
+                            {
+                                if( mouseevents.mMouseIsDown )
+                                {
+                                    var rect = mouseevents.canvas.getBoundingClientRect();
+                                    mouseevents.mMousePosX = Math.floor((ev.clientX-rect.left)/(rect.right-rect.left)*mouseevents.canvas.width);
+                                    mouseevents.mMousePosY = Math.floor(mouseevents.canvas.height - (ev.clientY-rect.top)/(rect.bottom-rect.top)*mouseevents.canvas.height);
+                                   //window.alert(mouseevents.mMousePosX);
+                                }
+                            }
+
+                            mouseevents.canvas.onmouseup = function(ev)
+                            {
+                                mouseevents.mMouseIsDown = false;
+                                if( mouseevents.mIsPaused ) mouseevents.mForceFrame = true;
+                            }
+                            /*
+                            */
+                        }
+			function init() {
+ 
+                                vertex_header_source = document.getElementById('vsHeader').textContent;
+                                fragment_header_source=document.getElementById('fsHeader').textContent;
+				vertex_shader_source = document.getElementById('vs').textContent;
+				fragment_shader_source = document.getElementById('fs').textContent;
+                                vertex_footer_source = document.getElementById('vsFooter').textContent;
+                                fragment_footer_source = document.getElementById('fsFooter').textContent;
+ 
+				canvas = document.querySelector( 'canvas' );
+                                
+                                
+                                addMouseEvents(canvas);
+                                
+ 
+				// Initialise WebGL
+ 
+				try {
+ 
+                                        var opts = { alpha: false ,
+                                        depth: false, 
+                                        stencil: false, 
+                                        premultipliedAlpha: false, 
+                                        antialias: false, 
+                                        preserveDrawingBuffer: false, 
+                                        powerPreference: "high-performance",  // "low_power", "high_performance", "default"
+                                       };
+                                        
+					gl = canvas.getContext( "webgl2",opts);
+                                        if( gl === null) gl = canvas.getContext( "experimental-webgl2" );
+                                        if( gl === null) gl = canvas.getContext( "webgl",opts );
+                                        if( gl === null) gl = canvas.getContext( "experimental-webgl",opts );
+ 
+				} catch( error ) { }
+ 
+				if ( !gl ) {
+ 
+					throw "cannot create webgl context";
+ 
+				}
+ 
+                                
+                                
+				// Create Vertex buffer (2 triangles)
+ 
+				buffer = gl.createBuffer();
+				gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
+				gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( [ - 1.0, - 1.0, 1.0, - 1.0, - 1.0, 1.0, 1.0, - 1.0, 1.0, 1.0, - 1.0, 1.0 ] ), gl.STATIC_DRAW );
+ 
+                               
+                                
+                                
+				currentProgram = createProgram( vertex_shader_source, fragment_shader_source, vertex_header_source, fragment_header_source,vertex_footer_source,fragment_footer_source );
+
+				timeLocation = gl.getUniformLocation( currentProgram, 'iTime' );
+                                frameLocation = gl.getUniformLocation( currentProgram, 'iFrame' );
+				resolutionLocation = gl.getUniformLocation( currentProgram, 'resolution' );
+                                iResolutionLocation = gl.getUniformLocation(currentProgram, 'iResolution' );
+                                iMouseLocation = gl.getUniformLocation(currentProgram,'iMouse');
+                                
+                                
+                                
+ 
+			}
+ 
+			function createProgram( vertex, fragment, vertexheader, fragmentheader, vertexfooter, fragmentfooter ) {
+ 
+				var program = gl.createProgram();
+ 
+				 
+                                var vs = createShader( vertexheader+"\r\n"+vertex+"\r\n"+vertexfooter, gl.VERTEX_SHADER);
+                                var fs = createShader( fragmentheader+"\r\n"+fragment+"\r\n"+fragmentfooter, gl.FRAGMENT_SHADER);
+                                
+				if ( vs == null || fs == null ) return null;
+ 
+				gl.attachShader( program, vs );
+				gl.attachShader( program, fs );
+ 
+				gl.deleteShader( vs );
+				gl.deleteShader( fs );
+ 
+				gl.linkProgram( program );
+ 
+				if ( !gl.getProgramParameter( program, gl.LINK_STATUS ) ) {
+ 
+					alert( "ERROR:\n" +
+					"VALIDATE_STATUS: " + gl.getProgramParameter( program, gl.VALIDATE_STATUS ) + "\n" +
+					"ERROR: " + gl.getError() + "\n\n" +
+					"- Vertex Shader -\n" + vertex + "\n\n" +
+					"- Fragment Shader -\n" + fragment );
+ 
+					return null;
+ 
+				}
+ 
+				return program;
+ 
+			}
+ 
+			function createShader( src, type ) {
+ 
+				var shader = gl.createShader( type );
+ 
+				gl.shaderSource( shader, src );
+				gl.compileShader( shader );
+ 
+				if ( !gl.getShaderParameter( shader, gl.COMPILE_STATUS ) ) {
+ 
+					alert( ( type == gl.VERTEX_SHADER ? "VERTEX" : "FRAGMENT" ) + " SHADER:\n" + gl.getShaderInfoLog( shader ) );
+					return null;
+ 
+				}
+ 
+				return shader;
+ 
+			}
+ 
+			function resizeCanvas( event ) {
+ 
+				if ( canvas.width != canvas.clientWidth ||
+					 canvas.height != canvas.clientHeight ) {
+
+					canvas.width = canvas.clientWidth;
+					canvas.height = canvas.clientHeight;
+
+					parameters.screenWidth = canvas.width;
+					parameters.screenHeight = canvas.height;
+
+					gl.viewport( 0, 0, canvas.width, canvas.height );
+
+				}
+ 
+			}
+ 
+			function animate() {
+ 
+				resizeCanvas();
+				render();
+				requestAnimationFrame( animate );
+ 
+			}
+                        
+			function render() {
+ 
+				if ( !currentProgram ) 
+                                {
+                                    return;
+                                }
+                              
+                                
+                                window.mouseevents.mMousePosX=window.mouseevents.mMousePosX||0;
+                                window.mouseevents.mMousePosY=window.mouseevents.mMousePosY||0;
+                                window.mouseevents.mMouseOriX=window.mouseevents.mMouseOriX||0;
+                                window.mouseevents.mMouseOriY=window.mouseevents.mMouseOriY||0;
+                                window.frameCounter = window.frameCounter||1;
+                               
+                                let mouse = [  window.mouseevents.mMousePosX, window.mouseevents.mMousePosY, window.mouseevents.mMouseOriX, window.mouseevents.mMouseOriY ];
+                                 
+
+				parameters.iTime = new Date().getTime() - parameters.start_time;
+ 
+				gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
+ 
+				// Load program into GPU
+ 
+				gl.useProgram( currentProgram );
+ 
+				// Set values to program variables
+ 
+				gl.uniform1f( timeLocation, parameters.iTime / 1000 );
+                                gl.uniform1i( frameLocation, window.frameCounter++);
+				gl.uniform2f( resolutionLocation, parameters.screenWidth, parameters.screenHeight );
+                                gl.uniform3f( iResolutionLocation, parameters.screenWidth, parameters.screenHeight, 32. );
+                                gl.uniform4f( iMouseLocation, window.mouseevents.mMousePosX, window.mouseevents.mMousePosY,window.mouseevents.mMouseOriX, window.mouseevents.mMouseOriY);
+                                
+                                
+				// Render geometry
+ 
+				gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
+				gl.vertexAttribPointer( vertex_position, 2, gl.FLOAT, false, 0, 0 );
+				gl.enableVertexAttribArray( vertex_position );
+				gl.drawArrays( gl.TRIANGLES, 0, 6 );
+				gl.disableVertexAttribArray( vertex_position );
+ 
+			}
+ 
+		</script> 
+ 
+	</body> 
+</html>

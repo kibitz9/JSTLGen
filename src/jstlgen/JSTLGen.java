@@ -19,11 +19,11 @@ public class JSTLGen {
         int threadCount =12;
         System.out.println(threadCount);
         long start = System.currentTimeMillis();
-        double epsilon = .00000000001;
+        double epsilon = .005;
         //double epsilon = .00001;
         //SignedDistanceField3d c = new SDFSphere(1.0);
         
-        SignedDistanceField3d phull = new SDFEnterprisePrimaryHull();
+        //SignedDistanceField3d phull = new SDFEnterprisePrimaryHull();
         
         
         
@@ -54,48 +54,86 @@ public class JSTLGen {
         //phull = new SDF3dPrimitiveTorus(50,10);
         //interesting and pretty good...
         
-        SDF3dPrimitivePoint p1 = new SDF3dPrimitivePoint(new Vector3d(1,0,1));
-        SDF3dPrimitivePoint p2 = new SDF3dPrimitivePoint(new Vector3d(-1,0,1));
-        SDF3dPrimitivePoint p3 = new SDF3dPrimitivePoint(new Vector3d(1,0,-1));
-        SDF3dPrimitivePoint p4 = new SDF3dPrimitivePoint(new Vector3d(-1,0,-1));
+//        SDF3dPrimitivePoint p1 = new SDF3dPrimitivePoint(new Vector3d(1,0,1));
+//        SDF3dPrimitivePoint p2 = new SDF3dPrimitivePoint(new Vector3d(-1,0,1));
+//        SDF3dPrimitivePoint p3 = new SDF3dPrimitivePoint(new Vector3d(1,0,-1));
+//        SDF3dPrimitivePoint p4 = new SDF3dPrimitivePoint(new Vector3d(-1,0,-1));
+//        
+//
+//        SignedDistanceField3d r1 = new SDFOperationRoundEdges(p1,.5);
+//        SignedDistanceField3d r2 = new SDFOperationRoundEdges(p2,.5);
+//        SignedDistanceField3d r3 = new SDFOperationRoundEdges(p3,.5);
+//        SignedDistanceField3d r4 = new SDFOperationRoundEdges(p4,.5);
+//        
+//        SignedDistanceField3d u1 = new SDFOperationSmoothUnion(r1,r2,3);
+//        SignedDistanceField3d u2 = new SDFOperationSmoothUnion(r3,r4,3);
+//        SignedDistanceField3d u3 = new SDFOperationSmoothUnion(u1,u2,3);
+//        
         
-
-        SignedDistanceField3d r1 = new SDFOperationRoundEdges(p1,.5);
-        SignedDistanceField3d r2 = new SDFOperationRoundEdges(p2,.5);
-        SignedDistanceField3d r3 = new SDFOperationRoundEdges(p3,.5);
-        SignedDistanceField3d r4 = new SDFOperationRoundEdges(p4,.5);
-        
-        SignedDistanceField3d u1 = new SDFOperationSmoothUnion(r1,r2,3);
-        SignedDistanceField3d u2 = new SDFOperationSmoothUnion(r3,r4,3);
-        SignedDistanceField3d u3 = new SDFOperationSmoothUnion(u1,u2,3);
-        
-        
-        SignedDistanceField3d final1 = u3;
-        final1 = new SDFOperationOnion(final1,.01);
-        final1 = new SDFOperationAxisCut(final1,SDFOperationAxisCut.Axis.Z,0,false);
-        double splitThreshold = .125;
+//        SignedDistanceField3d final1 = u3;
+//        final1 = new SDFOperationOnion(final1,.01);
+//        final1 = new SDFOperationAxisCut(final1,SDFOperationAxisCut.Axis.Z,0,false);
+        double splitThreshold = .0125;
 
         //Solid s = Solid.Triangulate(final1, 1, epsilon, threadCount,.5,2);
         
         //final1 = new SDF3dPrimitiveSphere(160);
         //Solid s = Solid.Triangulate(final1, 40, 40, .00000001, 12, 1,.001);
-        Solid s = Solid.HedronTriangulate(final1,.125, .125, epsilon, threadCount);
-        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
-        s=s.SideSplitStressedFaces(final1, epsilon, threadCount, splitThreshold);
-        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+        
+        //SDF3dPrimitiveMandelbox mb = new SDF3dPrimitiveMandelbox(12,-2.7,.666666,1.05);
+        SDF3dPrimitiveMandelbox mb = new SDF3dPrimitiveMandelbox(12,2,.5,1.05);
+        SignedDistanceField3d final1 = mb;
+        Solid s = Solid.HedronTriangulate(final1,1.,1., epsilon, threadCount);
+        
+        
+        
+        
+        
+//        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+//        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+//        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
 //        s=s.SideSplitStressedFaces(final1, epsilon, threadCount, splitThreshold);
 //        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
-//         s=s.SideSplitStressedFaces(final1, epsilon, threadCount, splitThreshold);
 //        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
-//         s=s.SideSplitStressedFaces(final1, epsilon, threadCount, splitThreshold);
-        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
-        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
-        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
-        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
-        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
-        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
-        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
-        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+//        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+//        s=s.SideSplitStressedFaces(final1, epsilon, threadCount, splitThreshold);
+////        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+////         s=s.SideSplitStressedFaces(final1, epsilon, threadCount, splitThreshold);
+////        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+////         s=s.SideSplitStressedFaces(final1, epsilon, threadCount, splitThreshold);
+//        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+//        //s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+//        //s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+//        //s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+//        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+//        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+//        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+//        
+//        s=s.SideSplitStressedFaces(final1, epsilon, threadCount, splitThreshold);
+//        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+//        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+//        
+//        s=s.SideSplitStressedFaces(final1, epsilon, threadCount, splitThreshold);
+//        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+//        s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+        System.out.println("here");
+        for (int a=0;a<5;a++){
+            //s=s.SideSplitStressedFaces(final1, epsilon, threadCount, splitThreshold);
+            //s=s.ShrinkWrap(final1);
+            s=s.Subdivide();
+           
+            s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+            s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+            s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+            s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+            s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+            s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+            s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+            s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
+        }
+        
+        
+      //  s=s.ShrinkTowardsSlope(final1, epsilon, threadCount, true);
 //        s=s.SideSplitStressedFaces(final1, epsilon, threadCount, splitThreshold);
 //        s=s.SideSplitStressedFaces(final1, epsilon, threadCount, splitThreshold);
 //        s=s.SideSplitStressedFaces(final1, epsilon, threadCount, splitThreshold);

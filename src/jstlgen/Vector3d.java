@@ -194,15 +194,19 @@ public class Vector3d {
             //move towards the origin the distance specified by sdf.
             double dist = sdf.GetDistance(this);
             dist *= .9999999;//avoid going inside.
+            
+            double sign = 1.;
             if (dist <= 0)
             {
-                return this;
+                sign=-1;
+                //return this;
             }
             //Vector3d towardsOrigin = this.UnitVector.Negate().Scale(dist);
 
             //return this.Add(towardsOrigin);
 
-            Vector3d towardsOrigin = this.GetUnitVector().Scale(dist);
+            Vector3d towardsOrigin = this.GetUnitVector().Scale(dist*sign);
+            
 
             return this.Subtract(towardsOrigin);
         }
@@ -729,7 +733,7 @@ public class Vector3d {
             TOX,FROMX,TOY,FROMY,TOZ,FROMZ
             ,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t
         );
-        private static final double BIGSIZE = 100000000;
+        private static final double BIGSIZE = 10000000;
 
         public static Vector3d BIG_X = new Vector3d(BIGSIZE, 0, 0);
         public static Vector3d BIG_NEG_X = new Vector3d(-BIGSIZE, 0, 0);

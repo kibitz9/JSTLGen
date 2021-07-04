@@ -41,19 +41,25 @@ public class SDFOperationTrigRotateY extends SDFOperationTrigRotate {
         super(toRotate,radians);
     }
     
+    public SDFOperationTrigRotateY(SignedDistanceField3d toRotate, String rotationExpression)
+    {
+        super(toRotate,rotationExpression);
+    }
+    
      @Override
     public ShaderString toShaderString(String parm){
         String cosThetaVar = ShaderString.nextVariableName("cosTheta");
         String sinThetaVar = ShaderString.nextVariableName("sinTheta");
         String vectorVar = ShaderString.nextVariableName("rot");
-
-        String defines = "\r\n\tfloat "+cosThetaVar+"="+(float)(this.cosTheta)+";";
-        defines+= "\r\n\tfloat "+sinThetaVar+"="+(float)(this.sinTheta)+";";
+        String comment = ShaderString.nextVariableName("\r\n\t//Rotate y axis");
+        String defines = comment;
+        defines+= "\r\n\tfloat "+cosThetaVar+"="+super.GetCosRotationExpression()+";";
+        defines+= "\r\n\tfloat "+sinThetaVar+"="+super.GetSinRotationExpression()+";";
         defines+= "\r\n\tvec3 "+vectorVar+"=vec3(<parm>.x*"+cosThetaVar+"+<parm>.z*+"+sinThetaVar+",<parm>.y,<parm>.z*"+cosThetaVar+"+<parm>.x*-"+sinThetaVar+");";
         defines=defines.replace("<parm>", parm);
         ShaderString c = toRotate.toShaderString(vectorVar);
         
-        return new ShaderString(defines+c.defines,c.code,c.functions);
+        return new ShaderString(defines+c.defines,c.code,c.constantsAndFunctions);
         
         
                 

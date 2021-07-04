@@ -38,7 +38,10 @@ public abstract class SignedDistanceField3d  extends SignedDistanceField{
         Vector3d returnVector = bigaxis.Add(bigaxis.Negate().GetUnitVector().Scale(this.GetDistance(bigaxis) - padding));
         return returnVector;
     }       
-     public Line GetBoundingBox(double padding)
+     
+    
+    
+    public Line GetBoundingBox(double padding)
     {
 
 
