@@ -41,7 +41,8 @@ public class SDF3dPrimitiveTorus extends SignedDistanceField3d {
         d+="\r\n\tfloat "+secondaryRadiusV+"="+this.secondaryRadius+";";
         String v = "length(vec2(length(<parm>.xz)-"+primaryRadiusV+",<parm>.y))-"+secondaryRadiusV;
         v=v.replace("<parm>", parmValue);
-        return new ShaderString(d,v);
+        String color = "vec3(1,1,1)";
+        return new ShaderString(d,v,"",color);
     }
     
 }

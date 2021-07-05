@@ -84,6 +84,7 @@ public class SDF3dPrimitiveMandelbox extends SignedDistanceField3d{
         d+="\r\n\t}";
         d=d.replace("<parm>",parm);
         String c=".333*length("+qS+".xyz)/abs("+qS+".w)";
-        return new ShaderString(d,c,f);
+        String color = "vec3(1,1,1)";
+        return new ShaderString(d,c,f,color);
     }
 }

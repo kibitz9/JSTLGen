@@ -75,7 +75,9 @@ public class SDF3dPrimitiveCone extends SignedDistanceField3d {
         ddd+="\r\n\tfloat "+s+"=max("+k+"*("+w+".x*"+q+".y-"+w+".y*"+q+".x),"+k+"*("+w+".y-"+q+".y));";
         String c = "sqrt("+d+")*sign("+s+")";
         ddd=ddd.replace("<parm>", parm);
-        return new ShaderString(ddd,c);
+        
+        String color = "vec3(1,1,1)";
+        return new ShaderString(ddd,c,"",color);
     }
     
 }

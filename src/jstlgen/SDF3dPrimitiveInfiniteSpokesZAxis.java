@@ -69,7 +69,8 @@ public class SDF3dPrimitiveInfiniteSpokesZAxis extends SignedDistanceField3d {
         d+="\r\n\tfloat "+bx1+"=min(max("+absq+".x,"+absq+".y),0.0)+length(max("+absq+",0.0));";
         String c=bx1;
         d=d.replace("<parm>", parm);
-        return new ShaderString(d,c);
+        String color = "vec3(1,1,1)";
+        return new ShaderString(d,c,"",color);
         
         
         

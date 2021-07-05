@@ -79,8 +79,35 @@ public class SDFOperationSectorDuplicateZAxis extends SignedDistanceField3d {
         
         d+=tt.defines;
         String c = tt.code;
+        //String color = tt.color;
         
-        return new ShaderString(d,c,f+tt.constantsAndFunctions);
+        String functions = "";
+        String color;
+        String fn = ShaderString.nextVariableName("sector_color");
+
+
+
+        functions +="\r\nvec3 "+fn+"(vec3 q){"; 
+
+        
+        functions+="\r\n\tfloat "+sectorNumberS+"=round(atan(q.y,q.x)/"+sectorSizeS+");";
+        functions+="\r\n\tfloat "+angleOffsetS+"=-"+sectorNumberS+"*"+sectorSizeS+";";
+        functions+="\r\n\tfloat "+cos+"=cos("+angleOffsetS+");";
+        functions+="\r\n\tfloat "+sin+"=sin("+angleOffsetS+");";
+
+
+        functions+="\r\n\tvec3 p=vec3(";
+        functions+="\r\n\t\tq.x*"+cos+"-q.y*"+sin+",";
+        functions+="\r\n\t\tq.y*"+cos+"+q.x*"+sin+",";
+        functions+="\r\n\t\tq.z";
+        //d+="\r\n\t\t<parm>.z";
+        functions+="\r\n\t);";
+        functions +="\r\n\treturn "+tt.color+";";
+        functions +="\r\n}";
+        color = fn+"(p)"; 
+
+        
+        return new ShaderString(d,c,f+tt.constantsAndFunctions+functions,color);
         
         
         

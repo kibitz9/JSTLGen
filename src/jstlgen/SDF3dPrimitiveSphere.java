@@ -36,8 +36,8 @@ public class SDF3dPrimitiveSphere extends SignedDistanceField3d {
         d += "\r\n\tfloat "+varName2+" ="+radius+";";
         String c = "length(<parm>)-"+varName2;
         c=c.replace("<parm>", parmValue);
-        
-        return new ShaderString(d,c);
+        String color = "vec3(1,1,1)";
+        return new ShaderString(d,c,"",color);
         
     }
   

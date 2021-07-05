@@ -91,10 +91,38 @@ public class SDFOperationSurfaceDetailOnion extends SignedDistanceField3d {
         String c = fn2Name+"(<parm>)";
         c=c.replace("<parm>",parm);
         
+        String color = "";
+        
+        String functions = "";
+        if (sss0.color.equals(sss1.color)){
+            color = sss0.color;
+        }
+        else{
+            String fn = ShaderString.nextVariableName("onion_color");
+            functions +="\r\nvec3 "+fn+"(vec3 p){"; 
+            functions +="\r\n\tfloat d1 = "+fn0Name+"(p);";
+            functions +="\r\n\tfloat d2 = "+fn1Name+"(p);";
+            functions +="\r\n\tif (abs(d1)<abs(d2)){";
+            functions +="\r\n\t\treturn "+sss0.color+";";
+            functions +="\r\n\t}";
+            functions +="\r\n\telse{";
+            functions +="\r\n\t\treturn "+sss1.color+";";
+            functions +="\r\n\t}";
+            functions +="\r\n}";
+            
+            color = fn+"(p)";
+            
+            
+            
+        }
+        
+        
+        
         ShaderString xx = new ShaderString(
                 ""
                 ,c
-                ,sss0.constantsAndFunctions+"\r\n"+sss1.constantsAndFunctions+f0+f1+f2
+                ,sss0.constantsAndFunctions+"\r\n"+sss1.constantsAndFunctions+f0+f1+f2+functions
+                ,color
         );
         return xx;
         

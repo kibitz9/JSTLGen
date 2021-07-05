@@ -45,6 +45,12 @@ public abstract class SDFOperationTrigRotate extends SignedDistanceField3d {
             }
         }
         
+        public boolean hasOverrideExpression(){
+            return overrideExpression!=null;
+        }
+        
+        
+        
         protected String overrideSinExpression = null;
         public String GetSinRotationExpression(){
             if (overrideExpression==null){

@@ -50,28 +50,35 @@ public class SDFOperationBoundingSphere extends SignedDistanceField3d{
         String radiusSquaredPlusPaddingS = ShaderString.nextVariableName("rp");
         String radiusS = ShaderString.nextVariableName("r");
         String dist = ShaderString.nextVariableName("d");
+        String sdfS = ShaderString.nextVariableName("sdf");
         
+        String f0 = "\r\nfloat "+sdfS+"(vec3 p){";
+        f0+="\r\n\tfloat "+radiusSquaredPlusPaddingS+"="+radiusSquaredPlusPadding+";";
+        f0+="\r\n\tfloat "+radiusS+"="+radius+";";
+        f0+="\r\n\tfloat "+dist+";";
+        f0+="\r\n\tfloat lp=length(p);";
         
-        String d="\r\n\tfloat "+radiusSquaredPlusPaddingS+"="+radiusSquaredPlusPadding+";";
-        d+="\r\n\tfloat "+radiusS+"="+radius+";";
-        d+="\r\n\tfloat "+dist+";";
+        f0+="\r\n\tif (lp>"+radiusSquaredPlusPaddingS+"+.2){";
+        f0+="\r\n\t\t"+dist+"=lp-("+radiusS+"+.1);";
+        f0+="\r\n\t}";
+        f0+="\r\n\telse{";
+        ShaderString ss = toContain.toShaderString("p");
+        f0+=ss.defines.replace("\r\n\t","\r\n\t\t");
+        f0+="\r\n\t\t"+dist+"="+ss.code+";";
         
-        d+="\r\n\tif (length(<parm>)>"+radiusSquaredPlusPaddingS+"){";
-        d+="\r\n\t\t"+dist+"=length(<parm>)-"+radiusS+";";
-        d+="\r\n\t}";
-        d+="\r\n\telse{";
-        ShaderString ss = toContain.toShaderString(parm);
-        d+=ss.defines.replace("\r\n\t","\r\n\t\t");
-        d+="\r\n\t\t"+dist+"="+ss.code+";";
-        d+="\r\n\t}";
+        f0+="\r\n\t}";
+        f0+="\r\nreturn "+dist+";";
+        f0+="\r\n}";
 
-        d=d.replace("<parm>",parm);
+        
      
-        String c = dist;
+        String c = sdfS+"(<parm>)";
+        c=c.replace("<parm>", parm);
         
  
+        String color = ss.color;   
         
-        return new ShaderString(d,c,ss.constantsAndFunctions+"\r\n");
+        return new ShaderString("",c,ss.constantsAndFunctions+"\r\n"+f0,color);
         
     }
     

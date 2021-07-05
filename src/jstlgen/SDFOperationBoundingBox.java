@@ -81,6 +81,8 @@ public class SDFOperationBoundingBox extends SignedDistanceField3d{
         String bnd = ShaderString.nextVariableName("bound");
         String dst = ShaderString.nextVariableName("dst");
         
+        
+        
         String d="\r\n\tvec3 "+bxs+"=vec3("+box.start.x+","+box.start.y+","+box.start.z+");";
         d+="\r\n\tvec3 "+bxe+"=vec3("+box.end.x+","+box.end.y+","+box.end.z+");";
         d+="\r\n\tvec3 "+q+"=clamp(<parm>,"+bxs+","+bxe+");";
@@ -107,13 +109,18 @@ public class SDFOperationBoundingBox extends SignedDistanceField3d{
         myFunction+="\r\n\treturn max(a,max_ext(b));";
         myFunction+="\r\n}";
         
+                    
+        
         ShaderString.AddGlobalFunction("max_ext", myFunction);
         
-       
-        
-        
-        return new ShaderString(d,c,sss.constantsAndFunctions+"\r\n");
+               
+            
+        String color = sss.color;   
+        return new ShaderString(d,c,sss.constantsAndFunctions+"\r\n",color);
         
     }
+    
+    
+    
     
 }

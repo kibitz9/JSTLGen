@@ -54,7 +54,8 @@ public class SDF3dPrimitiveSolidAngle extends SignedDistanceField3d{
         
         String c = "max("+l+","+m+"*sign("+sc+".y*"+q+".x-"+sc+".x*"+q+".y))";
         d=d.replace("<parm>",parm);
-        return new ShaderString(d,c);
+        String color = "vec3(1,1,1)";
+        return new ShaderString(d,c,"",color);
         
     }
 }

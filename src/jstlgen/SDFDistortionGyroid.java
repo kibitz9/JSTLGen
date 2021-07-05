@@ -52,8 +52,8 @@ public class SDFDistortionGyroid extends SignedDistanceField3d {
         
         String returnString = "dot(sin("+parmValue+".xyz*"+s1+"+"+o1+"),cos("+parmValue+".yzx*"+s2+"+"+o2+"))";
         
-        
-        return new ShaderString(d,returnString);
+        String color = "vec3(1,1,1)";
+        return new ShaderString(d,returnString,"",color);
     }
     
 }

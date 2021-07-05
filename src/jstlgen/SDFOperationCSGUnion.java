@@ -71,20 +71,60 @@ public class SDFOperationCSGUnion extends SignedDistanceField3d{
     @Override
     public ShaderString toShaderString(String parmValue){
         
-        ShaderString o = one.toShaderString(parmValue);
-        ShaderString t = two.toShaderString(parmValue);
+        ShaderString o = one.toShaderString("p");
+        ShaderString t = two.toShaderString("p");
         
-        String left = ShaderString.nextVariableName("unionleft");
-        String right = ShaderString.nextVariableName("unionRight");
+       // String left = ShaderString.nextVariableName("unionleft");
+       // String right = ShaderString.nextVariableName("unionRight");
         
-        
-        String d = o.defines+t.defines;
-        d+="\r\n\tfloat "+left+"="+o.code+";";
-        d+="\r\n\tfloat "+right+"="+t.code+";";
+        String fn1 = ShaderString.nextVariableName("sdf");
+        String fn2 = ShaderString.nextVariableName("sdf");
         
         
-        String c = "min("+left+","+right+")";
+       // String d = o.defines+t.defines;
+        //d+="\r\n\tfloat "+left+"="+o.code+";";
+       // d+="\r\n\tfloat "+right+"="+t.code+";";
         
-        return new ShaderString(d,c,o.constantsAndFunctions+"\r\n"+t.constantsAndFunctions);
+        String functions = "";
+        functions+="\r\nfloat "+fn1+"(vec3 p){";
+        functions+=o.defines;
+        functions+="\r\n\treturn ("+o.code+");";
+        functions+="\r\n}";
+        
+        functions+="\r\nfloat "+fn2+"(vec3 p){";
+        functions+=t.defines;
+        functions+="\r\n\treturn ("+t.code+");";
+        functions+="\r\n}";
+        
+      
+        String color = "";
+        
+        if (o.color.equals(t.color)){
+            color = o.color;
+        }
+        else{
+            String fn = ShaderString.nextVariableName("union_color");
+            functions +="\r\nvec3 "+fn+"(vec3 p){"; 
+            functions +="\r\n\tfloat d1 = "+fn1+"(p);";
+            functions +="\r\n\tfloat d2 = "+fn2+"(p);";
+            functions +="\r\n\tif (abs(d1)<abs(d2)){";
+            functions +="\r\n\t\treturn "+o.color+";";
+            functions +="\r\n\t}";
+            functions +="\r\n\telse{";
+            functions +="\r\n\t\treturn "+t.color+";";
+            functions +="\r\n\t}";
+            functions +="\r\n}";
+            
+            color = fn+"(p)";
+            
+            
+            
+        }
+        
+        
+        
+        String c = "min("+fn1+"(<parm>),"+fn2+"(<parm>))";
+        c=c.replace("<parm>",parmValue);
+        return new ShaderString("",c,o.constantsAndFunctions+"\r\n"+t.constantsAndFunctions+functions,color);
     }
 }

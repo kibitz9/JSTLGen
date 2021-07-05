@@ -57,4 +57,14 @@ public abstract class SignedDistanceField3d  extends SignedDistanceField{
 
 
     }
+    
+
+    public String materialString(String sdfFunctionName){
+        String 
+          f0 ="\r\nvec3 "+sdfFunctionName+"_color(vec3 p){";
+          f0+="\r\n\treturn vec3(1,1,1,1);";
+          f0+="\r\n}";
+        return f0;
+    }
+    
 }

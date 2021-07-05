@@ -17,6 +17,8 @@ public class ShaderString {
     public String defines;
     public String code;
     public String constantsAndFunctions="";
+    public String color;
+    
     
     public static int varCounter = 0;
     
@@ -51,6 +53,12 @@ public class ShaderString {
         this.defines=defines;
         this.code=code;
         this.constantsAndFunctions=functions;
+    }
+     public ShaderString(String defines, String code, String functions, String color){
+        this.defines=defines;
+        this.code=code;
+        this.constantsAndFunctions=functions;
+        this.color=color;
     }
     
     
@@ -101,6 +109,14 @@ public class ShaderString {
         returnString+="float "+functionName+"(vec3 p){\r\n";
         returnString+=defines+"\r\n\treturn "+code+";";
         returnString+="\r\n}\r\n";
+        
+        returnString+="vec3 "+functionName+"_color(vec3 p){\r\n";
+        returnString+="\r\n\treturn("+color+");";
+        returnString+="\r\n}\r\n";
+        
+        //returnString+="\r\nfloat "+functionName+"_color(vec3 p){";
+       //returnString+=
+        
         return returnString;
     }
     
