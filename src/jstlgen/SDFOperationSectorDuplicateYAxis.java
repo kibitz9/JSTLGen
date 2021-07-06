@@ -101,7 +101,7 @@ public class SDFOperationSectorDuplicateYAxis extends SignedDistanceField3d {
 
         functions+="\r\n\tvec3 p=vec3(";
         functions+="\r\n\t\tq.x*"+cos+"+q.z*"+sin+",";
-        functions+="\r\n\tq.y,";
+        functions+="\r\n\t\tq.y,";
         functions+="\r\n\t\tq.z*"+cos+"-q.x*"+sin;
         functions+="\r\n\t);"; 
         functions +="\r\n\treturn "+tt.color+";";
