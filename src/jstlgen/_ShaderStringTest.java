@@ -172,7 +172,9 @@ public class _ShaderStringTest {
         SDFOperationSmoothIntersection iii = new SDFOperationSmoothIntersection(u7,sss,smooth);
         SDFOperationSmoothDifference uuu = new SDFOperationSmoothDifference(iii,new SDF3dPrimitiveSphere(175),smooth);
       */
-      /* -- a cool ball */
+      /* -- Good test item... */
+      
+      
       
         SignedDistanceField3d mb = new SDF3dPrimitiveMandelbox(10,-2.5,.5,1);
         //SignedDistanceField3d mb2 = new SDF3dPrimitiveMandelbox(10,-2,.5,1);
