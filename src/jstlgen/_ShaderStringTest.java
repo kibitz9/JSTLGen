@@ -194,7 +194,7 @@ public class _ShaderStringTest {
         //mb2=new SDF3dPrimitiveSphere(3);
         
         //mb = new SDFOperationBoundingBox(mb,4);
-        mb=new SDFOperationBoundingSphere(mb,2.3,.0001);
+        mb=new SDFOperationBoundingSphere(mb,2.3,.01);
         
         SignedDistanceField3d sphere2 = new SDF3dPrimitiveSphere(1.9);
         sphere2 = new SDFMaterial(sphere2,new MaterialFunction(new Vector3d(1,0,0)));
@@ -210,6 +210,9 @@ public class _ShaderStringTest {
         
         mb = new SDFOperationTranslate(mb,new Vector3d(-1.5,0,0));
       
+        
+        
+        
       
         SignedDistanceField3d mb2 = new SDF3dPrimitiveMandelbox(10,-2.5,.5,1);
         //mb2=new SDFOperationRoundEdges(mb2,.01);
@@ -225,6 +228,9 @@ public class _ShaderStringTest {
         
         
         surface = new SDFOperationUniformScale(surface,.5);
+        
+        surface = new SDFDistortionNoise(surface,.125,10);
+        
         surface= new SDFOperationTrigRotateY(surface,"-iTime/5.");
         
        
@@ -264,6 +270,7 @@ public class _ShaderStringTest {
         u1 = new SDFOperationCSGUnion(u1,env);
         SignedDistanceField3d final1 = new SDFOperationCSGUnion(u1,mb);
        
+        
         
         
         //final1 = new SDFMaterial(final1,new MaterialFunction(new Vector3d(1,1,1)));

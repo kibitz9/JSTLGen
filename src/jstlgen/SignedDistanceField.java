@@ -112,11 +112,18 @@ public class SignedDistanceField {
         return vect.Abs();
     }
    
+    protected static Vector3d floor(Vector3d v){
+        return new Vector3d(Math.floor(v.x),Math.floor(v.y),Math.floor(v.z));
+    }
     
     public ShaderString toShaderString(String parmValue){
         ShaderString returnValue = new ShaderString("","");
        
         return returnValue;
+    }
+    
+    protected static double mix(double a, double b, double n){
+        return a+(b-a)*n;
     }
     
 }

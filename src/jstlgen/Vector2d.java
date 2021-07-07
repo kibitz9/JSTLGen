@@ -103,11 +103,34 @@ public class Vector2d {
         }
       
         
+       
+        
+        public Vector3d GetXXX(){
+            return new Vector3d(x,x,x);
+        }
+        public Vector3d GetXXY(){
+            return new Vector3d(x,x,y);
+        }
         public Vector3d GetXYX(){
             return new Vector3d(x,y,x);
         }
+        public Vector3d GetXYY(){
+            return new Vector3d(x,y,y);
+        }
+        public Vector3d GetYXX(){
+            return new Vector3d(y,x,x);
+        }
+        public Vector3d GetYXY(){
+            return new Vector3d(y,x,y);
+        }
+        public Vector3d GetYYX(){
+            return new Vector3d(y,y,x);
+        }
+        public Vector3d GetYYY(){
+            return new Vector3d(y,y,y);
+        }
        
-
+        
      
 
         public Vector2d Abs()

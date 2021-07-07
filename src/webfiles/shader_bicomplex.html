@@ -1,0 +1,835 @@
+<!DOCTYPE HTML> 
+<html> 
+	<head> 
+		<meta charset="utf-8"> 
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<title>Shader Template</title> 
+		
+		<style> 
+			html, body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+				width: 100%;
+				height: 100%;
+			}
+			canvas {
+				width: 100%;
+				height: 100%;
+			}
+		</style> 
+	</head> 
+	<body> 
+ 
+		<canvas></canvas>
+		<div id="info"></div> 
+ 
+               
+                
+                 <script id="vsHeader" type="x-shader/vertex">#version 300 es
+                        #ifdef GL_ES
+                            precision highp float;
+                            precision highp int;
+                            precision mediump sampler3D;
+                        #endif
+ 
+		</script> 
+                
+                <script id="vs" type="x-shader/vertex">
+                        layout(location = 0) in vec2 pos;
+			void main() {
+ 
+				gl_Position = vec4( pos.xy,0.0, 1.0 );
+                                
+			}
+		</script> 
+                <script id="vsFooter" type="x-shader/vertex">
+                        //nop
+		</script> 
+                
+                
+                <script id="fsHeader" type="x-shader/fragment">#version 300 es
+                        #ifdef GL_ES
+                            precision highp float;
+                            precision highp int;
+                            precision mediump sampler3D;
+                        #endif
+                        
+                        //shadertoy compatible items.
+                        #define HW_PERFORMANCE 0//TODO do something with this
+			uniform float iTime;
+                        uniform int iFrame;
+                        uniform vec4 iMouse;
+			uniform vec2 resolution;
+                        uniform vec3 iResolution;
+                        
+                     
+                        
+		</script> 
+                
+
+		<script id="fs" type="x-shader/fragment"> 
+                
+                       
+                        //******************************opening tag   ****************//
+                        //******************************opening tag   ****************//
+              
+                        
+                         const float GLOBAL_EPSILON = .0005;
+const vec2 GLOBAL_PN = vec2(1,-1);
+const vec3 GLOBAL_PN_XYY=GLOBAL_PN.xyy;
+const vec3 GLOBAL_PN_YYX=GLOBAL_PN.yyx;
+const vec3 GLOBAL_PN_YXY=GLOBAL_PN.yxy;
+const vec3 GLOBAL_PN_XXX=GLOBAL_PN.xxx;
+
+const vec3 GLOBAL_PN_XYY_EPS=GLOBAL_PN_XYY*GLOBAL_EPSILON;
+const vec3 GLOBAL_PN_YYX_EPS=GLOBAL_PN_YYX*GLOBAL_EPSILON;
+const vec3 GLOBAL_PN_YXY_EPS=GLOBAL_PN_YXY*GLOBAL_EPSILON;
+const vec3 GLOBAL_PN_XXX_EPS=GLOBAL_PN_XXX*GLOBAL_EPSILON;
+const float MAX_DIST = 10.0;         
+                       
+                        //******************************opening tag   ****************//
+                        //******************************opening tag   ****************//
+              
+                        
+                       //***************************************************************//
+// Bicomplex Mandelbrot by CMiller (kibitz9)
+// A bicomplex mandelbrot sliced in half to show the set inside.
+// The interior distance estimate is not accurate hence the banding.
+//***************************************************************// 
+
+vec4 square(vec4 B){
+    //Bicomplex square
+    float a=B.x;
+    float b=B.y;
+    float c=B.z;
+    float d=B.w;
+    return vec4(
+         a* a- b* b- c* c+ d* d
+        ,2.* a* b-2.* c* d
+        ,2.* a* c-2.* b* d
+        ,2.* a* d+2.* b* c
+     );
+}
+vec4 mult(vec4 A, vec4 B){
+    //Bicomplex multiplication
+    float a=A.x;
+    float b=A.y;
+    float c=A.z;
+    float d=A.w;
+    float e=B.x;
+    float f=B.y;
+    float g=B.z;
+    float h=B.w;
+    
+    return vec4(
+        a*e-b*f-c*g+d*h,
+        b*e+a*f-d*g-c*h,
+        c*e-d*f+a*g-b*h,
+        d*e+c*f+b*g+a*h
+    );
+        
+}
+
+vec4 zero = vec4(0,0,0,0);
+vec4 two = vec4(2,0,0,0);
+vec4 one = vec4(1,0,0,0);
+
+float mb(in vec4 c, in int itr){
+
+    vec4 z=zero;
+    vec4 dz=one;
+    int a=0; 
+    for (;a<itr;a++){
+
+        dz=mult(2.0*z,dz)+1.;
+        z=square(z)+c;
+      
+        float sqrd = dot(z,z);
+        if (sqrd>10000.){
+            break;
+        }
+    }
+    if (a==itr-1){
+        return 0.;
+    }
+    float lz = length(z);
+    float ldz = length(dz);
+    float dist = (log(lz)*lz)/ldz;
+    
+    return dist/2.;
+  
+
+}
+
+
+float map(in vec3 q){
+
+    //return 1.0;
+    vec3 p=q;
+
+    float lookDown=.2;
+    p=vec3(p.x,p.y*cos(lookDown)+p.z*-sin(lookDown),p.z*cos(lookDown)+p.y*sin(lookDown));
+
+    float rot = 4.25;
+
+    p =vec3(
+        p.x*cos(iTime/rot)+p.z*-sin(iTime/rot),
+        p.y
+        ,p.z*cos(iTime/rot)+p.x*sin(iTime/rot)
+        );
+
+    p=p+vec3(0.,-2.,0.);
+    
+
+    
+    float m= mb(vec4(p.x-.1,p.y,p.z,0.),100);
+    
+    //float m2= mb(vec4(-q.y+1.1,q.x-2.5,q.z,0.),20);
+    
+    
+    m=abs(m)-.0001;
+    m=max(m,-p.z-0.);
+    m=min(m,q.y-.1);
+    m=min(m,-q.z+3.);
+    //m=min(m,m2);
+    
+    
+    return m;
+ }
+    
+    
+    
+ 
+    
+
+
+vec3 getSurfaceNormal( in vec3 p, float epsilon ) // for function f(p)
+{
+  
+    return normalize(
+        GLOBAL_PN_XYY*map(p+GLOBAL_PN_XYY_EPS) +
+        GLOBAL_PN_YYX*map(p+GLOBAL_PN_YYX_EPS) +
+        GLOBAL_PN_YXY*map(p+GLOBAL_PN_YXY_EPS) +
+        GLOBAL_PN_XXX*map(p+GLOBAL_PN_XXX_EPS) 
+    
+    );
+}
+
+
+void rayMarch(
+    in vec3 origin, 
+    in vec3 ray, 
+    in float epsilon,
+    in float maxSteps,
+   
+    out vec3 marchPoint,
+    out float marchPointDist,
+    out float stepsTaken
+
+
+){
+    
+  
+    
+    stepsTaken = 0.0;
+    marchPoint=origin;
+    float h = map(marchPoint);
+    while (h>epsilon&&stepsTaken++<maxSteps&&h<MAX_DIST){
+        marchPoint+=ray*h;       
+        h=map(marchPoint);
+    }   
+    marchPointDist=h;
+}
+
+float softShadowBalanced(vec3 surface, vec3 light, float radius, float maxDist){
+   
+    
+      
+    vec3 surfaceToLight = light-surface;
+    float distanceToLight=length(surfaceToLight);
+    float maxDist2 = min(maxDist,distanceToLight);
+    vec3 ray =normalize(surfaceToLight);
+    float artifactCompensation = 2.0;
+    float minDist = .001;//think about this.
+    
+    float travelled = minDist;
+    float xx=1.0;
+    while (travelled < maxDist2){
+    
+        float ratioTravelled=travelled/distanceToLight;
+        
+       
+        float relativeRadius=ratioTravelled*radius;
+        
+        float dist=map(surface+ray*travelled);
+         
+        if (dist<-relativeRadius){
+            return 0.0;
+        }
+        float relativeDiameter=relativeRadius*2.0;
+        
+        float dist2=dist+relativeRadius;
+        xx = min(xx,dist2/relativeDiameter);
+        
+       
+        float artifatCompensation2 = artifactCompensation*clamp(relativeRadius/dist,0.,1.);
+        travelled +=max(abs(dist/artifactCompensation),minDist);
+        
+        
+    }
+       
+   return xx;
+    
+
+    
+}
+
+vec3 power(vec3 vec, float power){
+    return vec3(pow(vec.x,power),pow(vec.y,power),pow(vec.z,power));
+}
+
+
+
+void calcLight(
+    in vec3 surfacePoint, 
+    in float shineAtPosition,
+    in vec3 lightPosition,
+    in vec3 observationPosition,
+    in vec3 lightColor,
+    in float lightBrightness,
+    in vec3 surfaceNormal,
+    in float epsilon,
+    out vec3 diffuse, 
+    out vec3 specular){
+    
+ 
+     
+    vec3 col0 = lightColor;
+    
+    
+    vec3 surfaceToLight=lightPosition-surfacePoint;
+    vec3 normalToLight=normalize(surfaceToLight);
+    
+    float oneOverDistToLightSquared = lightBrightness/dot(surfaceToLight,surfaceToLight);
+    
+    
+    
+    float dp = dot(normalToLight,surfaceNormal);
+ 
+    dp=max(dp,0.0);
+
+    
+    diffuse=dp*lightColor*oneOverDistToLightSquared;
+    
+    
+    vec3 rayToObs=normalize(observationPosition-surfacePoint);
+    vec3 avg = normalize(normalToLight+rayToObs);
+    float spec = dot(avg,surfaceNormal);
+    spec = max(spec,0.0);
+    
+    spec = pow(spec,shineAtPosition);
+
+    specular=lightColor*spec*oneOverDistToLightSquared;
+    
+    float shadowAdjust = 1.0;
+    
+
+    if (true){
+        float s = softShadowBalanced(surfacePoint,lightPosition,5.0, 500.); 
+        diffuse*=s*shadowAdjust;
+        specular*=s*shadowAdjust;
+    }
+ 
+}
+
+
+void mainImage1( out vec4 fragColor, in vec2 fragCoord )
+{
+
+
+    vec3 eye = vec3(0.0,0.0,-.5);
+    vec3 lense = vec3(0.0,0.0,.5);
+    float xxx = 0.;
+    vec3 cameraPosition = vec3(0.,2.,-(6.+xxx)+sin(iTime/10.)*xxx);
+    float specAmt = 0.0;
+
+    vec2 uv = fragCoord/iResolution.xy;
+    float epsilon1 = .002;
+    
+   
+    vec3 objColor=vec3(1,1,1);
+  
+    vec2 ar = (fragCoord/iResolution.x)
+        -vec2(.5,iResolution.y/(2.0*iResolution.x));
+    vec3 lenseIntersection = vec3(ar,lense.z);
+    
+    vec3 ray = normalize(lenseIntersection-eye);
+   
+    
+    float stepsTaken;
+    vec3 finalPosition;
+    float finalDistance;
+
+    float maxSteps = 4000.0;
+    
+    rayMarch(eye+cameraPosition,ray,epsilon1,maxSteps,finalPosition,finalDistance,stepsTaken);
+    
+  
+    
+    float objectShine=7.;
+    
+    
+    vec3 diffuse1;
+    vec3 specular1;
+
+    vec3 diffuse2;
+    vec3 specular2;
+
+    vec3 diffuse3;
+    vec3 specular3;
+
+    vec3 diffuse4;
+    vec3 specular4;
+    if (finalDistance<epsilon1){
+    
+
+        finalPosition = finalPosition+(ray*epsilon1*-2.0);
+        vec3 normal = getSurfaceNormal(finalPosition,epsilon1);
+        
+       
+        
+        float lightBrightness = 1400.;
+        float specMult = 2.0;
+        
+        calcLight(
+            finalPosition,
+            objectShine,
+            vec3(60.0,80.0,-80.0),//lightposition
+            eye+cameraPosition,//observation position
+            vec3(.5,.5,1)*.5,//light color
+            lightBrightness*20.,//light bright
+            normal,
+            epsilon1,
+            diffuse1,
+            specular1
+        );
+        
+        /*
+         calcLight(
+            finalPosition,
+            objectShine,
+            vec3(-60.0,80.0,-80.0),//lightposition
+            eye+cameraPosition,//observation position
+            vec3(.6,.5,0.)*.5,//light color
+            lightBrightness*4.,//light bright
+            normal,
+            epsilon1,
+            diffuse2,
+            specular2
+        );
+        */
+        /*
+        calcLight(
+            finalPosition,
+            objectShine,
+            vec3(-60.0,30.0,-40.0),//lightposition
+            eye+cameraPosition,//observation position
+            vec3(.5,1.,.1)*.5,//light color
+            lightBrightness*1.,//light bright
+            normal,
+            epsilon1,
+            diffuse2,
+            specular2
+        );
+        */
+        /*
+        calcLight(
+            finalPosition,
+            objectShine,
+            vec3(130.0,30.0,-480.0),//lightposition
+            eye+cameraPosition,//observation position
+            vec3(1.,.9,.3)*.5,//light color
+            lightBrightness*5.,//light bright
+            normal,
+            epsilon1,
+            diffuse3,
+            specular3
+        );
+        */
+        
+        
+        /*
+        calcLight(
+            finalPosition,
+            objectShine,
+            vec3(0.0,10.0,-5.0),//lightposition
+            eye+cameraPosition,//observation position
+            vec3(1.,.8,.5)*.5,//light color
+            lightBrightness/20000.,//light bright
+            normal,
+            epsilon1,
+            diffuse4,
+            specular4
+        );
+    */
+    
+    
+        vec3 col1=objColor*max(diffuse1,0.0);
+        col1+=specular1*specMult;
+        
+        //vec3 col2=objColor*max(diffuse2,0.0);
+       // col2+=specular2*specMult;
+        
+        //vec3 col3=objColor*max(diffuse3,0.0);
+        //col3+=specular3*specMult;
+        
+        //vec3 col4=objColor*max(diffuse4,0.0);
+        //col4+=specular4*specMult;
+        
+        
+      
+        
+        //vec3 colFinal = min(col1+col2,1.0);
+        //vec3 colFinal = min(col1+col2+col3+col4,1.);
+        vec3 colFinal = min(col1,1.);
+        colFinal=power(colFinal,.9);
+        fragColor = vec4(colFinal,1.0);
+        
+    }
+    else{
+        fragColor = vec4(.2,0,0,1.0);
+
+    }
+    
+    
+    
+    
+    
+}
+
+void AntiAlias3( out vec4 fragColor, in vec2 fragCoord, float aaLevel){
+    vec2 uv = fragCoord/iResolution.xy;
+    
+    float subPixel = 1.0/aaLevel;
+    vec4 result = vec4(0,0,0,1);
+    for (float x=fragCoord.x;x<fragCoord.x+1.0;x+=subPixel){
+        for (float y=fragCoord.y;y<fragCoord.y+1.0;y+=subPixel){
+            vec4 temp;
+            mainImage1(temp,vec2(x,y));
+            result+=temp;
+        }
+    }
+    
+   
+    
+    
+    fragColor = result/(aaLevel*aaLevel);
+   
+    
+}
+
+void mainImage ( out vec4 fragColor, in vec2 fragCoord){
+    
+    //AntiAlias3(fragColor, fragCoord,2.);
+    vec4 result = vec4(0,0,0,1);
+    mainImage1(result,fragCoord);
+    fragColor=result;
+
+}
+
+             
+                        
+                        
+                   
+                        //******************************closing   **********************//
+                        //******************************closing   **********************//
+                        
+                       
+                        
+                        
+                   
+ 
+		</script> 
+ 
+                <script id="fsFooter" type="x-shader/fragment">
+                        out vec4 outColor;
+			void main() {
+                                vec4 tempColor = vec4(0.0,0.0,0.0,1.0);
+                                mainImage(tempColor,gl_FragCoord.xy);
+                                outColor = max(tempColor,vec4(0.0,0.0,0.0,1.0));
+                                outColor = min(tempColor,vec4(1.0,1.0,1.0,1.0));
+			}
+		</script> 
+                
+                
+                
+		<script> 
+ 
+			/**
+			 * Provides requestAnimationFrame in a cross browser way.
+			 * paulirish.com/2011/requestanimationframe-for-smart-animating/
+			 */
+			window.requestAnimationFrame = window.requestAnimationFrame || ( function() {
+
+				return  window.webkitRequestAnimationFrame ||
+				        window.mozRequestAnimationFrame ||
+				        window.oRequestAnimationFrame ||
+				        window.msRequestAnimationFrame ||
+				        function(  callback, element ) {
+					        window.setTimeout( callback, 1000 / 60 );
+				        };
+
+			})();
+
+ 
+			var 
+                            
+                            canvas, 
+			    gl, 
+			    buffer, 
+			    vertex_shader, fragment_shader, 
+			    currentProgram,
+			    vertex_position,
+			    timeLocation,
+			    resolutionLocation,
+                            iResolutionLocation,
+                            iMouseLocation,
+			    parameters = {  start_time  : new Date().getTime(), 
+			                    iTime        : 0, 
+			                    screenWidth : 0, 
+			                    screenHeight: 0 };
+                        window.mouseevents = window.mouseevents ||  function(){};
+			init();
+			animate();
+                        
+                        function addMouseEvents(cv){
+                          
+                            //shadertoy compatible mouse events.
+                            
+                            mouseevents.canvas = cv;
+                        
+                            mouseevents.canvas.onmousedown = function(ev)
+                            {
+                                var rect = mouseevents.canvas.getBoundingClientRect();
+                                mouseevents.mMouseOriX = Math.floor((ev.clientX-rect.left)/(rect.right-rect.left)*mouseevents.canvas.width);
+                                mouseevents.mMouseOriY = Math.floor(mouseevents.canvas.height - (ev.clientY-rect.top)/(rect.bottom-rect.top)*mouseevents.canvas.height);
+                                mouseevents.mMousePosX = mouseevents.mMouseOriX;
+                                mouseevents.mMousePosY = mouseevents.mMouseOriY;
+                                mouseevents.mMouseIsDown = true;
+                                        mouseevents.mMouseSignalDown = true;
+                                        //window.alert(mouseevents.mMouseOriX);
+                                        //window.alert(window.mouseevents.mMouseOriX);
+                                        //window.alert(Math.floor((ev.clientX-rect.left)/(rect.right-rect.left)*mouseevents.canvas.width));
+                                
+                            }
+                             
+                            mouseevents.canvas.onmousemove = function(ev)
+                            {
+                                if( mouseevents.mMouseIsDown )
+                                {
+                                    var rect = mouseevents.canvas.getBoundingClientRect();
+                                    mouseevents.mMousePosX = Math.floor((ev.clientX-rect.left)/(rect.right-rect.left)*mouseevents.canvas.width);
+                                    mouseevents.mMousePosY = Math.floor(mouseevents.canvas.height - (ev.clientY-rect.top)/(rect.bottom-rect.top)*mouseevents.canvas.height);
+                                   //window.alert(mouseevents.mMousePosX);
+                                }
+                            }
+
+                            mouseevents.canvas.onmouseup = function(ev)
+                            {
+                                mouseevents.mMouseIsDown = false;
+                                if( mouseevents.mIsPaused ) mouseevents.mForceFrame = true;
+                            }
+                            /*
+                            */
+                        }
+			function init() {
+ 
+                                vertex_header_source = document.getElementById('vsHeader').textContent;
+                                fragment_header_source=document.getElementById('fsHeader').textContent;
+				vertex_shader_source = document.getElementById('vs').textContent;
+				fragment_shader_source = document.getElementById('fs').textContent;
+                                vertex_footer_source = document.getElementById('vsFooter').textContent;
+                                fragment_footer_source = document.getElementById('fsFooter').textContent;
+ 
+				canvas = document.querySelector( 'canvas' );
+                                
+                                
+                                addMouseEvents(canvas);
+                                
+ 
+				// Initialise WebGL
+ 
+				try {
+ 
+                                        var opts = { alpha: false ,
+                                        depth: false, 
+                                        stencil: false, 
+                                        premultipliedAlpha: false, 
+                                        antialias: false, 
+                                        preserveDrawingBuffer: false, 
+                                        powerPreference: "high-performance",  // "low_power", "high_performance", "default"
+                                       };
+                                        
+					gl = canvas.getContext( "webgl2",opts);
+                                        if( gl === null) gl = canvas.getContext( "experimental-webgl2" );
+                                        if( gl === null) gl = canvas.getContext( "webgl",opts );
+                                        if( gl === null) gl = canvas.getContext( "experimental-webgl",opts );
+ 
+				} catch( error ) { }
+ 
+				if ( !gl ) {
+ 
+					throw "cannot create webgl context";
+ 
+				}
+ 
+                                
+                                
+				// Create Vertex buffer (2 triangles)
+ 
+				buffer = gl.createBuffer();
+				gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
+				gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( [ - 1.0, - 1.0, 1.0, - 1.0, - 1.0, 1.0, 1.0, - 1.0, 1.0, 1.0, - 1.0, 1.0 ] ), gl.STATIC_DRAW );
+ 
+                               
+                                
+                                
+				currentProgram = createProgram( vertex_shader_source, fragment_shader_source, vertex_header_source, fragment_header_source,vertex_footer_source,fragment_footer_source );
+
+				timeLocation = gl.getUniformLocation( currentProgram, 'iTime' );
+                                frameLocation = gl.getUniformLocation( currentProgram, 'iFrame' );
+				resolutionLocation = gl.getUniformLocation( currentProgram, 'resolution' );
+                                iResolutionLocation = gl.getUniformLocation(currentProgram, 'iResolution' );
+                                iMouseLocation = gl.getUniformLocation(currentProgram,'iMouse');
+                                
+                                
+                                
+ 
+			}
+ 
+			function createProgram( vertex, fragment, vertexheader, fragmentheader, vertexfooter, fragmentfooter ) {
+ 
+				var program = gl.createProgram();
+ 
+				 
+                                var vs = createShader( vertexheader+"\r\n"+vertex+"\r\n"+vertexfooter, gl.VERTEX_SHADER);
+                                var fs = createShader( fragmentheader+"\r\n"+fragment+"\r\n"+fragmentfooter, gl.FRAGMENT_SHADER);
+                                
+				if ( vs == null || fs == null ) return null;
+ 
+				gl.attachShader( program, vs );
+				gl.attachShader( program, fs );
+ 
+				gl.deleteShader( vs );
+				gl.deleteShader( fs );
+ 
+				gl.linkProgram( program );
+ 
+				if ( !gl.getProgramParameter( program, gl.LINK_STATUS ) ) {
+ 
+					alert( "ERROR:\n" +
+					"VALIDATE_STATUS: " + gl.getProgramParameter( program, gl.VALIDATE_STATUS ) + "\n" +
+					"ERROR: " + gl.getError() + "\n\n" +
+					"- Vertex Shader -\n" + vertex + "\n\n" +
+					"- Fragment Shader -\n" + fragment );
+ 
+					return null;
+ 
+				}
+ 
+				return program;
+ 
+			}
+ 
+			function createShader( src, type ) {
+ 
+				var shader = gl.createShader( type );
+ 
+				gl.shaderSource( shader, src );
+				gl.compileShader( shader );
+ 
+				if ( !gl.getShaderParameter( shader, gl.COMPILE_STATUS ) ) {
+ 
+					alert( ( type == gl.VERTEX_SHADER ? "VERTEX" : "FRAGMENT" ) + " SHADER:\n" + gl.getShaderInfoLog( shader ) );
+					return null;
+ 
+				}
+ 
+				return shader;
+ 
+			}
+ 
+			function resizeCanvas( event ) {
+ 
+				if ( canvas.width != canvas.clientWidth ||
+					 canvas.height != canvas.clientHeight ) {
+
+					canvas.width = canvas.clientWidth;
+					canvas.height = canvas.clientHeight;
+
+					parameters.screenWidth = canvas.width;
+					parameters.screenHeight = canvas.height;
+
+					gl.viewport( 0, 0, canvas.width, canvas.height );
+
+				}
+ 
+			}
+ 
+			function animate() {
+ 
+				resizeCanvas();
+				render();
+				requestAnimationFrame( animate );
+ 
+			}
+                        
+			function render() {
+ 
+				if ( !currentProgram ) 
+                                {
+                                    return;
+                                }
+                              
+                                
+                                window.mouseevents.mMousePosX=window.mouseevents.mMousePosX||0;
+                                window.mouseevents.mMousePosY=window.mouseevents.mMousePosY||0;
+                                window.mouseevents.mMouseOriX=window.mouseevents.mMouseOriX||0;
+                                window.mouseevents.mMouseOriY=window.mouseevents.mMouseOriY||0;
+                                window.frameCounter = window.frameCounter||1;
+                               
+                                let mouse = [  window.mouseevents.mMousePosX, window.mouseevents.mMousePosY, window.mouseevents.mMouseOriX, window.mouseevents.mMouseOriY ];
+                                 
+
+				parameters.iTime = new Date().getTime() - parameters.start_time;
+ 
+				gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
+ 
+				// Load program into GPU
+ 
+				gl.useProgram( currentProgram );
+ 
+				// Set values to program variables
+ 
+				gl.uniform1f( timeLocation, parameters.iTime / 1000 );
+                                gl.uniform1i( frameLocation, window.frameCounter++);
+				gl.uniform2f( resolutionLocation, parameters.screenWidth, parameters.screenHeight );
+                                gl.uniform3f( iResolutionLocation, parameters.screenWidth, parameters.screenHeight, 32. );
+                                gl.uniform4f( iMouseLocation, window.mouseevents.mMousePosX, window.mouseevents.mMousePosY,window.mouseevents.mMouseOriX, window.mouseevents.mMouseOriY);
+                                
+                                
+				// Render geometry
+ 
+				gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
+				gl.vertexAttribPointer( vertex_position, 2, gl.FLOAT, false, 0, 0 );
+				gl.enableVertexAttribArray( vertex_position );
+				gl.drawArrays( gl.TRIANGLES, 0, 6 );
+				gl.disableVertexAttribArray( vertex_position );
+ 
+			}
+ 
+		</script> 
+ 
+	</body> 
+</html>
