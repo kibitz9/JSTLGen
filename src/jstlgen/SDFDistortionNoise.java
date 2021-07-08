@@ -25,9 +25,9 @@ public class SDFDistortionNoise extends SignedDistanceField3d {
     @Override
     public double GetRawDistance(Vector3d p) {
         double d = toDistort.GetDistance(p);
-        if (d<=mult){
+        if (d<=mult*4.){
             double noise = noise(p.Scale(noiseScale));
-            d= d-noise;
+            d= (d-noise)*.5;
         }
         //double strength = clamp(mult/d,0.,1.);
         return d;
@@ -168,9 +168,9 @@ public class SDFDistortionNoise extends SignedDistanceField3d {
         String d = "\r\n\tfloat "+vMult+"="+mult+";";
         d+="\r\n\tfloat "+vNoiseScale+"="+noiseScale+";";
         d+="\r\n\tfloat "+vDist+"="+sd.code+";";
-        d+="\r\n\tif ("+vDist+"<="+vMult+"){";
+        d+="\r\n\tif ("+vDist+"<="+vMult+"*4.){";
         d+="\r\n\t\tfloat "+vNoise+"=simpleNoise(<parm>*"+vNoiseScale+")*"+vMult+";";
-        d+="\r\n\t\t"+vDist+"="+vDist+"-"+vNoise+";";
+        d+="\r\n\t\t("+vDist+"="+vDist+"-"+vNoise+")*.5;";
         d+="\r\n\t}";
                 
         //d+="\r\n\tfloat "+vStrength+"=clamp("+vMult+"/"+vDist+",0.,1.);";
