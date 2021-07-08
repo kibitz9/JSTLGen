@@ -229,7 +229,7 @@ public class _ShaderStringTest {
         
         surface = new SDFOperationUniformScale(surface,.5);
         
-        surface = new SDFDistortionNoise(surface,.125,10);
+        //surface = new SDFDistortionNoise(surface,.125,10);
         
         surface= new SDFOperationTrigRotateY(surface,"-iTime/5.");
         
@@ -260,11 +260,15 @@ public class _ShaderStringTest {
         
         SignedDistanceField3d env = new SDF3dPrimitivePlane(new Vector3d(0,1,0),1.1);
         env = new SDFMaterial(env,new MaterialFunction(new Vector3d(1,.9,.9)));
+        env = new SDFDistortionNoise(env,.1,20);
+        
         
         SignedDistanceField3d env2 = new SDF3dPrimitiveBox(new Vector3d(100,10,1));
         env2 = new SDFMaterial(env2,new MaterialFunction(new Vector3d(1.9,1.9,2)));
-        
+        env2 = new SDFDistortionNoise(env2,.1,20);
         env2 = new SDFOperationTranslate(env2,new Vector3d(0,0,3));
+        
+        
         
         u1 = new SDFOperationCSGUnion(u1,env2);
         u1 = new SDFOperationCSGUnion(u1,env);
