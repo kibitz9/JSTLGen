@@ -234,6 +234,34 @@ public class Fourier {
         i=i.ifft();
         i.WriteRealsToImageFile("c:\\data\\extractedOriginal.png");
         
+        /////////////////////////
+        
+        
+        ImageThreeChannel result = new ImageThreeChannel("c:\\data\\result.png");
+        ImageThreeChannel testone = new ImageThreeChannel("c:\\data\\test1.png");
+        ImageThreeChannel testtwo = new ImageThreeChannel("c:\\data\\test2.png");
+        
+        result=result.fft();
+        testone=testone.fft();
+        testtwo=testtwo.fft();
+        ImageThreeChannel c = result.divide(testone);
+        
+        ImageThreeChannel result2 = testtwo.multiply(c);
+        result2=result2.ifft();
+        result2.WriteRealsToImageFile("c:\\data\\crazyexperiment.png");
+        
+        
+        ImageThreeChannel cat = new ImageThreeChannel("c:\\data\\cat2.jpg");
+        
+        ImageThreeChannel catfft = cat.fft();
+        
+        catfft=catfft.lowPass(64);
+        cat = catfft.ifft();
+        
+        cat.WriteRealsToImageFile("c:\\data\\catfilteredlow.png");
+        
+        
+        
         
     }
     

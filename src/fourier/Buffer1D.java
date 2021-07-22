@@ -51,11 +51,16 @@ public class Buffer1D{
    
     Buffer1D lowPass(double amt){
         amt = clamp(amt,0,1);
-        int cutoff = (int)(((double)reals.length)*amt);
+        int cutoff = (int)(((double)reals.length)*amt)/2;
+        return lowPass(cutoff);
+    }
+    
+    Buffer1D lowPass(int cutoff){
+       
         double[] newReals = new double[reals.length];
         double[] newImaginaries = new double[imaginaries.length];
         for (int a=0;a<reals.length;a++){
-            if (a<=cutoff){
+            if (a<=cutoff||a>=(reals.length-(cutoff+1))){
                 newReals[a]=reals[a];
                 newImaginaries[a]=imaginaries[a];
             }
@@ -69,11 +74,16 @@ public class Buffer1D{
     
     Buffer1D highPass(double amt){
         amt = clamp(amt,0,1);
-        int cutoff = (int)(((double)reals.length)*amt);
+        int cutoff = (int)(((double)reals.length)*amt)/2;
+        return highPass(cutoff);
+    }
+    
+    Buffer1D highPass(int cutoff){
+        
         double[] newReals = new double[reals.length];
         double[] newImaginaries = new double[imaginaries.length];
         for (int a=0;a<reals.length;a++){
-            if (a>=cutoff){
+            if (a>=cutoff&&a<=(reals.length-(cutoff+1))){
                 newReals[a]=reals[a];
                 newImaginaries[a]=imaginaries[a];
             }
@@ -99,7 +109,13 @@ public class Buffer1D{
        
         return new Buffer1D(newReals,newImaginaries);
     }
-    
+//    Buffer1D growBuffer(){
+//        double[] newReals = new double[reals.length*2];
+//        double[] newImaginaries = new double[imaginaries.length*2];
+//        for (int a=0;a<reals.length;a++){
+//            
+//        }
+//    }
     Buffer1D multiply(Buffer1D other){
         if (other.reals.length!=this.reals.length){
             throw new java.lang.RuntimeException("buffer sizes must match");

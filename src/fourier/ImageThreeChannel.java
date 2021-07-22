@@ -122,10 +122,23 @@ public class ImageThreeChannel {
         return new ImageThreeChannel(newRed,newGreen,newBlue);
     }
     
+    public ImageThreeChannel lowPass(int cutoff){
+        Buffer2D newRed = this.red.lowPass(cutoff);
+        Buffer2D newGreen = this.green.lowPass(cutoff);
+        Buffer2D newBlue = this.blue.lowPass(cutoff);
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
+    
      public ImageThreeChannel highPass(double amt){
         Buffer2D newRed = this.red.highPass(amt);
         Buffer2D newGreen = this.green.highPass(amt);
         Buffer2D newBlue = this.blue.highPass(amt);
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
+    public ImageThreeChannel highPass(int cutoff){
+        Buffer2D newRed = this.red.highPass(cutoff);
+        Buffer2D newGreen = this.green.highPass(cutoff);
+        Buffer2D newBlue = this.blue.highPass(cutoff);
         return new ImageThreeChannel(newRed,newGreen,newBlue);
     }
     

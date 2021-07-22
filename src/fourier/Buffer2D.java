@@ -34,22 +34,59 @@ public  class Buffer2D{
         }
         return new Buffer2D(newBuffers);
     }
-    
+    private double clamp(double n, double low, double high){
+        if (n<low){
+            return low;
+        }
+        if (n>high){
+            return high;
+        }
+        return n;
+    }
+   
     public Buffer2D lowPass(double amt){
+        amt = clamp(amt,0,1);
+        int cutoff = (int)(((double)buffers1d.length)*amt)/2;
+        
+        return lowPass(cutoff);
+    }
+    
+    public Buffer2D lowPass(int cutoff){
+       
+        
         Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
         for(int a=0;a<newBuffers.length;a++){
-            newBuffers[a]=buffers1d[a].lowPass(amt);
+            if (a<=cutoff||a>=(buffers1d.length-(cutoff+1))){
+                newBuffers[a]=buffers1d[a].lowPass(cutoff);
+            }
+            else{
+                newBuffers[a]=new Buffer1D(new double[buffers1d.length]);
+            }
         }
         return new Buffer2D(newBuffers);
     }
     
     public Buffer2D highPass(double amt){
+        amt = clamp(amt,0,1);
+        int cutoff = (int)(((double)buffers1d.length)*amt)/2;
+        
+        return highPass(cutoff);
+    }
+    
+    public Buffer2D highPass(int cutoff){
+        
         Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
         for(int a=0;a<newBuffers.length;a++){
-            newBuffers[a]=buffers1d[a].highPass(amt);
+            if (a>=cutoff&&a<=(buffers1d.length-(cutoff+1))){
+                newBuffers[a]=buffers1d[a].highPass(cutoff);
+            }
+            else{
+                newBuffers[a]=new Buffer1D(new double[buffers1d.length]);
+            }
         }
         return new Buffer2D(newBuffers);
     }
+    
     
     public Buffer2D multiply(Buffer2D other){
         Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
