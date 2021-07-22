@@ -5,6 +5,8 @@
  */
 package fourier;
 
+import javax.imageio.ImageIO;
+
 /**
  *
  * @author Christopher.Miller
@@ -14,6 +16,65 @@ public  class Buffer2D{
     public Buffer2D(Buffer1D[] buffers1d){
         this.buffers1d=buffers1d;
     }
+    
+    
+    
+    public Buffer2D ifft(){
+        Buffer2D temp = this.onedifft();
+        temp=temp.SwapAxis();
+        temp = temp.onedifft();
+        temp=temp.SwapAxis();
+        return temp;
+    }
+    
+    public Buffer2D scale(double scalar){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        for(int a=0;a<newBuffers.length;a++){
+            newBuffers[a]=buffers1d[a].scale(scalar);
+        }
+        return new Buffer2D(newBuffers);
+    }
+    
+    public Buffer2D lowPass(double amt){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        for(int a=0;a<newBuffers.length;a++){
+            newBuffers[a]=buffers1d[a].lowPass(amt);
+        }
+        return new Buffer2D(newBuffers);
+    }
+    
+    public Buffer2D highPass(double amt){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        for(int a=0;a<newBuffers.length;a++){
+            newBuffers[a]=buffers1d[a].highPass(amt);
+        }
+        return new Buffer2D(newBuffers);
+    }
+    
+    public Buffer2D multiply(Buffer2D other){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        if (newBuffers.length!=other.buffers1d.length){
+            throw new java.lang.RuntimeException("Buffer sizes must match");
+            
+        }
+        for (int a=0;a<newBuffers.length;a++){
+            newBuffers[a]=buffers1d[a].multiply(other.buffers1d[a]);
+        }
+        return new Buffer2D(newBuffers);
+    }
+    
+    public Buffer2D divide(Buffer2D other){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        if (newBuffers.length!=other.buffers1d.length){
+            throw new java.lang.RuntimeException("Buffer sizes must match");
+            
+        }
+        for (int a=0;a<newBuffers.length;a++){
+            newBuffers[a]=buffers1d[a].divide(other.buffers1d[a]);
+        }
+        return new Buffer2D(newBuffers);
+    }
+    
     
     
     public Buffer2D fft(){
@@ -32,7 +93,16 @@ public  class Buffer2D{
         }
         return new Buffer2D(temp);
     }
+    public Buffer2D onedifft(){
+        //fft only in one dimension
+        Buffer1D[] temp = new Buffer1D[buffers1d.length];
+        for (int a=0;a<buffers1d.length;a++){
+            temp[a] = buffers1d[a].ifft();
+        }
+        return new Buffer2D(temp);
+    }
     
+   
     
     public Buffer2D SwapAxis(){
         if (buffers1d.length==0){

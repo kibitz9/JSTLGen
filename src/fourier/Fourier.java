@@ -39,6 +39,8 @@ public class Fourier {
         return _fft(toTransform);
     }
     
+    
+    
     private static Buffer1D _fft(Buffer1D toTransform){
         
        
@@ -191,6 +193,47 @@ public class Fourier {
         System.out.println("***************");
         System.out.println(aBuffer);
         System.out.println("***************");
+        
+        ImageThreeChannel i = new ImageThreeChannel("c:\\data\\imageone.png");
+        
+        double filterScale = 8192;
+        
+        ImageThreeChannel f = new ImageThreeChannel("c:\\data\\imagetwo.png");
+        f=f.scale(1.0/filterScale);
+        i=i.fft();
+        f=f.fft();
+        i=i.multiply(f);
+        //i=i.highPass(.995);
+        i=i.ifft();
+        
+       
+        i.WriteRealsToImageFile("c:\\data\\convolutionResult.png");
+        
+        //now attempt deconvolution...
+        ImageThreeChannel original = new ImageThreeChannel("c:\\data\\imageone.png");
+        
+        
+        original=original.fft();
+        i=i.fft();//convert back to f domain again.
+        ImageThreeChannel convolution = i.divide(original);
+        convolution=convolution.ifft();
+        //multiply so we can see the results in the image...
+        convolution=convolution.scale(filterScale);
+        convolution.WriteRealsToImageFile("c:\\data\\extractedConvolution.png");
+        convolution=convolution.scale(1./filterScale);
+        
+        convolution = convolution.fft();
+        
+        i=i.divide(convolution);
+        //attempt to restore original image from reconstructed convolution...
+        
+        
+        
+        //i=i.divide(f);
+        
+        i=i.ifft();
+        i.WriteRealsToImageFile("c:\\data\\extractedOriginal.png");
+        
         
     }
     
