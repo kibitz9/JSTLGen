@@ -36,8 +36,7 @@ public class ImageThreeChannel {
         return new ImageThreeChannel(newRed,newGreen,newBlue);
     }
     
-    public ImageThreeChannel(String filePath){
-        
+    private void loadImage(String filePath){
         try{
             java.io.File f = new java.io.File(filePath);
             java.awt.image.BufferedImage bi = ImageIO.read(f);
@@ -95,6 +94,14 @@ public class ImageThreeChannel {
         
     }
     
+    public ImageThreeChannel(String filePath){
+        
+        loadImage(filePath);
+    }
+    
+    
+    
+    
     public void writeNonZeros(){
         for (int a=0;a<this.red.buffers1d.length;a++){
             for (int b=0;b<this.red.buffers1d[a].reals.length;b++){
@@ -141,7 +148,32 @@ public class ImageThreeChannel {
         Buffer2D newBlue = this.blue.highPass(cutoff);
         return new ImageThreeChannel(newRed,newGreen,newBlue);
     }
+    public ImageThreeChannel merge(ImageThreeChannel other, int cutoff){
+        Buffer2D newRed = this.red.merge(other.red, cutoff);
+        Buffer2D newGreen = this.green.merge(other.green,cutoff);
+        Buffer2D newBlue = this.blue.merge(other.blue,cutoff);
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
+    public ImageThreeChannel blend(ImageThreeChannel other, double amount){
+        Buffer2D newRed = this.red.blend(other.red, amount);
+        Buffer2D newGreen = this.green.blend(other.green,amount);
+        Buffer2D newBlue = this.blue.blend(other.blue,amount);
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
     
+    public ImageThreeChannel threshold(double amt){
+        Buffer2D newRed = this.red.threshold(amt);
+        Buffer2D newGreen = this.green.threshold(amt);
+        Buffer2D newBlue = this.blue.threshold(amt);
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
+    
+     public ImageThreeChannel inversethreshold(double amt){
+        Buffer2D newRed = this.red.inversethreshold(amt);
+        Buffer2D newGreen = this.green.inversethreshold(amt);
+        Buffer2D newBlue = this.blue.inversethreshold(amt);
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
     
     public ImageThreeChannel scale(double scalar){
         Buffer2D newRed = this.red.scale(scalar);
@@ -163,6 +195,63 @@ public class ImageThreeChannel {
         return new ImageThreeChannel(newRed,newGreen,newBlue);
     }
     
+    public ImageThreeChannel swapRealsAndImaginaries(){
+        Buffer2D newRed = this.red.swapRealsAndImaginaries();
+        Buffer2D newGreen = this.green.swapRealsAndImaginaries();
+        Buffer2D newBlue = this.blue.swapRealsAndImaginaries();
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
+    
+    public ImageThreeChannel clearReals(){
+        Buffer2D newRed = this.red.clearReals();
+        Buffer2D newGreen = this.green.clearReals();
+        Buffer2D newBlue = this.blue.clearReals();
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
+    public ImageThreeChannel clearImaginaries(){
+        Buffer2D newRed = this.red.clearImaginaries();
+        Buffer2D newGreen = this.green.clearImaginaries();
+        Buffer2D newBlue = this.blue.clearImaginaries();
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
+    
+    public ImageThreeChannel add(ImageThreeChannel other){
+        Buffer2D newRed = this.red.add(other.red);
+        Buffer2D newGreen = this.green.add(other.green);
+        Buffer2D newBlue = this.blue.add(other.blue);
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
+    
+    public ImageThreeChannel toUnitVectors(){
+        Buffer2D newRed = this.red.toUnitVectors();
+        Buffer2D newGreen = this.green.toUnitVectors();
+        Buffer2D newBlue = this.blue.toUnitVectors();
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
+    
+    public ImageThreeChannel abs(){
+        Buffer2D newRed = this.red.abs();
+        Buffer2D newGreen = this.green.abs();
+        Buffer2D newBlue = this.blue.abs();
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
+    public ImageThreeChannel subtract(ImageThreeChannel other){
+        Buffer2D newRed = this.red.subtract(other.red);
+        Buffer2D newGreen = this.green.subtract(other.green);
+        Buffer2D newBlue = this.blue.subtract(other.blue);
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
+    public int getSize(){
+        return this.red.buffers1d.length;
+    }
+    
+    public ImageThreeChannel resize(int newSize){
+        Buffer2D newRed = this.red.resize(newSize);
+        Buffer2D newGreen = this.green.resize(newSize);
+        Buffer2D newBlue = this.blue.resize(newSize);
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
+    
     public void WriteRealsToImageFile(String path){
         int widthHeight = red.buffers1d.length;
         java.awt.image.BufferedImage bi = new java.awt.image.BufferedImage(widthHeight,widthHeight,2);
@@ -171,6 +260,98 @@ public class ImageThreeChannel {
                 int redInt = clamp((int)red.buffers1d[y].reals[x],0,255);
                 int greenInt = clamp((int)green.buffers1d[y].reals[x],0,255);
                 int blueInt = clamp((int)blue.buffers1d[y].reals[x],0,255);
+                
+                java.awt.Color temp = new java.awt.Color(redInt,greenInt,blueInt);
+                //System.out.println(temp.getRGB());
+//                if (temp.getRed()>0){
+//                    System.out.println(temp.getRed());
+//                }
+                bi.setRGB(x,y,temp.getRGB());
+                //bi.setRGB(x,y,0xff0000ff);
+            }
+        }
+        try{
+            ImageIO.write(bi,"png", new java.io.File(path));
+        }
+        catch(java.lang.Exception err){
+            System.out.println(err.getMessage());
+        }
+        
+    }
+    
+    public void WriteMagnitudesToImageFile(String path){
+        int widthHeight = red.buffers1d.length;
+        java.awt.image.BufferedImage bi = new java.awt.image.BufferedImage(widthHeight,widthHeight,2);
+        for (int y=0;y<widthHeight;y++){
+            for(int x=0;x<widthHeight;x++){
+                double r = Math.sqrt(
+                        red.buffers1d[y].reals[x]*red.buffers1d[y].reals[x]
+                        +red.buffers1d[y].imaginaries[x]*red.buffers1d[y].imaginaries[x]);
+                double g = Math.sqrt(
+                        green.buffers1d[y].reals[x]*green.buffers1d[y].reals[x]
+                        +green.buffers1d[y].imaginaries[x]*green.buffers1d[y].imaginaries[x]);
+                double b = Math.sqrt(
+                        blue.buffers1d[y].reals[x]*blue.buffers1d[y].reals[x]
+                        +blue.buffers1d[y].imaginaries[x]*blue.buffers1d[y].imaginaries[x]);
+                
+                int redInt = clamp((int)r,0,255);
+                int greenInt = clamp((int)g,0,255);
+                int blueInt = clamp((int)b,0,255);
+                
+                java.awt.Color temp = new java.awt.Color(redInt,greenInt,blueInt);
+                //System.out.println(temp.getRGB());
+//                if (temp.getRed()>0){
+//                    System.out.println(temp.getRed());
+//                }
+                bi.setRGB(x,y,temp.getRGB());
+                //bi.setRGB(x,y,0xff0000ff);
+            }
+        }
+        try{
+            ImageIO.write(bi,"png", new java.io.File(path));
+        }
+        catch(java.lang.Exception err){
+            System.out.println(err.getMessage());
+        }
+        
+    }
+    
+    
+    public static ImageThreeChannel EDGEDETECT3X3 = new ImageThreeChannel(
+            Buffer2D.EDGEDETECT3X3,
+            Buffer2D.EDGEDETECT3X3,
+            Buffer2D.EDGEDETECT3X3
+    );
+    
+    public static ImageThreeChannel EDGEDETECT6X6 = new ImageThreeChannel(
+            Buffer2D.EDGEDETECT6X6,
+            Buffer2D.EDGEDETECT6X6,
+            Buffer2D.EDGEDETECT6X6
+    );
+    
+    public static ImageThreeChannel EDGEDETECT9X9 = new ImageThreeChannel(
+            Buffer2D.EDGEDETECT9X9,
+            Buffer2D.EDGEDETECT9X9,
+            Buffer2D.EDGEDETECT9X9
+    );
+    
+     public static ImageThreeChannel EDGEDETECT9X9INVERTED = new ImageThreeChannel(
+            Buffer2D.EDGEDETECT9X9INVERTED,
+            Buffer2D.EDGEDETECT9X9INVERTED,
+            Buffer2D.EDGEDETECT9X9INVERTED
+    );
+    
+   
+    
+    
+    public void WriteImaginariesToImageFile(String path){
+        int widthHeight = red.buffers1d.length;
+        java.awt.image.BufferedImage bi = new java.awt.image.BufferedImage(widthHeight,widthHeight,2);
+        for (int y=0;y<widthHeight;y++){
+            for(int x=0;x<widthHeight;x++){
+                int redInt = clamp((int)red.buffers1d[y].imaginaries[x],0,255);
+                int greenInt = clamp((int)green.buffers1d[y].imaginaries[x],0,255);
+                int blueInt = clamp((int)blue.buffers1d[y].imaginaries[x],0,255);
                 
                 java.awt.Color temp = new java.awt.Color(redInt,greenInt,blueInt);
                 //System.out.println(temp.getRGB());

@@ -21,6 +21,8 @@ public class Buffer1D{
         }
     }
     
+    
+    
     public Buffer1D GetConjugates(){
         double[] newImaginaries = new double[imaginaries.length];
         for(int a=0;a<imaginaries.length;a++){
@@ -49,6 +51,70 @@ public class Buffer1D{
         return n;
     }
    
+    Buffer1D merge(Buffer1D other, int cutoff){
+        double[] newReals = new double[reals.length];
+        double[] newImaginaries = new double[imaginaries.length];
+        for (int a=0;a<reals.length;a++){
+            if (a<=cutoff||a>=(reals.length-(cutoff+1))){
+                newReals[a]=reals[a];
+                newImaginaries[a]=imaginaries[a];
+            }
+            else{
+                newReals[a]=other.reals[a];
+                newImaginaries[a]=other.imaginaries[a];
+            }
+        }
+        return new Buffer1D(newReals,newImaginaries);
+    }
+    
+    Buffer1D blend(Buffer1D other, double amount){
+        double[] newReals = new double[reals.length];
+        double[] newImaginaries = new double[imaginaries.length];
+        for (int a=0;a<reals.length;a++){
+            newReals[a]=reals[a]*(1-amount)+other.reals[a]*amount;
+            newImaginaries[a]=imaginaries[a]*(1-amount)+other.imaginaries[a]*amount;
+        }
+        return new Buffer1D(newReals,newImaginaries);
+    }
+    
+    Buffer1D threshold(double amt){
+        double amts = amt*amt;
+        double[] newReals = new double[reals.length];
+        double[] newImaginaries = new double[imaginaries.length];
+        for (int a=0;a<reals.length;a++){
+            if (Math.abs(reals[a]*imaginaries[a])>=amts){
+                newReals[a]=reals[a];
+                newImaginaries[a]=imaginaries[a];
+            }
+            else{
+                newReals[a]=0;
+                newImaginaries[a]=0;
+            }
+            
+        }
+        return new Buffer1D(newReals,newImaginaries);
+    }
+    
+    Buffer1D inversethreshold(double amt){
+        double amts = amt*amt;
+        double[] newReals = new double[reals.length];
+        double[] newImaginaries = new double[imaginaries.length];
+        for (int a=0;a<reals.length;a++){
+            if (Math.abs(reals[a]*imaginaries[a])<=amts){
+                newReals[a]=reals[a];
+                newImaginaries[a]=imaginaries[a];
+            }
+            else{
+                newReals[a]=0;
+                newImaginaries[a]=0;
+            }
+            
+        }
+        return new Buffer1D(newReals,newImaginaries);
+    }
+    
+    
+    
     Buffer1D lowPass(double amt){
         amt = clamp(amt,0,1);
         int cutoff = (int)(((double)reals.length)*amt)/2;
@@ -77,6 +143,23 @@ public class Buffer1D{
         int cutoff = (int)(((double)reals.length)*amt)/2;
         return highPass(cutoff);
     }
+    
+    Buffer1D resize(int newSize){
+        double[] newReals = new double[newSize];
+        double[] newImaginaries = new double[newSize];
+        for (int a=0;a<newReals.length;a++){
+            if (a<reals.length){
+                newReals[a]=reals[a];
+                newImaginaries[a]=imaginaries[a];
+            }
+            else{
+                newReals[a]=0;
+                newImaginaries[a]=0;
+            }
+        }
+        return new Buffer1D(newReals,newImaginaries);
+    }
+    
     
     Buffer1D highPass(int cutoff){
         
@@ -117,17 +200,23 @@ public class Buffer1D{
 //        }
 //    }
     Buffer1D multiply(Buffer1D other){
-        if (other.reals.length!=this.reals.length){
-            throw new java.lang.RuntimeException("buffer sizes must match");
+        if (other.reals.length>this.reals.length){
+            throw new java.lang.RuntimeException("Other buffer must currently be same size or smaller.");
         }
         double[] newReals = new double[reals.length];
         double[] newImaginaries = new double[imaginaries.length];
         for (int a=0;a<reals.length;a++){
             //complexMultiplication...
-            double nr = reals[a]*other.reals[a]-imaginaries[a]*other.imaginaries[a];
-            double ni = reals[a]*other.imaginaries[a]+imaginaries[a]*other.reals[a];
-            newReals[a]=nr;
-            newImaginaries[a]=ni;
+            if (a<other.reals.length){
+                double nr = reals[a]*other.reals[a]-imaginaries[a]*other.imaginaries[a];
+                double ni = reals[a]*other.imaginaries[a]+imaginaries[a]*other.reals[a];
+                newReals[a]=nr;
+                newImaginaries[a]=ni;
+            }
+            else{
+                newReals[a]=0;
+                newImaginaries[a]=0;
+            }
         }
         return new Buffer1D(newReals, newImaginaries);
     }
@@ -180,6 +269,89 @@ public class Buffer1D{
             imaginaries[a]=complexes[a].imaginary;
         }
     }
+    
+    public Buffer1D add(Buffer1D other){
+        double[] returnReals = new double[this.reals.length];
+        double[] returnImaginaries = new double[this.imaginaries.length];
+        for (int a=0;a<reals.length;a++){
+            returnReals[a]=reals[a]+other.reals[a];
+            returnImaginaries[a]=imaginaries[a]+other.imaginaries[a];
+        }
+        return new Buffer1D(returnReals, returnImaginaries);
+    }
+    
+    public Buffer1D subtract(Buffer1D other){
+        double[] returnReals = new double[this.reals.length];
+        double[] returnImaginaries = new double[this.imaginaries.length];
+        for (int a=0;a<reals.length;a++){
+            returnReals[a]=reals[a]-other.reals[a];
+            returnImaginaries[a]=imaginaries[a]-other.imaginaries[a];
+        }
+        return new Buffer1D(returnReals, returnImaginaries);
+    }
+    
+    public Buffer1D abs(){
+        double[] returnReals = new double[this.reals.length];
+        double[] returnImaginaries = new double[this.imaginaries.length];
+        for (int a=0;a<reals.length;a++){
+            returnReals[a]=Math.abs(reals[a]);
+            returnImaginaries[a]=Math.abs(imaginaries[a]);
+        }
+        return new Buffer1D(returnReals, returnImaginaries);
+    }
+    
+    
+    
+    public Buffer1D swapRealsAndImaginaries(){
+        double[] returnReals = new double[this.reals.length];
+        double[] returnImaginaries = new double[this.imaginaries.length];
+        for (int a=0;a<reals.length;a++){
+            returnReals[a]=imaginaries[a];
+            returnImaginaries[a]=reals[a];
+        }
+        return new Buffer1D(returnReals, returnImaginaries);
+    }
+    public Buffer1D clearReals(){
+        double[] returnReals = new double[this.reals.length];
+        double[] returnImaginaries = new double[this.imaginaries.length];
+        for (int a=0;a<reals.length;a++){
+            returnReals[a]=0;
+            returnImaginaries[a]=imaginaries[a];
+        }
+        return new Buffer1D(returnReals, returnImaginaries);
+    }
+    public Buffer1D clearImaginaries(){
+        double[] returnReals = new double[this.reals.length];
+        double[] returnImaginaries = new double[this.imaginaries.length];
+        for (int a=0;a<reals.length;a++){
+            returnReals[a]=reals[a];
+            returnImaginaries[a]=0;
+            
+        }
+        return new Buffer1D(returnReals, returnImaginaries);
+    }
+    
+    public Buffer1D toUnitVectors(){
+        double[] returnReals = new double[this.reals.length];
+        double[] returnImaginaries = new double[this.imaginaries.length];
+        for (int a=0;a<reals.length;a++){
+            double real = reals[a];
+            double imaginary = imaginaries[a];
+            
+            double mag =Math.sqrt(real*real+imaginary+imaginary);
+            if (mag==0){
+                mag=.000000001;//kludge.
+            }
+            real/=mag;
+            imaginary/=mag;
+            
+            returnReals[a]=real;
+            returnImaginaries[a]=imaginary;
+            
+        }
+        return new Buffer1D(returnReals, returnImaginaries);
+    }
+    
     @Override
     public String toString(){
         String returnString = "";

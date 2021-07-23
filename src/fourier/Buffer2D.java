@@ -87,18 +87,280 @@ public  class Buffer2D{
         return new Buffer2D(newBuffers);
     }
     
+    public Buffer2D merge(Buffer2D other, int cutoff){
+        
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        for(int a=0;a<newBuffers.length;a++){
+            if (a<=cutoff||a>=(buffers1d.length-(cutoff+1))){
+                newBuffers[a]=buffers1d[a].merge(other.buffers1d[a],cutoff);
+            }
+            else{
+                newBuffers[a]=other.buffers1d[a];//I have to think about this. Is this right?
+            }
+        }
+        return new Buffer2D(newBuffers);
+    }
+    
+    public Buffer2D blend(Buffer2D other, double amount){
+        
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        for(int a=0;a<newBuffers.length;a++){
+            
+                newBuffers[a]=buffers1d[a].blend(other.buffers1d[a],amount);
+            
+        }
+        return new Buffer2D(newBuffers);
+    }
+    
+    public Buffer2D threshold(double amount){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        for (int a=0;a<buffers1d.length;a++){
+            newBuffers[a]=buffers1d[a].threshold(amount);
+        }
+        return new Buffer2D(newBuffers);
+    }
+    
+    public Buffer2D clearReals(){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        for (int a=0;a<buffers1d.length;a++){
+            newBuffers[a]=buffers1d[a].clearReals();
+        }
+        return new Buffer2D(newBuffers);
+    }
+    public Buffer2D clearImaginaries(){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        for (int a=0;a<buffers1d.length;a++){
+            newBuffers[a]=buffers1d[a].clearImaginaries();
+        }
+        return new Buffer2D(newBuffers);
+    }
+    
+    public Buffer2D swapRealsAndImaginaries(){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        for (int a=0;a<buffers1d.length;a++){
+            newBuffers[a]=buffers1d[a].swapRealsAndImaginaries();
+        }
+        return new Buffer2D(newBuffers);
+    }
+    
+    public Buffer2D inversethreshold(double amount){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        for (int a=0;a<buffers1d.length;a++){
+            newBuffers[a]=buffers1d[a].inversethreshold(amount);
+        }
+        return new Buffer2D(newBuffers);
+    }
+    
+    private static Buffer2D getEdgeDetect3x3(){
+       
+        double[] x = new double[3];
+        x[0]=-1./8.;
+        x[1]=-1./8.;
+        x[2]=-1./8.;
+      
+        double[] y = new double[3];
+        y[0]=-1./8.;
+        y[1]=1.;
+        y[2]=-1./8.;
+      
+     
+       
+        
+        Buffer1D[] buffers = new Buffer1D[]{
+            new Buffer1D(x),
+            new Buffer1D(y),
+            new Buffer1D(x)
+        };
+        return new Buffer2D(buffers);
+    }
+    
+    
+    private static Buffer2D getEdgeDetect6x6(){
+       
+        double[] x = new double[6];
+        x[0]=-1./32.;
+        x[1]=-1./32.;
+        x[2]=-1./32.;
+        x[3]=-1./32.;
+        x[4]=-1./32.;
+        x[5]=-1./32.;
+      
+        double[] y = new double[6];
+        y[0]=-1./32.;
+        y[1]=-1./32.;
+        y[2]=.25;
+        y[3]=.25;
+        y[4]=-1./32.;
+        y[5]=-1./32.;
+      
+
+        Buffer1D[] buffers = new Buffer1D[]{
+            new Buffer1D(x),
+            new Buffer1D(x),
+            new Buffer1D(y),
+            new Buffer1D(y),
+            new Buffer1D(x),
+            new Buffer1D(x),
+        };
+        return new Buffer2D(buffers);
+    }
+    
+    private static Buffer2D getEdgeDetect9x9(){
+       
+        double[] x = new double[9];
+        x[0]=-1./72.;
+        x[1]=-1./72.;
+        x[2]=-1./72.;
+        x[3]=-1./72.;
+        x[4]=-1./72.;
+        x[5]=-1./72.;
+        x[6]=-1./72.;
+        x[7]=-1./72.;
+        x[8]=-1./72.;
+      
+        double[] y = new double[9];
+        y[0]=-1./72.;
+        y[1]=-1./72.;
+        y[2]=-1./72.;
+        y[3]= 1./9.;
+        y[4]= 1./9.;
+        y[5]= 1./9.;
+        y[6]=-1./72.;
+        y[7]=-1./72.;
+        y[8]=-1./72.;
+      
+
+        Buffer1D[] buffers = new Buffer1D[]{
+            new Buffer1D(x),
+            new Buffer1D(x),
+            new Buffer1D(x),
+            new Buffer1D(y),
+            new Buffer1D(y),
+            new Buffer1D(y),
+            new Buffer1D(x),
+            new Buffer1D(x),
+            new Buffer1D(x),
+        };
+        return new Buffer2D(buffers);
+    }
+    
+    private static Buffer2D getEdgeDetect9x9Inverted(){
+       
+        double[] x = new double[9];
+        x[0]=1./72.;
+        x[1]=1./72.;
+        x[2]=1./72.;
+        x[3]=1./72.;
+        x[4]=1./72.;
+        x[5]=1./72.;
+        x[6]=1./72.;
+        x[7]=1./72.;
+        x[8]=1./72.;
+      
+        double[] y = new double[9];
+        y[0]=1./72.;
+        y[1]=1./72.;
+        y[2]=1./72.;
+        y[3]=- 1./9.;
+        y[4]=- 1./9.;
+        y[5]=- 1./9.;
+        y[6]=1./72.;
+        y[7]=1./72.;
+        y[8]=1./72.;
+      
+
+        Buffer1D[] buffers = new Buffer1D[]{
+            new Buffer1D(x),
+            new Buffer1D(x),
+            new Buffer1D(x),
+            new Buffer1D(y),
+            new Buffer1D(y),
+            new Buffer1D(y),
+            new Buffer1D(x),
+            new Buffer1D(x),
+            new Buffer1D(x),
+        };
+        return new Buffer2D(buffers);
+    }
+    
+    
+    public static Buffer2D EDGEDETECT3X3 = getEdgeDetect3x3();
+    public static Buffer2D EDGEDETECT6X6 = getEdgeDetect6x6();
+    public static Buffer2D EDGEDETECT9X9 = getEdgeDetect9x9();
+    public static Buffer2D EDGEDETECT9X9INVERTED = getEdgeDetect9x9Inverted();
     
     public Buffer2D multiply(Buffer2D other){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        if (newBuffers.length<other.buffers1d.length){
+            throw new java.lang.RuntimeException("Other buffer must currently be same size or smaller.");
+            
+        }
+        for (int a=0;a<newBuffers.length;a++){
+            if (a<other.buffers1d.length){
+                newBuffers[a]=buffers1d[a].multiply(other.buffers1d[a]);
+            }
+            else{
+                newBuffers[a]=new Buffer1D(new double[buffers1d.length]);
+            }
+        }
+        return new Buffer2D(newBuffers);
+    }
+    
+    public Buffer2D toUnitVectors(){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        for (int a=0;a<buffers1d.length;a++){
+            newBuffers[a]=buffers1d[a].toUnitVectors();
+        }
+        return new Buffer2D(newBuffers);
+    }
+    
+    public Buffer2D abs(){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        for (int a=0;a<buffers1d.length;a++){
+            newBuffers[a]=buffers1d[a].abs();
+        }
+        return new Buffer2D(newBuffers);
+    }
+    
+    public Buffer2D resize(int newSize){
+        Buffer1D[] newBuffers = new Buffer1D[newSize];
+        for (int a=0;a<newSize;a++){
+            if (a<buffers1d.length){
+                newBuffers[a]=buffers1d[a].resize(newSize);
+            }
+            else{
+                newBuffers[a]=new Buffer1D(new double[newSize]);
+            }
+        }
+        return new Buffer2D(newBuffers);
+    }
+    
+    public Buffer2D add(Buffer2D other){
         Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
         if (newBuffers.length!=other.buffers1d.length){
             throw new java.lang.RuntimeException("Buffer sizes must match");
             
         }
         for (int a=0;a<newBuffers.length;a++){
-            newBuffers[a]=buffers1d[a].multiply(other.buffers1d[a]);
+            newBuffers[a]=buffers1d[a].add(other.buffers1d[a]);
         }
         return new Buffer2D(newBuffers);
     }
+    
+     public Buffer2D subtract(Buffer2D other){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        if (newBuffers.length!=other.buffers1d.length){
+            throw new java.lang.RuntimeException("Buffer sizes must match");
+            
+        }
+        for (int a=0;a<newBuffers.length;a++){
+            newBuffers[a]=buffers1d[a].subtract(other.buffers1d[a]);
+        }
+        return new Buffer2D(newBuffers);
+    }
+    
+     
+    
     
     public Buffer2D divide(Buffer2D other){
         Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];

@@ -108,7 +108,7 @@ public class Fourier {
     
     
     public static void main(String[] args){
-        
+        /*
         
         Buffer1D one = new Buffer1D(
         new double[]{
@@ -251,18 +251,80 @@ public class Fourier {
         result2.WriteRealsToImageFile("c:\\data\\crazyexperiment.png");
         
         
-        ImageThreeChannel cat = new ImageThreeChannel("c:\\data\\cat2.jpg");
+        //ImageThreeChannel gr = new ImageThreeChannel("c:\\data\\gr.jpg");
         
-        ImageThreeChannel catfft = cat.fft();
+        //ImageThreeChannel grfft = gr.fft();
         
-        catfft=catfft.lowPass(64);
-        cat = catfft.ifft();
+        ImageThreeChannel ac = new ImageThreeChannel("c:\\data\\ac.png");
         
-        cat.WriteRealsToImageFile("c:\\data\\catfilteredlow.png");
+        ImageThreeChannel acfft = ac.fft();
+        
+        ImageThreeChannel merged = grfft.merge(acfft,8);
+        //ImageThreeChannel merged2 = ac.blend(gr,.5);
+        
+        merged=merged.ifft();
+        merged.WriteRealsToImageFile("c:\\data\\merged.jpg");
+        //merged2.WriteRealsToImageFile("c:\\data\\merged2.jpg");
+        //catfft=catfft.lowPass(64);
+        //cat = catfft.ifft();
+        
+        //cat.WriteRealsToImageFile("c:\\data\\catfilteredlow.png");
+        */
+        
+        /*
+        ImageThreeChannel ac = new ImageThreeChannel("c:\\data\\ac512.png");
+        ac=ac.swapRealsAndImaginaries();
+        ImageThreeChannel gr = new ImageThreeChannel("c:\\data\\gr.jpg");
+        ac=ac.add(gr);
+        ac = ac.fft();
+        //ac = ac.threshold(256000);
+        ac = ac.highPass(.1);
+        ac=ac.ifft();
+        ac=ac.scale(20);
+        ac.WriteRealsToImageFile("c:\\data\\grthreshold.png");
+        ac=ac.swapRealsAndImaginaries();
+        ac.WriteRealsToImageFile("c:\\data\\acthreshold.png");
+        
+        ac.WriteMagnitudesToImageFile("c:\\data\\acgrmags.png");
+        */
         
         
+        ImageThreeChannel filter = ImageThreeChannel.EDGEDETECT9X9.resize(512);
+        filter = filter.fft();
+        ImageThreeChannel filter2 = ImageThreeChannel.EDGEDETECT9X9INVERTED.resize(512);
+        filter2 = filter2.fft();
+        
+        ImageThreeChannel ac = new ImageThreeChannel("C:\\data\\ac512.png");
+        ImageThreeChannel gr = new ImageThreeChannel("c:\\data\\eyeball512.png");
+        
+        ac=ac.fft();
+        ImageThreeChannel ed1 = ac.multiply(filter);//edge detect one
+        ImageThreeChannel ed2 = ac.multiply(filter2);
+    
+        ed1=ed1.ifft();
+        ed2=ed2.ifft();
+        
+        ac = ed1.subtract(ed2).abs();
+        ac=ac.fft();
         
         
+        gr=gr.fft();
+        ImageThreeChannel gr1 = gr.multiply(filter);
+        ImageThreeChannel gr2 = gr.multiply(filter2);
+        gr1=gr1.ifft();
+        gr2=gr2.ifft();
+        gr=gr1.subtract(gr2).abs();
+        gr=gr.fft();
+        
+        //gr=gr.multiply(filter);
+        ac=ac.multiply(gr);
+        ac=ac.ifft();
+        //ac=ac.scale(.0008);
+        ac=ac.scale(.00005);
+        ac.WriteRealsToImageFile("c:\\data\\convolved.png");
+        //ac.WriteImaginariesToImageFile("c:\\data\\convolved2.png");
+        
+       // ac.toUnitVectors().scale(128).WriteRealsToImageFile("c:\\data\\unitvectors.png");
     }
     
     
