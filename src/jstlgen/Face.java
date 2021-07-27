@@ -18,6 +18,7 @@ public class Face {
     private double areaSquared;
     private boolean areaCalulated = false;
     private boolean hasNoArea = false;
+    //
     public Face(Vector3d one, Vector3d two, Vector3d three)
     {
          this(one, two, three, null);
