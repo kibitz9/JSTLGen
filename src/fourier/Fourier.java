@@ -358,7 +358,9 @@ public class Fourier {
        
        c1=c1.divide(extractedFilter);
        System.out.println("multiplying original by filter.");
-       
+      // c1=c1.divide(extractedFilter);
+      // System.out.println("multiplying original by filter again.");
+       /*
        //so far, c1 has our first attempt at a fix. now bring in what it actually does after another round through the system...
        ImageThreeChannel c3 = new ImageThreeChannel("d:\\data\\afterprint.png");
        c3=c3.fft();
@@ -366,8 +368,10 @@ public class Fourier {
        ImageThreeChannel filter2 = c3.divide(c1Cached);
        
        c1=c1.divide(filter2);//reverse this over/undershoot.
-       
-       
+       */
+       int cutoff = 15;
+       ImageThreeChannel c4=c1.lowPass(cutoff);
+       c1=c4.merge(c1Cached,cutoff);
        
        c1=c1.ifft();
        System.out.println("ifft done");
