@@ -19,6 +19,8 @@ public  class Buffer2D{
     
     
     
+    
+    
     public Buffer2D ifft(){
         Buffer2D temp = this.onedifft();
         temp=temp.SwapAxis();
@@ -65,6 +67,17 @@ public  class Buffer2D{
         }
         return new Buffer2D(newBuffers);
     }
+    public Buffer2D clone(boolean sizeOnly){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        for (int a=0;a<newBuffers.length;a++){
+            newBuffers[a]=this.buffers1d[a].clone(sizeOnly);
+        }
+        return new Buffer2D(newBuffers);
+    }
+    public Buffer2D clone(){
+        return clone(false);
+    }
+    
     
     public Buffer2D highPass(double amt){
         amt = clamp(amt,0,1);
@@ -432,4 +445,65 @@ public  class Buffer2D{
         }
         return returnString;
     }
+    
+    public Buffer2D avg(Buffer2D... otherBuffers){
+        Buffer2D[] toParse = new Buffer2D[otherBuffers.length+1];
+        toParse[0]=this;
+        for (int a=0;a<otherBuffers.length;a++){
+            toParse[a+1]=otherBuffers[a];
+        }
+        return average(toParse);
+       
+    }
+    
+    public static Buffer1D[] extract1DBufferArrayAtIndex( int buffer1Dindex, Buffer2D... buffersCollection){
+        Buffer1D[] returnBufferArray = new Buffer1D[buffersCollection.length];
+        for (int a=0;a<buffersCollection.length;a++){
+            returnBufferArray[a]=buffersCollection[a].buffers1d[buffer1Dindex];
+        }
+        return returnBufferArray;
+    }
+    public static Buffer2D average(Buffer2D... buffers){
+        Buffer1D[] newBuffers = new Buffer1D[buffers[0].buffers1d.length];
+        
+        for (int a=0;a<newBuffers.length;a++){
+            Buffer1D[] crossBuffers = extract1DBufferArrayAtIndex(a,buffers);
+            newBuffers[a]=Buffer1D.average(crossBuffers);
+        }
+        return new Buffer2D(newBuffers);
+    }
+    
+    public static double max(double one, double two){
+        if (one>two){
+            return one;
+        }
+        return two;
+    }
+    
+    public Buffer2D showBrightestRealValue(){
+        Buffer1D[] newBuffers = new Buffer1D[this.buffers1d.length];
+        double maxReal = Double.MIN_VALUE;
+        for (int a=0;a<this.buffers1d.length;a++){
+            for (int b=0;b<this.buffers1d[a].reals.length;b++){
+                maxReal=max(maxReal,this.buffers1d[a].reals[b]);
+            }
+        }
+        //System.out.println(maxReal);
+        for (int a=0;a<this.buffers1d.length;a++){
+            double[] newReals = new double[this.buffers1d[a].reals.length];
+            double[] newImaginaries = new double[newReals.length];
+            for (int b=0;b<this.buffers1d[a].reals.length;b++){
+                if (this.buffers1d[a].reals[b]==maxReal){
+                    newReals[b]=maxReal;
+                    //System.out.println(maxReal);
+                }
+                
+            }
+            newBuffers[a]=new Buffer1D(newReals,newImaginaries);
+        }
+        return new Buffer2D(newBuffers);
+        
+        
+    }
+    
 }

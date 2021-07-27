@@ -175,7 +175,7 @@ public class _ShaderStringTest {
       /* -- Good test item... */
       
       
-      
+      /*
         SignedDistanceField3d mb = new SDF3dPrimitiveMandelbox(10,-2.5,.5,1);
         //SignedDistanceField3d mb2 = new SDF3dPrimitiveMandelbox(10,-2,.5,1);
         
@@ -279,7 +279,7 @@ public class _ShaderStringTest {
         
         //final1 = new SDFMaterial(final1,new MaterialFunction(new Vector3d(1,1,1)));
         
-        
+        */
         //***********************//
         
         
@@ -308,18 +308,62 @@ public class _ShaderStringTest {
         final1=xxxx;
         */
         
+        /*
+        SignedDistanceField3d spokes = new SDF3dPrimitiveInfiniteSpokesZAxis(2.,.01,500.);
+        
+        SignedDistanceField3d sphere = new SDF3dPrimitiveSphere(1.);
+        SignedDistanceField3d i = new SDFOperationCSGIntersection(spokes,sphere);
+        sphere = new SDF3dPrimitiveSphere(.95);
+        i=new SDFOperationCSGUnion(i,sphere);
+        i = new SDFOperationTrigRotateY(i,Math.PI/2.);
+        SignedDistanceField3d final1 = sphere;
         
         
+        */
+        /*
+        SignedDistanceField3d sphere = new SDF3dPrimitiveSphere(1.);
+        SignedDistanceField3d gyroid = new SDFDistortionGyroid(.5,.5,0,0);
+        SignedDistanceField3d scale = new SDFOperationUniformScale(gyroid,.1);
+        SignedDistanceField3d onion = new SDFOperationOnion(scale,.09);
+        onion = new SDFOperationOnion(onion,.03);
+        
+        SignedDistanceField3d mb2 = new SDF3dPrimitiveMandelbox(10,-2.5,.5,1);
+        mb2 = new SDFOperationUniformScale(mb2,.33);
+        onion = new SDFOperationCSGIntersection(mb2,onion);
+        SDFMaterial mat1 = new SDFMaterial(onion,new MaterialFunction(new Vector3d(1,0,0)));
+        onion = new SDFOperationOnion(mat1,.01);
+        SignedDistanceField3d surfaceDetail = new SDFOperationSurfaceDetailOnion(sphere,onion,.1);
+        */
+        
+        double ss = -1.5;
+        double rr = .15;
+        int itr = 9;
+        
+        SignedDistanceField3d mb2 = new SDF3dPrimitiveMandelbox(itr,ss,rr,1);
+        mb2 = new SDFOperationTrigRotateX(mb2,3.14159265/4.);
+        SignedDistanceField3d mb3 = new SDF3dPrimitiveMandelbox(itr,ss,rr,1);
+        mb3 = new SDFOperationCSGUnion(mb3,mb2);
+        
+        SignedDistanceField3d mb4 = new SDFOperationTrigRotateY(mb3,3.14159265/4.);
+        mb3 = new SDFOperationCSGUnion(mb3,mb4);
         
         
+        mb3 = new SDFOperationUniformScale(mb3,.5);
         
+        SignedDistanceField3d sphere = new SDF3dPrimitiveSphere(1.);
+        mb3 = new SDFOperationSurfaceDetailOnion(sphere,mb3,.1);
         
-        //SignedDistanceField3d final1 = mb2;
+        mb3 = new SDFOperationSectorDuplicateYAxis(mb3,12);
+        
+        SignedDistanceField3d final1 = mb3;
+        
+        final1 = sphere;
+        
         String initialVarName = "p";
-        ShaderString ss = final1.toShaderString(initialVarName);
+        ShaderString ss2 = final1.toShaderString(initialVarName);
         
         //test = new SDFDistortionSin(test,4,.25);
-        System.out.println(ss.generateString("map7",initialVarName));
-        
+        System.out.println(ss2.generateString("map7",initialVarName));
+        //SignedDistanceField3d mb2 = new SDF3dPrimitiveMandelbox(10,-2.5,.5,1);
     }
 }

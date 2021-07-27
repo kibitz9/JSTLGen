@@ -29,11 +29,23 @@ public class ImageThreeChannel {
         return new ImageThreeChannel(newRed,newGreen,newBlue);
     }
     
+    public ImageThreeChannel toMonochrome(){
+        Buffer2D newRed = red.avg(green,blue);
+        return new ImageThreeChannel(newRed,newRed,newRed);
+    }
+    
     public ImageThreeChannel ifft(){
         Buffer2D newRed = red.ifft();
         Buffer2D newGreen = green.ifft();
         Buffer2D newBlue = blue.ifft();
         return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
+    
+    public ImageThreeChannel showBrightestRealValue(){
+        Buffer2D newRed = red.showBrightestRealValue();
+        Buffer2D newGreen = green.showBrightestRealValue();
+        Buffer2D newBlue = blue.showBrightestRealValue();
+        return new ImageThreeChannel(newRed, newGreen, newBlue);
     }
     
     private void loadImage(String filePath){

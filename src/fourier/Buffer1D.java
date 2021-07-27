@@ -22,6 +22,62 @@ public class Buffer1D{
     }
     
     
+    public Buffer1D avg(Buffer1D... others){
+        Buffer1D[] more = new Buffer1D[others.length+1];
+        more[0]=this;
+        for (int a=0;a<others.length;a++){
+            more[a+1]=others[a];
+        }
+        return average(more);
+    }
+    
+    public static Buffer1D average(Buffer1D... buffers){
+        double[] returnDoubleReal = new double[buffers[0].reals.length];
+        double[] returnDoubleImaginary = new double[buffers[0].imaginaries.length];
+        int bufferCount = buffers.length;
+        
+        if (bufferCount<1){
+            throw new java.lang.RuntimeException("No buffers!");
+                    
+        }
+        double bufferCountD = bufferCount;
+        int buffSize = buffers[0].reals.length;
+        
+        for (int a=0;a<buffSize;a++){
+            for (int b=0;b<bufferCount;b++){
+            
+                returnDoubleReal[a]+=buffers[b].reals[a];
+                returnDoubleImaginary[a]+=buffers[b].imaginaries[a];
+              
+            }
+            returnDoubleReal[a]/=bufferCountD;
+            returnDoubleImaginary[a]/=bufferCountD;
+        }
+        return new Buffer1D(returnDoubleReal,returnDoubleImaginary);
+        
+    }
+    
+    
+    public Buffer1D clone(boolean sizeOnly){
+        if (sizeOnly){
+            return new Buffer1D(new double[reals.length],new double[imaginaries.length]);
+        }
+        else{
+            return clone();
+        }
+    }
+    @Override
+    public Buffer1D clone(){
+        double[] newReals = new double[this.reals.length];
+        double[] newImaginaries = new double[this.imaginaries.length];
+        for (int a=0;a>newReals.length;a++){
+            newReals[a]=reals[a];
+            newImaginaries[a]=imaginaries[a];
+        }
+        return new Buffer1D(newReals,newImaginaries);
+    }
+    
+    
     
     public Buffer1D GetConjugates(){
         double[] newImaginaries = new double[imaginaries.length];
