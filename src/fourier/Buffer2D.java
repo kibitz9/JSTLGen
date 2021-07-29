@@ -17,7 +17,14 @@ public  class Buffer2D{
         this.buffers1d=buffers1d;
     }
     
-    
+    public Buffer2D fft(){
+        //first, fft all the individual rows...
+        Buffer2D temp = this.onedfft();
+        temp=temp.SwapAxis();
+        temp = temp.onedfft();
+        temp=temp.SwapAxis();
+        return temp;
+    }
     
     
     
@@ -67,6 +74,40 @@ public  class Buffer2D{
         }
         return new Buffer2D(newBuffers);
     }
+    
+//    public Buffer2D zeroOutNegativeFrequencies(){
+//        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+//        for(int a=0;a<newBuffers.length;a++){
+//            if (a<=buffers1d.length/2){
+//                newBuffers[a]=buffers1d[a].zeroOutNegativeFrequencies();
+//                
+//            }
+//            else{
+//               // newBuffers[a]=buffers1d[a].zeroOutNegativeFrequencies();
+//                newBuffers[a]=new Buffer1D(new double[buffers1d.length]);
+//            }
+//        }
+//        return new Buffer2D(newBuffers);
+//    }
+//    
+//    public Buffer2D populateNegativeFromPositiveFrequencies(){
+//        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+//        int length = buffers1d.length;
+//        for(int a=0;a<newBuffers.length;a++){
+//            if (a<=buffers1d.length/2){
+//                newBuffers[a]=buffers1d[a].populateNegativeFromPositiveFrequencies();
+//                
+//            }
+//            else{
+//                //newBuffers[a]=buffers1d[a].populateNegativeFromPositiveFrequencies();
+//                newBuffers[a]=buffers1d[length-a].populateNegativeFromPositiveFrequencies().GetConjugates();
+//                
+//            }
+//        }
+//        return new Buffer2D(newBuffers);
+//    }
+//   
+    
     public Buffer2D clone(boolean sizeOnly){
         Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
         for (int a=0;a<newBuffers.length;a++){
@@ -100,6 +141,8 @@ public  class Buffer2D{
         return new Buffer2D(newBuffers);
     }
     
+    
+    
     public Buffer2D merge(Buffer2D other, int cutoff){
         
         Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
@@ -131,6 +174,28 @@ public  class Buffer2D{
             newBuffers[a]=buffers1d[a].threshold(amount);
         }
         return new Buffer2D(newBuffers);
+    }
+    
+    public Buffer2D topNWaves(int waveCount){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        for(int a=0;a<newBuffers.length;a++){
+            newBuffers[a]=buffers1d[a].topNWaves(waveCount);
+        }
+        return new Buffer2D(newBuffers);
+    }
+    public int countNonZeroComponents(){
+        int count = 0;
+        for(int a=0;a<buffers1d.length;a++){
+            count+=buffers1d[a].countNonZeroComponents();
+        }
+        return count;
+    }
+    public int countZeroComponents(){
+        int count = 0;
+        for(int a=0;a<buffers1d.length;a++){
+            count+=buffers1d[a].countZeroComponents();
+        }
+        return count;
     }
     
     public Buffer2D clearReals(){
@@ -389,14 +454,7 @@ public  class Buffer2D{
     
     
     
-    public Buffer2D fft(){
-        //first, fft all the individual rows...
-        Buffer2D temp = this.onedfft();
-        temp=temp.SwapAxis();
-        temp = temp.onedfft();
-        temp=temp.SwapAxis();
-        return temp;
-    }
+   
     public Buffer2D onedfft(){
         //fft only in one dimension
         Buffer1D[] temp = new Buffer1D[buffers1d.length];

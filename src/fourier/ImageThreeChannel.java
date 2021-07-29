@@ -180,13 +180,55 @@ public class ImageThreeChannel {
         return new ImageThreeChannel(newRed,newGreen,newBlue);
     }
     
-     public ImageThreeChannel inversethreshold(double amt){
+    public int countNonZeroComponents(){
+        int count = 0;
+        count +=red.countNonZeroComponents();
+        count +=green.countNonZeroComponents();
+        count +=blue.countNonZeroComponents();
+        return count;
+    }
+    
+//    public ImageThreeChannel zeroOutNegativeFrequencies(){
+//        Buffer2D newRed = this.red.zeroOutNegativeFrequencies();
+//        Buffer2D newGreen = this.green.zeroOutNegativeFrequencies();
+//        Buffer2D newBlue = this.blue.zeroOutNegativeFrequencies();
+//        return new ImageThreeChannel(newRed,newGreen,newBlue);
+//    }
+//    
+//    public ImageThreeChannel populateNegativeFromPositiveFrequencies(){
+//        Buffer2D newRed = this.red.populateNegativeFromPositiveFrequencies();
+//        Buffer2D newGreen = this.green.populateNegativeFromPositiveFrequencies();
+//        Buffer2D newBlue = this.blue.populateNegativeFromPositiveFrequencies();
+//        return new ImageThreeChannel(newRed,newGreen,newBlue);
+//    }
+    public int countZeroComponents(){
+        int count = 0;
+        count +=red.countZeroComponents();
+        count +=green.countZeroComponents();
+        count +=blue.countZeroComponents();
+        return count;
+    }
+    
+    public ImageThreeChannel topNWaves(int waveCount){
+        Buffer2D newRed = this.red.topNWaves(waveCount);
+        Buffer2D newGreen = this.green.topNWaves(waveCount);
+        Buffer2D newBlue = this.blue.topNWaves(waveCount);
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
+    
+    public ImageThreeChannel inversethreshold(double amt){
         Buffer2D newRed = this.red.inversethreshold(amt);
         Buffer2D newGreen = this.green.inversethreshold(amt);
         Buffer2D newBlue = this.blue.inversethreshold(amt);
         return new ImageThreeChannel(newRed,newGreen,newBlue);
     }
     
+    public ImageThreeChannel swapAxis(){
+        Buffer2D newRed = this.red.SwapAxis();
+        Buffer2D newGreen = this.green.SwapAxis();
+        Buffer2D newBlue = this.blue.SwapAxis();
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
     public ImageThreeChannel scale(double scalar){
         Buffer2D newRed = this.red.scale(scalar);
         Buffer2D newGreen = this.green.scale(scalar);

@@ -335,6 +335,7 @@ public class Fourier {
         //ac.WriteImaginariesToImageFile("c:\\data\\convolved2.png");
         
        // ac.toUnitVectors().scale(128).WriteRealsToImageFile("c:\\data\\unitvectors.png");
+       /*
        ImageThreeChannel c1 = new ImageThreeChannel("d:\\data\\c3Original.png");
        System.out.println("Image one loaded");
        ImageThreeChannel c2 = new ImageThreeChannel("d:\\data\\c3AfterSystemRotationCorrection.png");
@@ -360,6 +361,7 @@ public class Fourier {
        System.out.println("multiplying original by filter.");
       // c1=c1.divide(extractedFilter);
       // System.out.println("multiplying original by filter again.");
+       */
        /*
        //so far, c1 has our first attempt at a fix. now bring in what it actually does after another round through the system...
        ImageThreeChannel c3 = new ImageThreeChannel("d:\\data\\afterprint.png");
@@ -369,6 +371,7 @@ public class Fourier {
        
        c1=c1.divide(filter2);//reverse this over/undershoot.
        */
+       /*
        int cutoff = 15;
        ImageThreeChannel c4=c1.lowPass(cutoff);
        c1=c4.merge(c1Cached,cutoff);
@@ -377,6 +380,37 @@ public class Fourier {
        System.out.println("ifft done");
        c1.WriteRealsToImageFile("d:\\data\\claudiaout.png");
        System.out.println("file written");
+
+*/
+       
+       ImageThreeChannel c4= new ImageThreeChannel("d:\\data\\girl.png");
+       c4=c4.fft();
+       //c4=c4.fft();
+       //c4=c4.lowPass(64);
+       //c4=c4.topNWaves(64);
+       //c4=c4.zeroOutNegativeFrequencies();
+       //c4=c4.populateNegativeFromPositiveFrequencies();
+       c4=c4.topNWaves(64);
+       c4=c4.swapAxis();
+       c4=c4.topNWaves(32);
+       c4=c4.swapAxis();
+       //TODO make a version of topNWaves that does the swap axis for us,.
+       
+       double nonZero = c4.countNonZeroComponents();
+       double zero = c4.countZeroComponents();
+       System.out.println(nonZero);
+       System.out.println(zero);
+       
+       System.out.println((nonZero/(nonZero+zero))*100.+"%");
+       
+       
+       
+       //c4=c4.scale(.000001);
+       //c4=c4.ifft();
+       c4=c4.ifft();
+       c4.WriteRealsToImageFile("d:\\data\\girlextremecompression.png");
+       
+       
        
     }
     

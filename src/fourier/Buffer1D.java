@@ -81,13 +81,15 @@ public class Buffer1D{
     
     public Buffer1D GetConjugates(){
         double[] newImaginaries = new double[imaginaries.length];
+        double[] newReals = new double[reals.length];
         for(int a=0;a<imaginaries.length;a++){
+            newReals[a]=reals[a];
             newImaginaries[a] = -imaginaries[a];
         }
-        return new Buffer1D(reals, newImaginaries);
+        return new Buffer1D(newReals, newImaginaries);
     }
 
-    Buffer1D scale(double scalar){
+    public Buffer1D scale(double scalar){
         double[] newReals = new double[reals.length];
         double[] newImaginaries = new double[imaginaries.length];
         for(int a=0;a<reals.length;a++){
@@ -107,7 +109,7 @@ public class Buffer1D{
         return n;
     }
    
-    Buffer1D merge(Buffer1D other, int cutoff){
+    public Buffer1D merge(Buffer1D other, int cutoff){
         double[] newReals = new double[reals.length];
         double[] newImaginaries = new double[imaginaries.length];
         for (int a=0;a<reals.length;a++){
@@ -123,7 +125,7 @@ public class Buffer1D{
         return new Buffer1D(newReals,newImaginaries);
     }
     
-    Buffer1D blend(Buffer1D other, double amount){
+    public Buffer1D blend(Buffer1D other, double amount){
         double[] newReals = new double[reals.length];
         double[] newImaginaries = new double[imaginaries.length];
         for (int a=0;a<reals.length;a++){
@@ -133,12 +135,12 @@ public class Buffer1D{
         return new Buffer1D(newReals,newImaginaries);
     }
     
-    Buffer1D threshold(double amt){
+    public Buffer1D threshold(double amt){
         double amts = amt*amt;
         double[] newReals = new double[reals.length];
         double[] newImaginaries = new double[imaginaries.length];
         for (int a=0;a<reals.length;a++){
-            if (Math.abs(reals[a]*imaginaries[a])>=amts){
+            if (Math.abs(reals[a]*reals[a]+imaginaries[a]*imaginaries[a])>=amts){
                 newReals[a]=reals[a];
                 newImaginaries[a]=imaginaries[a];
             }
@@ -151,12 +153,112 @@ public class Buffer1D{
         return new Buffer1D(newReals,newImaginaries);
     }
     
+    public int countNonZeroComponents(){
+        int count = 0;
+        for (int a=0;a<reals.length;a++){
+            if (reals[a]!=0||imaginaries[a]!=0){
+                count++;
+            }
+        }
+        return count;
+        
+    }
+    public int countZeroComponents(){
+        int count = 0;
+        for (int a=0;a<reals.length;a++){
+            if (reals[a]==0&&imaginaries[a]==0){
+                count++;
+            }
+        }
+        return count;
+    }
+    
+//    public Buffer1D zeroOutNegativeFrequencies(){
+//        double[] newReals = new double[reals.length];
+//        double[] newImaginaries = new double[imaginaries.length];
+//        for (int a=0;a<reals.length;a++){
+//            if (a<=reals.length/2){
+//                newReals[a]=reals[a];
+//                newImaginaries[a]=imaginaries[a];
+//            }
+//            else{
+//                //leave then as zero.
+//            }
+//        }
+//        return new Buffer1D(newReals, newImaginaries);
+//    }
+//    public Buffer1D populateNegativeFromPositiveFrequencies(){
+//        double[] newReals = new double[reals.length];
+//        double[] newImaginaries = new double[imaginaries.length];
+//        int length = reals.length;
+//        for (int a=0;a<reals.length;a++){
+//            if (a<=reals.length/2){
+//                newReals[a]=reals[a];
+//                newImaginaries[a]=imaginaries[a];
+//            }
+//            else{
+//                newReals[a]=reals[length-a];
+//                newImaginaries[a]=-imaginaries[length-a];
+//            }
+//        }
+//        return new Buffer1D(newReals, newImaginaries);
+//    }
+    
+    public Buffer1D topNWaves(int count){
+        //zeros out all other waves beyond the top n (count) magnitudes.
+        //used for possible compression.
+        
+        if (count>=this.reals.length){
+            return this;
+        }
+        int[] savedIndexes = new int[count];
+        double[] savedMagnitudesSquared = new double[count];
+        
+        //assume the first n items have the greatest magnitude to start...
+        for (int a=0;a<count;a++){
+            savedIndexes[a]=a;
+            savedMagnitudesSquared[a]=reals[a]*reals[a]+imaginaries[a]*imaginaries[a];
+        }
+        
+        //now do the rest...
+        for (int a=count;a<reals.length;a++){
+            double ms = reals[a]*reals[a]+imaginaries[a]*imaginaries[a];
+            int currentIndex=a;
+            for (int b=0;b<savedIndexes.length;b++){
+                if (ms>savedMagnitudesSquared[b]){
+                    double temp = savedMagnitudesSquared[b];
+                    savedMagnitudesSquared[b]=ms;
+                    ms=temp;//move this one along...
+                    
+                    int tempi = savedIndexes[b];
+                    savedIndexes[b]=currentIndex;
+                    currentIndex=tempi;//move this one along...
+                }
+            }
+        }
+        
+        double[] newReals = new double[reals.length];
+        double[] newImaginaries = new double[imaginaries.length];
+        
+        for (int a=0;a<newReals.length;a++){
+            for (int b=0;b<savedIndexes.length;b++){
+                if (savedIndexes[b]==a){
+                    newReals[a]=reals[a];
+                    newImaginaries[a]=imaginaries[a];
+                    break;
+                }
+            }
+        }
+        return new Buffer1D(newReals,newImaginaries);
+        
+    }
+    
     Buffer1D inversethreshold(double amt){
         double amts = amt*amt;
         double[] newReals = new double[reals.length];
         double[] newImaginaries = new double[imaginaries.length];
         for (int a=0;a<reals.length;a++){
-            if (Math.abs(reals[a]*imaginaries[a])<=amts){
+            if (Math.abs(reals[a]*reals[a]+imaginaries[a]*imaginaries[a])<=amts){
                 newReals[a]=reals[a];
                 newImaginaries[a]=imaginaries[a];
             }
