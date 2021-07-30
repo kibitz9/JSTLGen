@@ -209,10 +209,31 @@ public class ImageThreeChannel {
         return count;
     }
     
-    public ImageThreeChannel topNWaves(int waveCount){
-        Buffer2D newRed = this.red.topNWaves(waveCount);
-        Buffer2D newGreen = this.green.topNWaves(waveCount);
-        Buffer2D newBlue = this.blue.topNWaves(waveCount);
+    public ImageThreeChannel topNMagnitudes(int waveCount){
+        Buffer2D newRed = this.red.topNMagnitudes(waveCount);
+        Buffer2D newGreen = this.green.topNMagnitudes(waveCount);
+        Buffer2D newBlue = this.blue.topNMagnitudes(waveCount);
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
+    
+    public ImageThreeChannel topNExperimental(int waveCount){
+        Buffer2D newRed = this.red.topNExperimental(waveCount);
+        Buffer2D newGreen = this.green.topNExperimental(waveCount);
+        Buffer2D newBlue = this.blue.topNExperimental(waveCount);
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
+    
+    public ImageThreeChannel topNReals(int waveCount){
+        Buffer2D newRed = this.red.topNReals(waveCount);
+        Buffer2D newGreen = this.green.topNReals(waveCount);
+        Buffer2D newBlue = this.blue.topNReals(waveCount);
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
+    
+    public ImageThreeChannel topNImaginaries(int waveCount){
+        Buffer2D newRed = this.red.topNReals(waveCount);
+        Buffer2D newGreen = this.green.topNReals(waveCount);
+        Buffer2D newBlue = this.blue.topNReals(waveCount);
         return new ImageThreeChannel(newRed,newGreen,newBlue);
     }
     
@@ -220,6 +241,20 @@ public class ImageThreeChannel {
         Buffer2D newRed = this.red.inversethreshold(amt);
         Buffer2D newGreen = this.green.inversethreshold(amt);
         Buffer2D newBlue = this.blue.inversethreshold(amt);
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
+    
+    public ImageThreeChannel reduceToFloatPrecision(){
+        Buffer2D newRed = this.red.reduceToFloatPrecision();
+        Buffer2D newGreen = this.green.reduceToFloatPrecision();
+        Buffer2D newBlue = this.blue.reduceToFloatPrecision();
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
+    
+    public ImageThreeChannel reduceToHalfPrecision(){
+        Buffer2D newRed = this.red.reduceToHalfPrecision();
+        Buffer2D newGreen = this.green.reduceToHalfPrecision();
+        Buffer2D newBlue = this.blue.reduceToHalfPrecision();
         return new ImageThreeChannel(newRed,newGreen,newBlue);
     }
     

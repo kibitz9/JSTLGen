@@ -43,6 +43,22 @@ public  class Buffer2D{
         }
         return new Buffer2D(newBuffers);
     }
+    
+    public Buffer2D reduceToFloatPrecision(){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        for(int a=0;a<newBuffers.length;a++){
+            newBuffers[a]=buffers1d[a].reduceToFloatPrecision();
+        }
+        return new Buffer2D(newBuffers);
+    }
+    public Buffer2D reduceToHalfPrecision(){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        for(int a=0;a<newBuffers.length;a++){
+            newBuffers[a]=buffers1d[a].reduceToHalfPrecision();
+        }
+        return new Buffer2D(newBuffers);
+    }
+    
     private double clamp(double n, double low, double high){
         if (n<low){
             return low;
@@ -176,13 +192,37 @@ public  class Buffer2D{
         return new Buffer2D(newBuffers);
     }
     
-    public Buffer2D topNWaves(int waveCount){
+    public Buffer2D topNMagnitudes(int waveCount){
         Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
         for(int a=0;a<newBuffers.length;a++){
-            newBuffers[a]=buffers1d[a].topNWaves(waveCount);
+            newBuffers[a]=buffers1d[a].topNMagnitudes(waveCount);
         }
         return new Buffer2D(newBuffers);
     }
+    
+    public Buffer2D topNExperimental(int waveCount){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        for(int a=0;a<newBuffers.length;a++){
+            newBuffers[a]=buffers1d[a].topNExperimental(waveCount);
+        }
+        return new Buffer2D(newBuffers);
+    }
+    
+    public Buffer2D topNReals(int waveCount){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        for(int a=0;a<newBuffers.length;a++){
+            newBuffers[a]=buffers1d[a].topNReals(waveCount);
+        }
+        return new Buffer2D(newBuffers);
+    }
+    public Buffer2D topNImaginaries(int waveCount){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+        for(int a=0;a<newBuffers.length;a++){
+            newBuffers[a]=buffers1d[a].topNReals(waveCount);
+        }
+        return new Buffer2D(newBuffers);
+    }
+    
     public int countNonZeroComponents(){
         int count = 0;
         for(int a=0;a<buffers1d.length;a++){

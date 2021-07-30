@@ -89,6 +89,28 @@ public class Buffer1D{
         return new Buffer1D(newReals, newImaginaries);
     }
 
+    public Buffer1D reduceToFloatPrecision(){
+        double[] newImaginaries = new double[imaginaries.length];
+        double[] newReals = new double[reals.length];
+        for(int a=0;a<imaginaries.length;a++){
+            newReals[a]=(float)(reals[a]);
+            newImaginaries[a] = (float)(imaginaries[a]);
+        }
+        return new Buffer1D(newReals, newImaginaries);
+    }
+    
+    public Buffer1D reduceToHalfPrecision(){
+        double[] newImaginaries = new double[imaginaries.length];
+        double[] newReals = new double[reals.length];
+        for(int a=0;a<imaginaries.length;a++){
+            int real = util.HalfPrecision.fromFloat((float)reals[a]);
+            int imaginary = util.HalfPrecision.fromFloat((float)imaginaries[a]);
+            newReals[a]=util.HalfPrecision.toFloat(real);
+            newImaginaries[a] = util.HalfPrecision.toFloat(imaginary);
+        }
+        return new Buffer1D(newReals, newImaginaries);
+    }
+    
     public Buffer1D scale(double scalar){
         double[] newReals = new double[reals.length];
         double[] newImaginaries = new double[imaginaries.length];
@@ -204,7 +226,7 @@ public class Buffer1D{
 //        return new Buffer1D(newReals, newImaginaries);
 //    }
     
-    public Buffer1D topNWaves(int count){
+    public Buffer1D topNMagnitudes(int count){
         //zeros out all other waves beyond the top n (count) magnitudes.
         //used for possible compression.
         
@@ -252,6 +274,258 @@ public class Buffer1D{
         return new Buffer1D(newReals,newImaginaries);
         
     }
+   
+    //why does the following produce better yet dimmer results?
+    public Buffer1D topNExperimental2(int count){
+        //zeros out all other waves beyond the top n (count) magnitudes.
+        //used for possible compression.
+        
+        if (count>=this.reals.length){
+            return this;
+        }
+        int[] savedIndexes = new int[count];
+        double[] savedMagnitudesSquared = new double[count];
+        
+        //assume the first n items have the greatest magnitude to start...
+        for (int a=0;a<count;a++){
+            savedIndexes[a]=a;
+            savedMagnitudesSquared[a]=Math.abs(reals[a]*imaginaries[a]);
+        }
+        
+        //now do the rest...
+        for (int a=count;a<reals.length;a++){
+            double ms = Math.abs(reals[a]*imaginaries[a]);
+            int currentIndex=a;
+            for (int b=0;b<savedIndexes.length;b++){
+                if (ms>savedMagnitudesSquared[b]){
+                    double temp = savedMagnitudesSquared[b];
+                    savedMagnitudesSquared[b]=ms;
+                    ms=temp;//move this one along...
+                    
+                    int tempi = savedIndexes[b];
+                    savedIndexes[b]=currentIndex;
+                    currentIndex=tempi;//move this one along...
+                }
+            }
+        }
+        
+        double[] newReals = new double[reals.length];
+        double[] newImaginaries = new double[imaginaries.length];
+        
+        for (int a=0;a<newReals.length;a++){
+            for (int b=0;b<savedIndexes.length;b++){
+                if (savedIndexes[b]==a){
+                    newReals[a]=reals[a];
+                    newImaginaries[a]=imaginaries[a];
+                    break;
+                }
+            }
+        }
+        return new Buffer1D(newReals,newImaginaries);
+        
+    }
+    
+    //why does the following produce better yet dimmer results?
+    public Buffer1D topNExperimental(int count){
+        //zeros out all other waves beyond the top n (count) magnitudes.
+        //used for possible compression.
+        
+        if (count>=this.reals.length){
+            return this;
+        }
+        int[] savedIndexes = new int[count];
+        double[] savedMagnitudesSquared = new double[count];
+        
+        //assume the first n items have the greatest magnitude to start...
+        for (int a=0;a<count;a++){
+            savedIndexes[a]=a;
+            savedMagnitudesSquared[a]=reals[a]*imaginaries[a];
+        }
+        
+        //now do the rest...
+        for (int a=count;a<reals.length;a++){
+            double ms = reals[a]*imaginaries[a];
+            int currentIndex=a;
+            for (int b=1;b<savedIndexes.length/2;b++){
+                if (ms>savedMagnitudesSquared[b]){
+                    double temp = savedMagnitudesSquared[b];
+                    savedMagnitudesSquared[b]=ms;
+                    ms=temp;//move this one along...
+                    
+                    int tempi = savedIndexes[b];
+                    savedIndexes[b]=currentIndex;
+                    currentIndex=tempi;//move this one along...
+                }
+            }
+        }
+        
+        double[] newReals = new double[reals.length];
+        double[] newImaginaries = new double[imaginaries.length];
+        
+        for (int a=0;a<newReals.length;a++){
+            for (int b=0;b<savedIndexes.length;b++){
+                if (savedIndexes[b]==a){
+                    newReals[a]=reals[a];
+                    newImaginaries[a]=imaginaries[a];
+                    break;
+                }
+            }
+        }
+        return new Buffer1D(newReals,newImaginaries);
+        
+    }
+    
+    //why does the following produce better yet dimmer results?
+    public Buffer1D topNExperimentalNegative(int count){
+        //zeros out all other waves beyond the top n (count) magnitudes.
+        //used for possible compression.
+        
+        if (count>=this.reals.length){
+            return this;
+        }
+        int[] savedIndexes = new int[count];
+        double[] savedMagnitudesSquared = new double[count];
+        
+        //assume the first n items have the greatest magnitude to start...
+        for (int a=0;a<count;a++){
+            savedIndexes[a]=a;
+            savedMagnitudesSquared[a]=reals[a]*imaginaries[a];
+        }
+        
+        //now do the rest...
+        for (int a=count;a<reals.length;a++){
+            double ms = reals[a]*imaginaries[a];
+            int currentIndex=a;
+            for (int b=0;b<savedIndexes.length;b++){
+                if (ms<savedMagnitudesSquared[b]){
+                    double temp = savedMagnitudesSquared[b];
+                    savedMagnitudesSquared[b]=ms;
+                    ms=temp;//move this one along...
+                    
+                    int tempi = savedIndexes[b];
+                    savedIndexes[b]=currentIndex;
+                    currentIndex=tempi;//move this one along...
+                }
+            }
+        }
+        
+        double[] newReals = new double[reals.length];
+        double[] newImaginaries = new double[imaginaries.length];
+        
+        for (int a=0;a<newReals.length;a++){
+            for (int b=0;b<savedIndexes.length;b++){
+                if (savedIndexes[b]==a){
+                    newReals[a]=reals[a];
+                    newImaginaries[a]=imaginaries[a];
+                    break;
+                }
+            }
+        }
+        return new Buffer1D(newReals,newImaginaries);
+        
+    }
+    
+    
+    
+    public Buffer1D topNReals(int count){
+        //zeros out all other waves beyond the top n (count) magnitudes.
+        //used for possible compression.
+        
+        if (count>=this.reals.length){
+            return this;
+        }
+        int[] savedIndexes = new int[count];
+        double[] savedReals = new double[count];
+        
+        //assume the first n items have the greatest magnitude to start...
+        for (int a=0;a<count;a++){
+            savedIndexes[a]=a;
+            savedReals[a]=reals[a];
+        }
+        
+        //now do the rest...
+        for (int a=count;a<reals.length;a++){
+            double ms = reals[a];
+            int currentIndex=a;
+            for (int b=0;b<savedIndexes.length;b++){
+                if (ms>savedReals[b]){
+                    double temp = savedReals[b];
+                    savedReals[b]=ms;
+                    ms=temp;//move this one along...
+                    
+                    int tempi = savedIndexes[b];
+                    savedIndexes[b]=currentIndex;
+                    currentIndex=tempi;//move this one along...
+                }
+            }
+        }
+        
+        double[] newReals = new double[reals.length];
+        double[] newImaginaries = new double[imaginaries.length];
+        
+        for (int a=0;a<newReals.length;a++){
+            for (int b=0;b<savedIndexes.length;b++){
+                if (savedIndexes[b]==a){
+                    newReals[a]=reals[a];
+                    newImaginaries[a]=imaginaries[a];
+                    break;
+                }
+            }
+        }
+        return new Buffer1D(newReals,newImaginaries);
+        
+    }
+    
+    
+    public Buffer1D topNImaginaries(int count){
+        //zeros out all other waves beyond the top n (count) magnitudes.
+        //used for possible compression.
+        
+        if (count>=this.reals.length){
+            return this;
+        }
+        int[] savedIndexes = new int[count];
+        double[] savedImaginaries = new double[count];
+        
+        //assume the first n items have the greatest magnitude to start...
+        for (int a=0;a<count;a++){
+            savedIndexes[a]=a;
+            savedImaginaries[a]=imaginaries[a];
+        }
+        
+        //now do the rest...
+        for (int a=count;a<imaginaries.length;a++){
+            double ms = imaginaries[a];
+            int currentIndex=a;
+            for (int b=0;b<savedIndexes.length;b++){
+                if (ms>savedImaginaries[b]){
+                    double temp = savedImaginaries[b];
+                    savedImaginaries[b]=ms;
+                    ms=temp;//move this one along...
+                    
+                    int tempi = savedIndexes[b];
+                    savedIndexes[b]=currentIndex;
+                    currentIndex=tempi;//move this one along...
+                }
+            }
+        }
+        
+        double[] newReals = new double[reals.length];
+        double[] newImaginaries = new double[imaginaries.length];
+        
+        for (int a=0;a<newReals.length;a++){
+            for (int b=0;b<savedIndexes.length;b++){
+                if (savedIndexes[b]==a){
+                    newReals[a]=reals[a];
+                    newImaginaries[a]=imaginaries[a];
+                    break;
+                }
+            }
+        }
+        return new Buffer1D(newReals,newImaginaries);
+        
+    }
+    
     
     Buffer1D inversethreshold(double amt){
         double amts = amt*amt;
