@@ -297,7 +297,7 @@ public class Tests {
        //c4=c4.populateNegativeFromPositiveFrequencies();
        
        boolean test = false;
-       int amount = 1;
+       int amount = 200;
        if (test){
             c4=c4.topNExperimental(amount);
             c4=c4.swapAxis();
@@ -305,10 +305,12 @@ public class Tests {
             c4=c4.swapAxis();
        }
        else{
-            c4=c4.topNMagnitudes(amount);
+           
+            c4=c4.highPass(amount);
             c4=c4.swapAxis();
-            c4=c4.topNMagnitudes(amount);
+            c4=c4.highPass(amount);
             c4=c4.swapAxis();
+            //c4=c4.scale(4);
        }
       //c4=c4.topNMagnitudes(2);
        //c4=c4.swapAxis();

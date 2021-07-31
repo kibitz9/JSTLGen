@@ -80,19 +80,42 @@ public class Fourier {
         }
         int nd2 = n/2;
    
-        Buffer1D evenFFT;
-        Buffer1D oddFFT;
+        
+        
+        double[] evenFFTReals;// = evenFFT.reals;
+        double[] oddFFTReals;// = oddFFT.reals;
+        double[] evenFFTImaginaries;// = evenFFT.imaginaries;
+        double[] oddFFTImaginaries;// = oddFFT.imaginaries;
+        
+        
         if (nd2==1){
             //Buffer1D evens =
-            evenFFT =  toTransform.GetEvens();
+            //evenFFT =  toTransform.GetEvens();
+            
+            //evenFFT = new Buffer1D(new double[]{toTransform.reals[0]},new double[]{toTransform.imaginaries[0]});
+            
+            evenFFTReals = new double[]{toTransform.reals[0]};
+            oddFFTReals = new double[]{toTransform.reals[1]};
+            evenFFTImaginaries = new double[]{toTransform.imaginaries[0]};
+            oddFFTImaginaries = new double[]{toTransform.imaginaries[1]};
+            
             //Buffer1D odds = 
-            oddFFT = toTransform.GetOdds();
+            //oddFFT = toTransform.GetOdds();
+            //oddFFT = new Buffer1D(new double[]{toTransform.reals[1]},new double[]{toTransform.imaginaries[1]});
         }
         else{
+            
+            
             Buffer1D evens = toTransform.GetEvens();
-            evenFFT = _fft(evens,nd2);
+            Buffer1D evenFFT = _fft(evens,nd2);
             Buffer1D odds = toTransform.GetOdds();
-            oddFFT = _fft(odds,nd2);
+            Buffer1D oddFFT = _fft(odds,nd2);
+            
+            evenFFTReals = evenFFT.reals;
+            oddFFTReals = oddFFT.reals;
+            evenFFTImaginaries = evenFFT.imaginaries;
+            oddFFTImaginaries = oddFFT.imaginaries;
+            
         }
 
 
@@ -101,10 +124,10 @@ public class Fourier {
         double[] finalReals = new double[n];
         double[] finalImaginaries = new double[n];
         
-        double[] evenFFTReals = evenFFT.reals;
-        double[] oddFFTReals = oddFFT.reals;
-        double[] evenFFTImaginaries = evenFFT.imaginaries;
-        double[] oddFFTImaginaries = oddFFT.imaginaries;
+        //double[] evenFFTReals = evenFFT.reals;
+        //double[] oddFFTReals = oddFFT.reals;
+        //double[] evenFFTImaginaries = evenFFT.imaginaries;
+        //double[] oddFFTImaginaries = oddFFT.imaginaries;
         
         
         for (int k=0;k<nd2;k++){
