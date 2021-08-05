@@ -24,6 +24,9 @@ public class Complex{
     public Complex add(Complex other){
         return new Complex(this.real+other.real, this.imaginary+other.imaginary);
     }
+    public Complex subtract(Complex other){
+        return new Complex(this.real-other.real, this.imaginary-other.imaginary);
+    }
     public Complex conjugate(){
         return new Complex(this.real,-this.imaginary);
     }
@@ -38,5 +41,11 @@ public class Complex{
     public String toString(){
         return String.valueOf(real)+(imaginary>=0.?"+":"")+String.valueOf(imaginary)+"i ";
     }
+    
+    public Complex (ComplexPolar p){
+        this.real = p.modulus*Math.cos(p.argument);
+        this.imaginary = p.modulus*Math.sin(p.argument);
+    }
 
+    
 }

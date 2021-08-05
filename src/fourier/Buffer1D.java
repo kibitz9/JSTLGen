@@ -669,8 +669,14 @@ public class Buffer1D{
         }
         return new Buffer1D(evenReals, evenImaginaries);
     }
-    
-     public Buffer1D GetOdds(){
+    public Complex[] toComplexes(){
+        Complex[] returnComplexes = new Complex[this.reals.length];
+        for (int a=0;a<reals.length;a++){
+            returnComplexes[a]=new Complex(reals[a],imaginaries[a]);
+        }
+        return returnComplexes;
+    }
+    public Buffer1D GetOdds(){
         int lengthD2 = this.reals.length/2;
         double[] oddReals = new double[lengthD2];
         double[] oddImaginaries = new double[lengthD2];
@@ -793,6 +799,7 @@ public class Buffer1D{
         return returnString;
     }
 
+   
     
     public Buffer1D fft(){
         return Fourier.fft(this);
