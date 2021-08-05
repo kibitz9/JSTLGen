@@ -28,6 +28,13 @@ public class ComplexPolar {
         );
     };
     
+    public ComplexPolar multiply(double other){
+        return new ComplexPolar(
+                 this.modulus*other
+                ,this.argument
+        );
+    };
+    
     
     public ComplexPolar divide(ComplexPolar other){
         return new ComplexPolar(

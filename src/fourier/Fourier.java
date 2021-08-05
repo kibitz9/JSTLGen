@@ -57,8 +57,30 @@ public class Fourier {
         return _fft(toTransform,n);
     }
     
+    public static Buffer1DPolar ifft(Buffer1DPolar toTransform){
+        double n = toTransform.nodes.length;
+        Buffer1DPolar temp = toTransform.GetConjugates();
+        temp = fft(temp);
+        temp = temp.GetConjugates();
+        temp = temp.scale(1.0/n);
+        return temp;
+    }
+    
+    public static Buffer1DPolar fft(Buffer1DPolar toTransform){
+        int n = toTransform.nodes.length;
+        //populateks(n);
+        return _fft(toTransform,n);
+    }
+    
 //    public static native double sin(double a);
 //    public static native double cos(double a);
+    
+    
+    private static Buffer1DPolar _fft(Buffer1DPolar toTransform, int n){
+        return null;
+    
+    }
+    
     
     private static Buffer1D _fft(Buffer1D toTransform, int n){
         
