@@ -21,6 +21,16 @@ public class Buffer1D{
         }
     }
     
+    public Buffer1D(Buffer1DPolar polarVersion){
+        this.reals = new double[polarVersion.nodes.length];
+        this.imaginaries = new double[polarVersion.nodes.length];
+        for (int a=0;a<reals.length;a++){
+            Complex c = new Complex(polarVersion.nodes[a]);
+            reals[a]=c.real;
+            imaginaries[a]=c.imaginary;
+        }
+    }
+    
     
     public Buffer1D avg(Buffer1D... others){
         Buffer1D[] more = new Buffer1D[others.length+1];

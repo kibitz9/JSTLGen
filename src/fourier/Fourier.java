@@ -68,7 +68,7 @@ public class Fourier {
     
     public static Buffer1DPolar fft(Buffer1DPolar toTransform){
         int n = toTransform.nodes.length;
-        //populateks(n);
+        populateks(n);
         return _fft(toTransform,n);
     }
     
@@ -77,9 +77,49 @@ public class Fourier {
     
     
     private static Buffer1DPolar _fft(Buffer1DPolar toTransform, int n){
-        return null;
+        
+        if (n==1){
+            return toTransform;
+        }
+        if (n%2!=0){
+            throw new java.lang.IllegalArgumentException("this fft routine only works on buffer sizes that are a power of 2.");
+        }
+        int nd2 = n/2;
+        
+        Buffer1DPolar evens = toTransform.GetEvens();
+        Buffer1DPolar odds = toTransform.GetOdds();
+        
+        Buffer1DPolar evenFFT = _fft(evens, nd2);
+        Buffer1DPolar oddFFT = _fft(odds, nd2);
+        
+        ComplexPolar[] newComplexes = new ComplexPolar[n];
+        
+         
+        for (int k=0;k<nd2;k++){
+            double kth = ks[k]/n;
+            
+            ComplexPolar wk = new ComplexPolar(1.,kth);
+            ComplexPolar oddFFTK = oddFFT.nodes[k];
+            
+            ComplexPolar wkTimesOdd = wk.multiply(oddFFTK);
+            
+            ComplexPolar evenFFTK = evenFFT.nodes[k];
+            
+            int kPlusND2 = k+nd2;
+            
+            newComplexes[k]=evenFFTK.add(wkTimesOdd);
+            newComplexes[kPlusND2]=evenFFTK.subtract(wkTimesOdd);
+            
+            
+        }
+        return new Buffer1DPolar(newComplexes);
+        
+        
+       // return null;
     
     }
+    
+    
     
     
     private static Buffer1D _fft(Buffer1D toTransform, int n){

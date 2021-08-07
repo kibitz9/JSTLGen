@@ -20,6 +20,19 @@ public class Buffer1DPolar{
         
     }
     
+    public Buffer1DPolar(int size){
+        nodes = new ComplexPolar[size];
+        for (int a=0;a<size;a++){
+            nodes[a] = ComplexPolar.ZERO;
+        }
+    }
+    
+    public Buffer1DPolar(Buffer1D buffer1dcartesian){
+        this.nodes = new ComplexPolar[buffer1dcartesian.reals.length];
+        for (int a=0;a<this.nodes.length;a++){
+            this.nodes[a]=ComplexPolar.fromCartesianComponents(buffer1dcartesian.reals[a],buffer1dcartesian.imaginaries[a]);
+        }
+    }
     
 //    public Buffer1DPolar avg(Buffer1DPolar... others){
 //        Buffer1DPolar[] more = new Buffer1DPolar[others.length+1];
@@ -555,34 +568,32 @@ public class Buffer1DPolar{
     
     
     
-//    Buffer1DPolar lowPass(double amt){
-//        amt = clamp(amt,0,1);
-//        int cutoff = (int)(((double)reals.length)*amt)/2;
-//        return lowPass(cutoff);
-//    }
+    Buffer1DPolar lowPass(double amt){
+        amt = clamp(amt,0,1);
+        int cutoff = (int)(((double)this.nodes.length)*amt)/2;
+        return lowPass(cutoff);
+    }
     
-//    Buffer1DPolar lowPass(int cutoff){
-//       
+    Buffer1DPolar lowPass(int cutoff){
+        ComplexPolar[] complexes = new ComplexPolar[nodes.length];
 //        double[] newReals = new double[reals.length];
 //        double[] newImaginaries = new double[imaginaries.length];
-//        for (int a=0;a<reals.length;a++){
-//            if (a<=cutoff||a>=(reals.length-(cutoff+1))){
-//                newReals[a]=reals[a];
-//                newImaginaries[a]=imaginaries[a];
-//            }
-//            else{
-//                newReals[a]=0;
-//                newImaginaries[a]=0;
-//            }
-//        }
-//        return new Buffer1DPolar(newReals,newImaginaries);
-//    }
+        for (int a=0;a<nodes.length;a++){
+            if (a<=cutoff||a>=(nodes.length-(cutoff+1))){
+                complexes[a]=nodes[a];
+            }
+            else{
+                complexes[a]=new ComplexPolar(0,1);
+            }
+        }
+        return new Buffer1DPolar(complexes);
+    }
     
-//    Buffer1DPolar highPass(double amt){
-//        amt = clamp(amt,0,1);
-//        int cutoff = (int)(((double)reals.length)*amt)/2;
-//        return highPass(cutoff);
-//    }
+    Buffer1DPolar highPass(double amt){
+        amt = clamp(amt,0,1);
+        int cutoff = (int)(((double)nodes.length)*amt)/2;
+        return highPass(cutoff);
+    }
     
 //    Buffer1DPolar resize(int newSize){
 //        double[] newReals = new double[newSize];
@@ -601,22 +612,24 @@ public class Buffer1DPolar{
 //    }
 //    
     
-//    Buffer1DPolar highPass(int cutoff){
-//        
-//        double[] newReals = new double[reals.length];
-//        double[] newImaginaries = new double[imaginaries.length];
-//        for (int a=0;a<reals.length;a++){
-//            if (a>=cutoff&&a<=(reals.length-(cutoff+1))){
-//                newReals[a]=reals[a];
-//                newImaginaries[a]=imaginaries[a];
-//            }
-//            else{
-//                newReals[a]=0;
-//                newImaginaries[a]=0;
-//            }
-//        }
-//        return new Buffer1DPolar(newReals,newImaginaries);
-//    }
+    Buffer1DPolar highPass(int cutoff){
+        ComplexPolar[] complexes = new ComplexPolar[nodes.length];
+        //double[] newReals = new double[reals.length];
+        //double[] newImaginaries = new double[imaginaries.length];
+        
+         for (int a=0;a<nodes.length;a++){
+            if (a>=cutoff&&a<=(nodes.length-(cutoff+1))){
+                complexes[a]=nodes[a];
+            }
+            else{
+                complexes[a]=new ComplexPolar(0,1);
+            }
+        }
+        return new Buffer1DPolar(complexes);
+        
+       
+        //return new Buffer1DPolar(newReals,newImaginaries);
+    }
     
   
 //    Buffer1D growBuffer(){
@@ -711,15 +724,25 @@ public class Buffer1DPolar{
         this.nodes=complexes;
     }
 //    
-//    public Buffer1DPolar add(Buffer1DPolar other){
-//        double[] returnReals = new double[this.reals.length];
-//        double[] returnImaginaries = new double[this.imaginaries.length];
-//        for (int a=0;a<reals.length;a++){
-//            returnReals[a]=reals[a]+other.reals[a];
-//            returnImaginaries[a]=imaginaries[a]+other.imaginaries[a];
-//        }
-//        return new Buffer1DPolar(returnReals, returnImaginaries);
-//    }
+    public Buffer1DPolar add(Buffer1DPolar other){
+        ComplexPolar[] complexes = new ComplexPolar[nodes.length];
+        
+        for (int a=0;a<nodes.length;a++){
+            complexes[a]=nodes[a].add(other.nodes[a]);
+           
+        }
+        return new Buffer1DPolar(complexes);
+    }
+    
+     public Buffer1DPolar subtract(Buffer1DPolar other){
+        ComplexPolar[] complexes = new ComplexPolar[nodes.length];
+        
+        for (int a=0;a<nodes.length;a++){
+            complexes[a]=nodes[a].subtract(other.nodes[a]);
+           
+        }
+        return new Buffer1DPolar(complexes);
+    }
 //    
 //    public Buffer1DPolar subtract(Buffer1DPolar other){
 //        double[] returnReals = new double[this.reals.length];
@@ -772,26 +795,19 @@ public class Buffer1DPolar{
 //        return new Buffer1DPolar(returnReals, returnImaginaries);
 //    }
 //    
-//    public Buffer1DPolar toUnitVectors(){
-//        double[] returnReals = new double[this.reals.length];
-//        double[] returnImaginaries = new double[this.imaginaries.length];
-//        for (int a=0;a<reals.length;a++){
-//            double real = reals[a];
-//            double imaginary = imaginaries[a];
-//            
-//            double mag =Math.sqrt(real*real+imaginary+imaginary);
-//            if (mag==0){
-//                mag=.000000001;//kludge.
-//            }
-//            real/=mag;
-//            imaginary/=mag;
-//            
-//            returnReals[a]=real;
-//            returnImaginaries[a]=imaginary;
-//            
-//        }
-//        return new Buffer1DPolar(returnReals, returnImaginaries);
-//    }
+    public Buffer1DPolar toUnitVectors(){
+        ComplexPolar[] complexes = new ComplexPolar[nodes.length];
+        //double[] returnReals = new double[this.reals.length];
+        //double[] returnImaginaries = new double[this.imaginaries.length];
+        for (int a=0;a<complexes.length;a++){
+            complexes[a] = new ComplexPolar(1.,nodes[a].argument);
+            
+            
+//      
+            
+        }
+        return new Buffer1DPolar(complexes);
+    }
 //    
 //    @Override
 //    public String toString(){

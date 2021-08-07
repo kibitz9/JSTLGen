@@ -17,6 +17,13 @@ public  class Buffer2D{
         this.buffers1d=buffers1d;
     }
     
+    public Buffer2D(Buffer2DPolar buffersPolar){
+        this.buffers1d = new Buffer1D[buffersPolar.buffers1d.length];
+        for (int a=0;a<buffers1d.length;a++){
+            buffers1d[a]=new Buffer1D(buffersPolar.buffers1d[a]);
+        }
+    }
+    
     public Buffer2D fft(){
         //first, fft all the individual rows...
         Buffer2D temp = this.onedfft();

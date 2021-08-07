@@ -287,7 +287,11 @@ public class Tests {
 
 */
        
-       ImageThreeChannel c4= new ImageThreeChannel("d:\\data\\claudia2048.png");
+       
+       long startTime = java.lang.System.currentTimeMillis();
+       
+       ImageThreeChannelPolar c4= new ImageThreeChannelPolar("c:\\data\\catsmaller.jpg");
+       
        c4=c4.fft();
        //ImageThreeChannel cache = c4;
        //c4=c4.fft();
@@ -297,34 +301,43 @@ public class Tests {
        //c4=c4.populateNegativeFromPositiveFrequencies();
        
        boolean test = false;
-       int amount = 200;
-       if (test){
-            c4=c4.topNExperimental(amount);
-            c4=c4.swapAxis();
-            c4=c4.topNExperimental(amount);
-            c4=c4.swapAxis();
-       }
-       else{
+       int amount = 100;
+//       if (test){
+//            c4=c4.topNExperimental(amount);
+//            c4=c4.swapAxis();
+//            c4=c4.topNExperimental(amount);
+//            c4=c4.swapAxis();
+//       }
+//       else{
            
-            c4=c4.highPass(amount);
+            c4=c4.lowPass(amount);
             c4=c4.swapAxis();
-            c4=c4.highPass(amount);
+            c4=c4.lowPass(amount);
             c4=c4.swapAxis();
+            
+            c4=c4.ifft();
+            c4=c4.fft();
+            c4=c4.ifft();
+            c4=c4.fft();
+             c4=c4.ifft();
+            c4=c4.fft();
+            c4=c4.ifft();
+            c4=c4.fft();
             //c4=c4.scale(4);
-       }
+//       }
       //c4=c4.topNMagnitudes(2);
        //c4=c4.swapAxis();
        //TODO make a version of topNWaves that does the swap axis for us,.
        
        //cache = cache.subtract(c4);
        
-       double nonZero = c4.countNonZeroComponents();
-       double zero = c4.countZeroComponents();
-       System.out.println(nonZero);
-       System.out.println(zero);
-       
-       System.out.println((nonZero/(nonZero+zero))*100.+"%");
-       
+//       double nonZero = c4.countNonZeroComponents();
+//       double zero = c4.countZeroComponents();
+//       System.out.println(nonZero);
+//       System.out.println(zero);
+//       
+//       System.out.println((nonZero/(nonZero+zero))*100.+"%");
+//       
        
        
        //double scale = .00001;
@@ -339,15 +352,17 @@ public class Tests {
       // c4.WriteRealsToImageFile("d:\\data\\girlextremecompressionreals.png");
       // c4.WriteImaginariesToImageFile("d:\\data\\girlextremecompressionimaginaries.png");
        c4=c4.ifft();
-       if (test){
-            //c4=c4.scale(3);
-            c4.WriteRealsToImageFile("d:\\data\\acExperimental.png");
-       }
-       else{
-           c4.WriteRealsToImageFile("d:\\data\\acNonExperimental.png");
+//       if (test){
+//            //c4=c4.scale(3);
+//            c4.WriteRealsToImageFile("d:\\data\\acExperimental.png");
+//       }
+//       else{
+           c4.WriteRealsToImageFile("c:\\data\\acNonExperimental.png");
        
-       }
+//       }
        
+
+        System.out.println(java.lang.System.currentTimeMillis()-startTime);
        //cache=cache.ifft();
        
        //cache.WriteRealsToImageFile("d:\\data\\girldiff.png");

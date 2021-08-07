@@ -111,7 +111,11 @@ public class ImageThreeChannel {
         loadImage(filePath);
     }
     
-    
+    public ImageThreeChannel(ImageThreeChannelPolar polarVersion){
+        this.red = new Buffer2D(polarVersion.red);
+        this.green = new Buffer2D(polarVersion.green);
+        this.blue = new Buffer2D(polarVersion.blue);
+    }
     
     
     public void writeNonZeros(){
