@@ -620,12 +620,25 @@ public class Buffer1D{
         return new Buffer1D(newReals,newImaginaries);
     }
     
+    public Buffer1D divideViaPolar(Buffer1D other){
+        Buffer1DPolar p = new Buffer1DPolar(this);
+        Buffer1DPolar otherp = new Buffer1DPolar(other);
+        Buffer1DPolar result = p.divide(otherp);
+        return new Buffer1D(result);
+       
+    }
+    
+    
     Buffer1D divide(Buffer1D other){
         double[] newReals = new double[reals.length];
         double[] newImaginaries = new double[imaginaries.length];
         
         for (int a=0;a<this.reals.length;a++){
             double sharedDivisor = other.reals[a]*other.reals[a]+other.imaginaries[a]*other.imaginaries[a];
+            if (sharedDivisor ==0.){
+                sharedDivisor = .0000000000000000000000001;
+                //System.out.println("poit");
+            }
             double newReal = (this.reals[a]*other.reals[a]+this.imaginaries[a]*other.imaginaries[a])/sharedDivisor;
             double newImaginary = (this.imaginaries[a]*other.reals[a]-this.reals[a]*other.imaginaries[a])/sharedDivisor;
             newReals[a]=newReal;

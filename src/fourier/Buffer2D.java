@@ -300,6 +300,65 @@ public  class Buffer2D{
     }
     
     
+    public static Buffer2D getBoxBlur2x2(){
+        double[] x = new double[2];
+        x[0]=1;
+        x[1]=1;
+        
+        return new Buffer2D(new Buffer1D[]{
+            new Buffer1D(x),
+            new Buffer1D(x),
+        });
+    }
+    private static Buffer2D getGaussianBlur3x3(){
+       
+        double[] x = new double[3];
+        x[0]=1;
+        x[1]=2;
+        x[2]=1;
+      
+        double[] y = new double[3];
+        y[0]=2;
+        y[1]=4;
+        y[2]=2;
+      
+     
+       
+        
+        Buffer1D[] buffers = new Buffer1D[]{
+            new Buffer1D(x),
+            new Buffer1D(y),
+            new Buffer1D(x)
+        };
+        return new Buffer2D(buffers);
+    }
+    
+    private static Buffer2D getSharpen3x3(){
+       
+        double[] x = new double[3];
+        x[0]=0;
+        x[1]=-1;
+        x[2]=0;
+      
+        double[] y = new double[3];
+        y[0]=-1;
+        y[1]=5;
+        y[2]=-1;
+      
+     
+       
+        
+        Buffer1D[] buffers = new Buffer1D[]{
+            new Buffer1D(x),
+            new Buffer1D(y),
+            new Buffer1D(x)
+        };
+        return new Buffer2D(buffers);
+    }
+    
+    
+    
+    
     private static Buffer2D getEdgeDetect6x6(){
        
         double[] x = new double[6];
@@ -408,11 +467,15 @@ public  class Buffer2D{
         return new Buffer2D(buffers);
     }
     
-    
+    public static Buffer2D SHARPEN3X3 = getSharpen3x3();
     public static Buffer2D EDGEDETECT3X3 = getEdgeDetect3x3();
     public static Buffer2D EDGEDETECT6X6 = getEdgeDetect6x6();
     public static Buffer2D EDGEDETECT9X9 = getEdgeDetect9x9();
     public static Buffer2D EDGEDETECT9X9INVERTED = getEdgeDetect9x9Inverted();
+    
+    public static Buffer2D GAUSSIANBLUR3X3 = getGaussianBlur3x3();
+    
+    public static Buffer2D BOXBLUR2X2 = getBoxBlur2x2();
     
     public Buffer2D multiply(Buffer2D other){
         Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];

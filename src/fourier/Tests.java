@@ -290,9 +290,15 @@ public class Tests {
        
        long startTime = java.lang.System.currentTimeMillis();
        
-       ImageThreeChannel c4= new ImageThreeChannel("c:\\data\\catsmaller.jpg");
+       ImageThreeChannel c4= new ImageThreeChannel("c:\\data\\test.png");
+       
+       //add a little something to the imaginary channel to avoid certain issues...
+       c4=c4.add(new Complex(.000000001,1));
        
        c4=c4.fft();
+       
+       ImageThreeChannel c4Temp = c4;
+       
        //ImageThreeChannel cache = c4;
        //c4=c4.fft();
        //c4=c4.lowPass(64);
@@ -300,9 +306,26 @@ public class Tests {
        //c4=c4.zeroOutNegativeFrequencies();
        //c4=c4.populateNegativeFromPositiveFrequencies();
        
-       boolean test = false;
-       int amount = 15;
-       int amount2 = 35;
+       ImageThreeChannel gb = ImageThreeChannel.SHARPEN3X3;
+       gb=gb.resize(128);
+       //gb=gb.add(.01);
+       //gb=gb.scale(10);
+       //gb=gb.add(new Complex(0,1));
+       gb=gb.fft();
+       
+       
+       
+       //c4Temp=c4Temp.multiply(gb);
+       //c4Temp=c4Temp.divide(c4);
+       //c4=c4.multiply(gb);
+       //c4=c4.divide(gb);
+       c4=c4.multiply(gb);
+       //c4=c4.multiply(gb);
+       //c4=c4.multiply(gb);
+       //c4=c4.add(.0000001);
+//       boolean test = false;
+//       int amount = 15;
+//       int amount2 = 35;
 //       if (test){
 //            c4=c4.topNExperimental(amount);
 //            c4=c4.swapAxis();
@@ -311,16 +334,16 @@ public class Tests {
 //       }
 //       else{
            
-            c4=c4.highPass(amount);
-            c4=c4.swapAxis();
-            c4=c4.highPass(amount);
-            c4=c4.swapAxis();
-            
-            
-            c4=c4.lowPass(amount2);
-            c4=c4.swapAxis();
-            c4=c4.lowPass(amount2);
-            c4=c4.swapAxis();
+//            c4=c4.highPass(amount);
+//            c4=c4.swapAxis();
+//            c4=c4.highPass(amount);
+//            c4=c4.swapAxis();
+//            
+//            
+//            c4=c4.lowPass(amount2);
+//            c4=c4.swapAxis();
+//            c4=c4.lowPass(amount2);
+//            c4=c4.swapAxis();
             
 //            c4=c4.ifft();
 //            c4=c4.fft();
@@ -358,16 +381,21 @@ public class Tests {
        //c4=c4.scale(.0000025);
       // c4.WriteRealsToImageFile("d:\\data\\girlextremecompressionreals.png");
       // c4.WriteImaginariesToImageFile("d:\\data\\girlextremecompressionimaginaries.png");
+     //c4.writeNonZeros();;
+     //c4=c4.lowPass(50);
        c4=c4.ifft();
+       //c4.writeNonZeros();;
+        //c4.writeNonZeros();;
 //       if (test){
 //            //c4=c4.scale(3);
 //            c4.WriteRealsToImageFile("d:\\data\\acExperimental.png");
 //       }
 //       else{
-        
-        c4=c4.scale(15);
+       // c4=c4.add(256);
+       //c4=c4.scale(50);
+       
         //c4=c4.add(50.);
-           c4.WriteRealsToImageFile("c:\\data\\acNonExperimental.png");
+           c4.WriteRealsToImageFile("c:\\data\\timeout.png");
        
 //       }
        

@@ -424,10 +424,28 @@ public class ImageThreeChannel {
     }
     
     
+    public static ImageThreeChannel BOXBLUR2X2 = new ImageThreeChannel(
+            Buffer2D.BOXBLUR2X2,
+            Buffer2D.BOXBLUR2X2,
+            Buffer2D.BOXBLUR2X2
+    );
+    
+    public static ImageThreeChannel SHARPEN3X3 = new ImageThreeChannel(
+            Buffer2D.SHARPEN3X3,
+            Buffer2D.SHARPEN3X3,
+            Buffer2D.SHARPEN3X3
+    );
+    
     public static ImageThreeChannel EDGEDETECT3X3 = new ImageThreeChannel(
             Buffer2D.EDGEDETECT3X3,
             Buffer2D.EDGEDETECT3X3,
             Buffer2D.EDGEDETECT3X3
+    );
+    
+    public static ImageThreeChannel GAUSSIANBLUR3X3 = new ImageThreeChannel(
+            Buffer2D.GAUSSIANBLUR3X3,
+            Buffer2D.GAUSSIANBLUR3X3,
+            Buffer2D.GAUSSIANBLUR3X3
     );
     
     public static ImageThreeChannel EDGEDETECT6X6 = new ImageThreeChannel(
@@ -442,7 +460,7 @@ public class ImageThreeChannel {
             Buffer2D.EDGEDETECT9X9
     );
     
-     public static ImageThreeChannel EDGEDETECT9X9INVERTED = new ImageThreeChannel(
+    public static ImageThreeChannel EDGEDETECT9X9INVERTED = new ImageThreeChannel(
             Buffer2D.EDGEDETECT9X9INVERTED,
             Buffer2D.EDGEDETECT9X9INVERTED,
             Buffer2D.EDGEDETECT9X9INVERTED
