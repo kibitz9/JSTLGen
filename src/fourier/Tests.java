@@ -290,7 +290,7 @@ public class Tests {
        
        long startTime = java.lang.System.currentTimeMillis();
        
-       ImageThreeChannelPolar c4= new ImageThreeChannelPolar("c:\\data\\catsmaller.jpg");
+       ImageThreeChannel c4= new ImageThreeChannel("c:\\data\\catsmaller.jpg");
        
        c4=c4.fft();
        //ImageThreeChannel cache = c4;
@@ -301,7 +301,8 @@ public class Tests {
        //c4=c4.populateNegativeFromPositiveFrequencies();
        
        boolean test = false;
-       int amount = 100;
+       int amount = 15;
+       int amount2 = 35;
 //       if (test){
 //            c4=c4.topNExperimental(amount);
 //            c4=c4.swapAxis();
@@ -310,19 +311,25 @@ public class Tests {
 //       }
 //       else{
            
-            c4=c4.lowPass(amount);
+            c4=c4.highPass(amount);
             c4=c4.swapAxis();
-            c4=c4.lowPass(amount);
+            c4=c4.highPass(amount);
             c4=c4.swapAxis();
             
-            c4=c4.ifft();
-            c4=c4.fft();
-            c4=c4.ifft();
-            c4=c4.fft();
-             c4=c4.ifft();
-            c4=c4.fft();
-            c4=c4.ifft();
-            c4=c4.fft();
+            
+            c4=c4.lowPass(amount2);
+            c4=c4.swapAxis();
+            c4=c4.lowPass(amount2);
+            c4=c4.swapAxis();
+            
+//            c4=c4.ifft();
+//            c4=c4.fft();
+//            c4=c4.ifft();
+//            c4=c4.fft();
+//             c4=c4.ifft();
+//            c4=c4.fft();
+//            c4=c4.ifft();
+//            c4=c4.fft();
             //c4=c4.scale(4);
 //       }
       //c4=c4.topNMagnitudes(2);
@@ -357,6 +364,9 @@ public class Tests {
 //            c4.WriteRealsToImageFile("d:\\data\\acExperimental.png");
 //       }
 //       else{
+        
+        c4=c4.scale(15);
+        //c4=c4.add(50.);
            c4.WriteRealsToImageFile("c:\\data\\acNonExperimental.png");
        
 //       }

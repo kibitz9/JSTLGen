@@ -315,6 +315,20 @@ public class ImageThreeChannel {
         return new ImageThreeChannel(newRed,newGreen,newBlue);
     }
     
+    public ImageThreeChannel add(Complex constant){
+        Buffer2D newRed = this.red.add(constant);
+        Buffer2D newGreen = this.green.add(constant);
+        Buffer2D newBlue = this.blue.add(constant);
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
+    
+    public ImageThreeChannel add(double constant){
+        Buffer2D newRed = this.red.add(constant);
+        Buffer2D newGreen = this.green.add(constant);
+        Buffer2D newBlue = this.blue.add(constant);
+        return new ImageThreeChannel(newRed,newGreen,newBlue);
+    }
+    
     public ImageThreeChannel toUnitVectors(){
         Buffer2D newRed = this.red.toUnitVectors();
         Buffer2D newGreen = this.green.toUnitVectors();

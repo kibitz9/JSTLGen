@@ -472,7 +472,24 @@ public  class Buffer2D{
         return new Buffer2D(newBuffers);
     }
     
-     public Buffer2D subtract(Buffer2D other){
+    public Buffer2D add(Complex constant){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+       
+        for (int a=0;a<newBuffers.length;a++){
+            newBuffers[a]=buffers1d[a].add(constant);
+        }
+        return new Buffer2D(newBuffers);
+    }
+    public Buffer2D add(double constant){
+        Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
+       
+        for (int a=0;a<newBuffers.length;a++){
+            newBuffers[a]=buffers1d[a].add(constant);
+        }
+        return new Buffer2D(newBuffers);
+    }
+    
+    public Buffer2D subtract(Buffer2D other){
         Buffer1D[] newBuffers = new Buffer1D[buffers1d.length];
         if (newBuffers.length!=other.buffers1d.length){
             throw new java.lang.RuntimeException("Buffer sizes must match");

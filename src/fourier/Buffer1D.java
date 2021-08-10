@@ -728,6 +728,25 @@ public class Buffer1D{
         return new Buffer1D(returnReals, returnImaginaries);
     }
     
+    public Buffer1D add(Complex constant){
+        double[] returnReals = new double[this.reals.length];
+        double[] returnImaginaries = new double[this.imaginaries.length];
+        for (int a=0;a<reals.length;a++){
+            returnReals[a]=reals[a]+constant.real;
+            returnImaginaries[a]=imaginaries[a]+constant.imaginary;
+        }
+        return new Buffer1D(returnReals, returnImaginaries);
+    }
+    public Buffer1D add(double constant){
+        double[] returnReals = new double[this.reals.length];
+        double[] returnImaginaries = new double[this.imaginaries.length];
+        for (int a=0;a<reals.length;a++){
+            returnReals[a]=reals[a]+constant;
+            returnImaginaries[a]=imaginaries[a]+0;
+        }
+        return new Buffer1D(returnReals, returnImaginaries);
+    }
+    
     public Buffer1D subtract(Buffer1D other){
         double[] returnReals = new double[this.reals.length];
         double[] returnImaginaries = new double[this.imaginaries.length];
