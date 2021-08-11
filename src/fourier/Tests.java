@@ -290,14 +290,14 @@ public class Tests {
        
        long startTime = java.lang.System.currentTimeMillis();
        
-       ImageThreeChannel c4= new ImageThreeChannel("c:\\data\\test.png");
+       ImageThreeChannel c4= new ImageThreeChannel("c:\\data\\cat.png");
        
        //add a little something to the imaginary channel to avoid certain issues...
-       c4=c4.add(new Complex(.000000001,1));
-       
+      // c4=c4.add(new Complex(.000000001,1));
+        ImageThreeChannel c4Temp = c4;
        c4=c4.fft();
        
-       ImageThreeChannel c4Temp = c4;
+      
        
        //ImageThreeChannel cache = c4;
        //c4=c4.fft();
@@ -306,12 +306,14 @@ public class Tests {
        //c4=c4.zeroOutNegativeFrequencies();
        //c4=c4.populateNegativeFromPositiveFrequencies();
        
-       ImageThreeChannel gb = ImageThreeChannel.SHARPEN3X3;
-       gb=gb.resize(128);
+       //ImageThreeChannel gb = ImageThreeChannel.SHARPEN3X3;
+       //gb=gb.resize(128);
+       
+       
        //gb=gb.add(.01);
        //gb=gb.scale(10);
        //gb=gb.add(new Complex(0,1));
-       gb=gb.fft();
+       //gb=gb.fft();
        
        
        
@@ -319,7 +321,7 @@ public class Tests {
        //c4Temp=c4Temp.divide(c4);
        //c4=c4.multiply(gb);
        //c4=c4.divide(gb);
-       c4=c4.multiply(gb);
+       //c4=c4.multiply(gb);
        //c4=c4.multiply(gb);
        //c4=c4.multiply(gb);
        //c4=c4.add(.0000001);
@@ -383,7 +385,14 @@ public class Tests {
       // c4.WriteImaginariesToImageFile("d:\\data\\girlextremecompressionimaginaries.png");
      //c4.writeNonZeros();;
      //c4=c4.lowPass(50);
-       c4=c4.ifft();
+     
+      c4=c4.lowPass(60);
+      c4=c4.highPass(20);
+      c4=c4.ifft();
+      c4=c4.scale(10);
+       
+      c4Temp=c4Temp.scale(.75);
+      c4=c4.add(c4Temp);
        //c4.writeNonZeros();;
         //c4.writeNonZeros();;
 //       if (test){
@@ -395,12 +404,12 @@ public class Tests {
        //c4=c4.scale(50);
        
         //c4=c4.add(50.);
-           c4.WriteRealsToImageFile("c:\\data\\timeout.png");
+      c4.WriteRealsToImageFile("c:\\data\\catout.png");
        
 //       }
        
 
-        System.out.println(java.lang.System.currentTimeMillis()-startTime);
+      System.out.println(java.lang.System.currentTimeMillis()-startTime);
        //cache=cache.ifft();
        
        //cache.WriteRealsToImageFile("d:\\data\\girldiff.png");
