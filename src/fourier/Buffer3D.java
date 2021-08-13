@@ -53,6 +53,38 @@ public class Buffer3D {
         return new Buffer3D(returnBuffers);
     }
     
+    public Buffer3D highPass(int cutoff){
+        Buffer2D[] returnBuffers = new Buffer2D[buffers2d.length];
+        for (int a=0;a<returnBuffers.length;a++){
+            returnBuffers[a]=buffers2d[a].highPass(cutoff);
+        }
+        return new Buffer3D(returnBuffers);
+    }
+    
+    public Buffer3D highPass(double amount){
+        Buffer2D[] returnBuffers = new Buffer2D[buffers2d.length];
+        for (int a=0;a<returnBuffers.length;a++){
+            returnBuffers[a]=buffers2d[a].highPass(amount);
+        }
+        return new Buffer3D(returnBuffers);
+    }
+    
+    public Buffer3D lowPass(int cutoff){
+        Buffer2D[] returnBuffers = new Buffer2D[buffers2d.length];
+        for (int a=0;a<returnBuffers.length;a++){
+            returnBuffers[a]=buffers2d[a].lowPass(cutoff);
+        }
+        return new Buffer3D(returnBuffers);
+    }
+    
+    public Buffer3D lowPass(double amount){
+        Buffer2D[] returnBuffers = new Buffer2D[buffers2d.length];
+        for (int a=0;a<returnBuffers.length;a++){
+            returnBuffers[a]=buffers2d[a].lowPass(amount);
+        }
+        return new Buffer3D(returnBuffers);
+    }
+    
     private Buffer3D _ifftIndividualRows(){
         Buffer2D[] returnBuffers = new Buffer2D[buffers2d.length];
         for (int a=0;a<returnBuffers.length;a++){

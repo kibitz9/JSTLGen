@@ -412,13 +412,23 @@ public class Tests {
       //c4.WriteRealsToImageFile("c:\\data\\catout.png");
        
 //       }
-      Buffer3D test = Buffer3D.generateTestSphere(16,256);
+      Buffer3D test = Buffer3D.generateTestSphere(32,256);
       test=test.fft();
-      int frame = 128;
+      
+      test=test.highPass(32);
+      //test=test.hiPass(20);
+      
+      int frame = 123;
       test=test.centerShift();
+      test=test.centerShift();
+      test=test.ifft();
+      
       ImageThreeChannel i = new ImageThreeChannel(test.buffers2d[frame],test.buffers2d[frame],test.buffers2d[frame]);
       
-      i=i.scale(1);
+      
+      i=i.scale(1000);
+      
+      
       
       i.WriteRealsToImageFile("c:\\data\\circletest.png");
       System.out.println(java.lang.System.currentTimeMillis()-startTime);
