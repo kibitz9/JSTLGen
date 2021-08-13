@@ -13,6 +13,12 @@ public class Buffer1D{
     public double[] reals;
     public double[] imaginaries;
 
+    
+    public Buffer1D(int size){
+        this.reals=new double[size];
+        this.imaginaries = new double[size];
+    }
+    
     public Buffer1D(double[] reals, double[] imaginaries){
         this.reals=reals;
         this.imaginaries=imaginaries;
@@ -39,6 +45,19 @@ public class Buffer1D{
             more[a+1]=others[a];
         }
         return average(more);
+    }
+    
+    public Buffer1D centerShift(){
+        int size = this.reals.length;
+        int sizeD2 = size/2;
+        double[] returnReals = new double[size];
+        double[] returnImaginaries = new double[size];
+        for (int a=0;a<size;a++){
+            int offsetIndex = (a+sizeD2)%size;
+            returnReals[a]=reals[offsetIndex];
+            returnImaginaries[a]=imaginaries[offsetIndex];
+        }
+        return new Buffer1D(returnReals, returnImaginaries);
     }
     
     public static Buffer1D average(Buffer1D... buffers){

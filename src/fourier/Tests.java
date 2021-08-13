@@ -290,12 +290,12 @@ public class Tests {
        
        long startTime = java.lang.System.currentTimeMillis();
        
-       ImageThreeChannel c4= new ImageThreeChannel("c:\\data\\cat.png");
+       //ImageThreeChannel c4= new ImageThreeChannel("c:\\data\\cat.png");
        
        //add a little something to the imaginary channel to avoid certain issues...
       // c4=c4.add(new Complex(.000000001,1));
-        ImageThreeChannel c4Temp = c4;
-       c4=c4.fft();
+       // ImageThreeChannel c4Temp = c4;
+       //c4=c4.fft();
        
       
        
@@ -386,13 +386,18 @@ public class Tests {
      //c4.writeNonZeros();;
      //c4=c4.lowPass(50);
      
-      c4=c4.lowPass(60);
-      c4=c4.highPass(20);
-      c4=c4.ifft();
-      c4=c4.scale(10);
+     // c4=c4.lowPass(400);
+      //c4=c4.highPass(399);
+      
+      //c4 = c4.topNMagnitudes(100);
+      //c4=c4.ifft();
+     
        
-      c4Temp=c4Temp.scale(.75);
-      c4=c4.add(c4Temp);
+      //c4Temp=c4Temp.scale(.75);
+      //c4=c4Temp.subtract(c4);
+      
+       //c4=c4.scale(19);
+      //c4=c4.add(c4Temp);
        //c4.writeNonZeros();;
         //c4.writeNonZeros();;
 //       if (test){
@@ -404,11 +409,18 @@ public class Tests {
        //c4=c4.scale(50);
        
         //c4=c4.add(50.);
-      c4.WriteRealsToImageFile("c:\\data\\catout.png");
+      //c4.WriteRealsToImageFile("c:\\data\\catout.png");
        
 //       }
-       
-
+      Buffer3D test = Buffer3D.generateTestSphere(16,256);
+      test=test.fft();
+      int frame = 128;
+      test=test.centerShift();
+      ImageThreeChannel i = new ImageThreeChannel(test.buffers2d[frame],test.buffers2d[frame],test.buffers2d[frame]);
+      
+      i=i.scale(1);
+      
+      i.WriteRealsToImageFile("c:\\data\\circletest.png");
       System.out.println(java.lang.System.currentTimeMillis()-startTime);
        //cache=cache.ifft();
        

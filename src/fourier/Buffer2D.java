@@ -17,6 +17,13 @@ public  class Buffer2D{
         this.buffers1d=buffers1d;
     }
     
+    public Buffer2D(int size){
+        this.buffers1d = new Buffer1D[size];
+        for(int a=0;a<size;a++){
+            this.buffers1d[a]=new Buffer1D(size);
+        }
+    }
+    
     public Buffer2D(Buffer2DPolar buffersPolar){
         this.buffers1d = new Buffer1D[buffersPolar.buffers1d.length];
         for (int a=0;a<buffers1d.length;a++){
@@ -579,6 +586,17 @@ public  class Buffer2D{
         return new Buffer2D(newBuffers);
     }
     
+    public Buffer2D centerShift(){
+        int size = this.buffers1d.length;
+        int sizeD2 = size/2;
+        Buffer1D[] newBuffers = new Buffer1D[size];
+        for (int a=0;a<buffers1d.length;a++){
+            int offsetIndex = (a+sizeD2)%size;
+            newBuffers[a]=buffers1d[offsetIndex].centerShift();
+            
+        }
+        return new Buffer2D(newBuffers);
+    }
     
     
    
