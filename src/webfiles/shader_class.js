@@ -1,6 +1,6 @@
 class CJMShader{
 
-        constructor(fragmentShaderSourcecode, canvasToRender){
+        constructor(fragmentShaderSourcecode, canvasToRender, shaderVariableName){
                 this.fs=fragmentShaderSourcecode;
                 //window.alert(0);
                 this.canvasToRender=canvasToRender;
@@ -11,6 +11,7 @@ class CJMShader{
                 //window.alert(fragmentShaderSourcecode);
                 this.shaderInit();
                 //window.alert("Constructed");
+                this.shaderVariableName=shaderVariableName;
         }
         start(){
                 try{    
@@ -20,6 +21,7 @@ class CJMShader{
                         window.alert(error);
                 }
         }
+        shaderVariableName;
         //variables that need analysis
         vertex_position;
         timeLocation;
@@ -311,12 +313,15 @@ class CJMShader{
                         
                         this.resizeCanvas();
                         this.render();
+                        var callback = new Function(`${this.shaderVariableName}.animate();`);
+                        
+                      
                         //apparently requestAnimationFrame won't take class methods directly. Must be a function.
-                        window.requestAnimationFrame( function(){shader.animate();});
+                        window.requestAnimationFrame( callback);
                         this.counter++;
                 }
                 catch(err){
-                        window.alert(this.counter);
+                        window.alert(err);
                 }
 
         }

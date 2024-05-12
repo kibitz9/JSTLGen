@@ -1,0 +1,879 @@
+<!DOCTYPE HTML> 
+<html> 
+	<head> 
+		<meta charset="utf-8"> 
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<title>Shader Template</title> 
+		
+		<style> 
+			html, body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+				width: 100%;
+				height: 100%;
+			}
+			canvas {
+				width: 100%;
+				height: 100%;
+			}
+		</style> 
+		
+
+
+
+
+		<script id="fs" type="x-shader/fragment"> 
+		
+				            
+			//******************************opening tag   ****************//
+			//******************************opening tag   ****************//
+  
+//***************************************************************//
+// Yet More Fractal Surface Experiments by CMiller (kibitz9)
+// I am experimenting with using fractals for surface detail (greebles). 
+//***************************************************************// 
+
+const float GLOBAL_EPSILON = .0005;
+const vec2 GLOBAL_PN = vec2(1,-1);
+const vec3 GLOBAL_PN_XYY=GLOBAL_PN.xyy;
+const vec3 GLOBAL_PN_YYX=GLOBAL_PN.yyx;
+const vec3 GLOBAL_PN_YXY=GLOBAL_PN.yxy;
+const vec3 GLOBAL_PN_XXX=GLOBAL_PN.xxx;
+
+const vec3 GLOBAL_PN_XYY_EPS=GLOBAL_PN_XYY*GLOBAL_EPSILON;
+const vec3 GLOBAL_PN_YYX_EPS=GLOBAL_PN_YYX*GLOBAL_EPSILON;
+const vec3 GLOBAL_PN_YXY_EPS=GLOBAL_PN_YXY*GLOBAL_EPSILON;
+const vec3 GLOBAL_PN_XXX_EPS=GLOBAL_PN_XXX*GLOBAL_EPSILON;
+const float MAX_DIST = 10.0;
+
+
+
+
+
+const float COSTHETA1=0.70710677;
+const float SINTHETA1=0.70710677;
+const float SECTORSIZE1=0.5235987756;
+float sdf4(vec3 p){
+//Torus1
+float primaryRadius1=0.55;
+float secondaryRadius1=0.2;
+return length(vec2(length(p.xz)-primaryRadius1,p.y))-secondaryRadius1;
+}
+
+const float SCALE1=0.7;
+//Mandelbox1
+const float S1=-2.9;
+const float R1=0.5;
+const int ITR1=10;
+const float F1=1.0;
+vec3 scale_color1(vec3 q){
+vec3 p=q/SCALE1;
+return vec3(1,1,1);
+}
+float sdf1(vec3 p){
+return sdf4(p);
+}
+float sdf2(vec3 p){
+vec3 sp1=p/SCALE1;
+vec4 q3=vec4(sp1,1.0);
+vec4 c1=vec4(sp1,1.0);
+for (int a1=0;a1<ITR1;a1++){
+q3.xyz=F1*(clamp(q3.xyz,-1.0,1.0)*2.0-q3.xyz);
+q3 *=S1/clamp(dot(q3.xyz,q3.xyz),R1,1.0);
+q3 +=c1;
+}
+return (.333*length(q3.xyz)/abs(q3.w))*SCALE1;
+}
+float sdf3(vec3 p){
+float thickness=0.05;
+float surface=sdf1(p);
+float onioned=abs(surface)-thickness;
+if (onioned>thickness){
+return onioned;
+}
+else if (surface<-thickness){
+return surface;
+}
+else{
+float detail=sdf2(p);
+float dist = max(onioned,detail);
+return min(dist,surface);
+}
+}
+vec3 onion_color1(vec3 p){
+float d1 = sdf1(p);
+float d2 = sdf2(p);
+if (abs(d1)<abs(d2)){
+return vec3(2.0,1.0,0.0);
+}
+else{
+return scale_color1(p);
+}
+}
+vec3 rotation_color1(vec3 q){
+vec3 p=vec3(q.x,q.y*COSTHETA1+q.z*SINTHETA1,q.z*COSTHETA1+q.y*-SINTHETA1);
+return onion_color1(p);
+}
+vec3 rotation_color2(vec3 q){
+float cosTheta1=cos(iTime/5.);
+float sinTheta1=sin(iTime/5.);
+vec3 p=vec3(q.x*cosTheta1+q.z*+sinTheta1,q.y,q.z*cosTheta1+q.x*-sinTheta1);
+return rotation_color1(p);
+}
+vec3 translation_color1(vec3 q){
+vec3 p=q+vec3(-1.5,-0.0,-0.0);
+return rotation_color2(p);
+}
+
+const float SCALE2=0.5;
+//Box1
+const vec3 BOX1=vec3(0.95,0.95,0.95);
+float sdf8(vec3 p){
+vec3 q4=abs(p)-BOX1;
+return length(max(q4,0.0))+min(max(q4.x,max(q4.y,q4.z)),0.0);
+}
+
+//Mandelbox2
+const float S2=-2.5;
+const float R2=0.5;
+const int ITR2=10;
+const float F2=1.0;
+float sdf5(vec3 p){
+return sdf8(p);
+}
+float sdf6(vec3 p){
+vec4 q5=vec4(p,1.0);
+vec4 c2=vec4(p,1.0);
+for (int a2=0;a2<ITR2;a2++){
+q5.xyz=F2*(clamp(q5.xyz,-1.0,1.0)*2.0-q5.xyz);
+q5 *=S2/clamp(dot(q5.xyz,q5.xyz),R2,1.0);
+q5 +=c2;
+}
+return .333*length(q5.xyz)/abs(q5.w);
+}
+float sdf7(vec3 p){
+float thickness=0.1;
+float surface=sdf5(p);
+float onioned=abs(surface)-thickness;
+if (onioned>thickness){
+return onioned;
+}
+else if (surface<-thickness){
+return surface;
+}
+else{
+float detail=sdf6(p);
+float dist = max(onioned,detail);
+return min(dist,surface);
+}
+}
+vec3 onion_color2(vec3 p){
+float d1 = sdf5(p);
+float d2 = sdf6(p);
+if (abs(d1)<abs(d2)){
+return vec3(1.0,0.0,0.0);
+}
+else{
+return vec3(1,1,1);
+}
+}
+vec3 scale_color2(vec3 q){
+vec3 p=q/SCALE2;
+return onion_color2(p);
+}
+vec3 rotation_color3(vec3 q){
+float cosTheta2=cos(-iTime/5.);
+float sinTheta2=sin(-iTime/5.);
+vec3 p=vec3(q.x*cosTheta2+q.z*+sinTheta2,q.y,q.z*cosTheta2+q.x*-sinTheta2);
+return scale_color2(p);
+}
+float sdf9(vec3 p){
+vec3 q1=p+vec3(-1.5,-0.0,-0.0);
+//Rotate y axis1
+float cosTheta1=cos(iTime/5.);
+float sinTheta1=sin(iTime/5.);
+vec3 rot1=vec3(q1.x*cosTheta1+q1.z*+sinTheta1,q1.y,q1.z*cosTheta1+q1.x*-sinTheta1);
+//Rotate x axis1
+vec3 rot2=vec3(rot1.x,rot1.y*COSTHETA1+rot1.z*SINTHETA1,rot1.z*COSTHETA1+rot1.y*-SINTHETA1);
+float sectorNumber1=round(atan(rot2.x,rot2.z)/SECTORSIZE1);
+float angleOffset1=-sectorNumber1*SECTORSIZE1;
+float cos1=cos(angleOffset1);
+float sin1=sin(angleOffset1);
+vec3 q2=vec3(
+rot2.x*cos1+rot2.z*sin1,
+rot2.y,
+rot2.z*cos1-rot2.x*sin1
+);
+return (sdf3(q2));
+}
+float sdf10(vec3 p){
+//Rotate y axis2
+float cosTheta2=cos(-iTime/5.);
+float sinTheta2=sin(-iTime/5.);
+vec3 rot3=vec3(p.x*cosTheta2+p.z*+sinTheta2,p.y,p.z*cosTheta2+p.x*-sinTheta2);
+vec3 sp2=rot3/SCALE2;
+return ((sdf7(sp2))*SCALE2);
+}
+vec3 union_color1(vec3 p){
+float d1 = sdf9(p);
+float d2 = sdf10(p);
+if (abs(d1)<abs(d2)){
+return translation_color1(p);
+}
+else{
+return rotation_color3(p);
+}
+}
+
+//Box2
+const vec3 BOX2=vec3(100.0,10.0,1.0);
+float sdf11(vec3 p){
+vec3 q7=abs(p)-BOX2;
+return length(max(q7,0.0))+min(max(q7.x,max(q7.y,q7.z)),0.0);
+}
+vec3 translation_color2(vec3 q){
+vec3 p=q+vec3(-0.0,-0.0,-3.0);
+return vec3(1.9,1.9,2.0);
+}
+float sdf12(vec3 p){
+return (min(sdf9(p),sdf10(p)));
+}
+float sdf13(vec3 p){
+vec3 q6=p+vec3(-0.0,-0.0,-3.0);
+return (sdf11(q6));
+}
+vec3 union_color2(vec3 p){
+float d1 = sdf12(p);
+float d2 = sdf13(p);
+if (abs(d1)<abs(d2)){
+return union_color1(p);
+}
+else{
+return translation_color2(p);
+}
+}
+
+float sdf14(vec3 p){
+vec3 planeAngleNorm1=vec3(0.0,1.0,0.0);
+float planeHeight1=1.5;
+float plane1=dot(p,planeAngleNorm1)+planeHeight1;
+return plane1;
+}
+float sdf15(vec3 p){
+return (min(sdf12(p),sdf13(p)));
+}
+float sdf16(vec3 p){
+return (sdf14(p));
+}
+vec3 union_color3(vec3 p){
+float d1 = sdf15(p);
+float d2 = sdf16(p);
+if (abs(d1)<abs(d2)){
+return union_color2(p);
+}
+else{
+return vec3(1.0,0.9,0.9);
+}
+}
+
+const float SCALE3=0.3;
+const float SECTORSIZE2=0.31415926536;
+const float SECTORSIZE3=0.31415926536;
+const float SECTORSIZE4=0.31415926536;
+const float COSTHETA2=0.70710677;
+const float SINTHETA2=0.70710677;
+const float SCALE4=0.75;
+//Mandelbox3
+const float S3=-2.5;
+const float R3=0.5;
+const int ITR3=10;
+const float F3=1.0;
+vec3 scale_color3(vec3 q){
+vec3 p=q/SCALE4;
+return vec3(1,1,1);
+}
+vec3 rotation_color4(vec3 q){
+vec3 p=vec3(q.x,q.y*COSTHETA2+q.z*SINTHETA2,q.z*COSTHETA2+q.y*-SINTHETA2);
+return scale_color3(p);
+}
+
+float sdf17(vec3 p){
+float rp1=5.29046001;
+float r1=2.3;
+float d1;
+float lp=length(p);
+if (lp>rp1+.2){
+d1=lp-(r1+.1);
+}
+else{
+float sectorNumber2=round(atan(p.y,p.x)/SECTORSIZE2);
+float angleOffset2=-sectorNumber2*SECTORSIZE2;
+float cos2=cos(angleOffset2);
+float sin2=sin(angleOffset2);
+vec3 q9=vec3(
+p.x*cos2-p.y*sin2,
+p.y*cos2+p.x*sin2,
+p.z
+);
+float sectorNumber3=round(atan(q9.x,q9.z)/SECTORSIZE3);
+float angleOffset3=-sectorNumber3*SECTORSIZE3;
+float cos3=cos(angleOffset3);
+float sin3=sin(angleOffset3);
+vec3 q10=vec3(
+q9.x*cos3+q9.z*sin3,
+q9.y,
+q9.z*cos3-q9.x*sin3
+);
+float sectorNumber4=round(atan(q10.y,q10.x)/SECTORSIZE4);
+float angleOffset4=-sectorNumber4*SECTORSIZE4;
+float cos4=cos(angleOffset4);
+float sin4=sin(angleOffset4);
+vec3 q11=vec3(
+q10.x*cos4-q10.y*sin4,
+q10.y*cos4+q10.x*sin4,
+q10.z
+);
+//Rotate x axis2
+vec3 rot5=vec3(q11.x,q11.y*COSTHETA2+q11.z*SINTHETA2,q11.z*COSTHETA2+q11.y*-SINTHETA2);
+vec3 sp4=rot5/SCALE4;
+vec4 q12=vec4(sp4,1.0);
+vec4 c3=vec4(sp4,1.0);
+for (int a3=0;a3<ITR3;a3++){
+q12.xyz=F3*(clamp(q12.xyz,-1.0,1.0)*2.0-q12.xyz);
+q12 *=S3/clamp(dot(q12.xyz,q12.xyz),R3,1.0);
+q12 +=c3;
+}
+d1=(.333*length(q12.xyz)/abs(q12.w))*SCALE4;
+}
+return d1;
+}
+
+float sdf18(vec3 p){
+//Sphere1
+float radius1 =1.9;
+return length(p)-radius1;
+}
+float sdf19(vec3 p){
+return (sdf17(p));
+}
+float sdf20(vec3 p){
+return (sdf18(p));
+}
+vec3 union_color4(vec3 p){
+float d1 = sdf19(p);
+float d2 = sdf20(p);
+if (abs(d1)<abs(d2)){
+return rotation_color4(p);
+}
+else{
+return vec3(1.0,0.0,0.0);
+}
+}
+vec3 scale_color4(vec3 q){
+vec3 p=q/SCALE3;
+return union_color4(p);
+}
+vec3 rotation_color5(vec3 q){
+float cosTheta3=cos(iTime/5.);
+float sinTheta3=sin(iTime/5.);
+vec3 p=vec3(q.x*cosTheta3+q.z*+sinTheta3,q.y,q.z*cosTheta3+q.x*-sinTheta3);
+return scale_color4(p);
+}
+vec3 translation_color3(vec3 q){
+vec3 p=q+vec3(1.5,-0.0,-0.0);
+return rotation_color5(p);
+}
+float sdf21(vec3 p){
+return (min(sdf15(p),sdf16(p)));
+}
+float sdf22(vec3 p){
+vec3 q8=p+vec3(1.5,-0.0,-0.0);
+//Rotate y axis3
+float cosTheta3=cos(iTime/5.);
+float sinTheta3=sin(iTime/5.);
+vec3 rot4=vec3(q8.x*cosTheta3+q8.z*+sinTheta3,q8.y,q8.z*cosTheta3+q8.x*-sinTheta3);
+vec3 sp3=rot4/SCALE3;
+return ((min(sdf19(sp3),sdf20(sp3)))*SCALE3);
+}
+vec3 union_color5(vec3 p){
+float d1 = sdf21(p);
+float d2 = sdf22(p);
+if (abs(d1)<abs(d2)){
+return union_color3(p);
+}
+else{
+return translation_color3(p);
+}
+}
+float map7(vec3 p){
+
+return min(sdf21(p),sdf22(p));
+}
+vec3 map7_color(vec3 p){
+
+return(union_color5(p));
+}
+
+
+
+
+
+
+float map(in vec3 q){
+/*
+float time = iTime/8.5;
+//return 1.0;
+vec3 p=q;
+
+float lookDown=.2;
+float cosld=cos(lookDown);
+float sinld=sin(lookDown);
+p=vec3(p.x,p.y*cosld+p.z*-sinld,p.z*cosld+p.y*sinld);
+//p =vec3(
+//    p.x*cos(time)+p.z*-sin(time),
+//    p.y
+//    ,p.z*cos(time)+p.x*sin(time)
+//);
+p=p+vec3(0.,-2.+sin(time*2.)*.125,0.);
+
+//float ang2 = sin(iTime/4.)*.25;
+//p = vec3(p.x*cos(ang2)-p.y*sin(ang2),p.y*cos(ang2)+p.x*sin(ang2),p.z);
+
+float m;
+float mb=0.;
+
+bool bound = false;
+*/
+float m= map7(q)*.95;
+
+///if (calcColor){
+//   color = map7_color(q);
+//}
+
+
+//m=min(m,q.y+1.8);
+// m=min(m,-q.z+25.4);
+
+
+return m;
+}
+
+
+vec3 map_color(vec3 p){
+return map7_color(p);
+}
+
+
+
+
+
+vec3 getSurfaceNormal( in vec3 p, float epsilon ) // for function f(p)
+{
+
+return normalize(
+GLOBAL_PN_XYY*map(p+GLOBAL_PN_XYY_EPS) +
+GLOBAL_PN_YYX*map(p+GLOBAL_PN_YYX_EPS) +
+GLOBAL_PN_YXY*map(p+GLOBAL_PN_YXY_EPS) +
+GLOBAL_PN_XXX*map(p+GLOBAL_PN_XXX_EPS) 
+
+);
+}
+
+
+void rayMarch(
+in vec3 origin, 
+in vec3 ray, 
+in float epsilon,
+in float maxSteps,
+
+out vec3 marchPoint,
+out float marchPointDist,
+out float stepsTaken
+
+
+){
+
+
+
+stepsTaken = 0.0;
+marchPoint=origin;
+float h = map(marchPoint);
+while (h>epsilon&&stepsTaken++<maxSteps&&h<MAX_DIST){
+marchPoint+=ray*h;       
+h=map(marchPoint);
+}   
+marchPointDist=h;
+
+}
+
+float softShadowBalanced(vec3 surface, vec3 surfaceToLight, float radius, float maxDist){
+
+//return 1.0;
+
+//vec3 surfaceToLight = light-surface;
+float distanceToLight=length(surfaceToLight);
+float maxDist2 = min(maxDist,distanceToLight);
+vec3 ray =normalize(surfaceToLight);
+float artifactCompensation = 1.0;
+float minDist = 0.05;//think about this.
+
+float travelled = minDist;
+float xx=1.0;
+while (travelled < maxDist2){
+
+float ratioTravelled=travelled/distanceToLight;
+
+
+float relativeRadius=ratioTravelled*radius;
+
+float dist=map(surface+ray*travelled);
+
+if (dist<-relativeRadius){
+return 0.0;
+}
+float relativeDiameter=relativeRadius*2.0;
+
+float dist2=dist+relativeRadius;
+xx = min(xx,dist2/relativeDiameter);
+
+
+float artifatCompensation2 = artifactCompensation*clamp(relativeRadius/dist,0.,1.);
+travelled +=max(abs(dist/artifactCompensation),minDist);
+
+
+}
+
+return xx;
+
+
+
+}
+
+vec3 power(vec3 vec, float power){
+return vec3(pow(vec.x,power),pow(vec.y,power),pow(vec.z,power));
+}
+
+
+void calcLight(
+in vec3 surfacePoint, 
+in float shineAtPosition,
+in vec3 lightPosition,
+in vec3 observationPosition,
+in vec3 lightColor,
+in float lightBrightness,
+in vec3 surfaceNormal,
+in float epsilon,
+in float lightRadius,
+out vec3 diffuse, 
+out vec3 specular){
+
+
+
+vec3 col0 = lightColor;
+
+
+vec3 surfaceToLight=lightPosition-surfacePoint;
+vec3 normalToLight=normalize(surfaceToLight);
+
+float oneOverDistToLightSquared = lightBrightness/dot(surfaceToLight,surfaceToLight);
+
+
+
+float dp = dot(normalToLight,surfaceNormal);
+
+dp=max(dp,0.0);
+
+
+diffuse=dp*lightColor*oneOverDistToLightSquared;
+
+
+vec3 rayToObs=normalize(observationPosition-surfacePoint);
+vec3 avg = normalize(normalToLight+rayToObs);
+float spec = dot(avg,surfaceNormal);
+spec = max(spec,0.0);
+
+spec = pow(spec,shineAtPosition);
+
+specular=lightColor*spec*oneOverDistToLightSquared;
+
+float shadowAdjust = 1.0;
+
+
+if (true){
+float s = softShadowBalanced(surfacePoint,surfaceToLight,lightRadius, 500.); 
+diffuse*=s*shadowAdjust;
+specular*=s*shadowAdjust;
+}
+
+}
+
+
+void mainImage1( out vec4 fragColor, in vec2 fragCoord )
+{
+
+
+
+vec3 lense = vec3(0.0,0.0,1.);
+
+
+vec3 cameraPosition = vec3(0.,4.,-5);//.+sin(iTime/10.));
+float specAmt = 0.0;
+
+vec2 uv = fragCoord/iResolution.xy;
+float epsilon1 = .00125;
+
+
+
+
+vec2 ar = (fragCoord/iResolution.x)
+-vec2(.5,iResolution.y/(2.0*iResolution.x));
+
+vec3 lenseIntersection = vec3(ar,lense.z);
+
+vec3 ray = normalize(lenseIntersection);//-eye);
+
+float lookDown=.4;
+float cosld=cos(lookDown);
+float sinld=sin(lookDown);
+
+ray = vec3(ray.x,ray.y*cosld+ray.z*-sinld,ray.z*cosld+ray.y*sinld);
+
+
+float stepsTaken;
+vec3 finalPosition;
+float finalDistance;
+
+float maxSteps = 200.0;
+
+
+
+
+float time = iTime/8.5;
+
+vec3 p=cameraPosition+ray;
+
+
+p=p+vec3(0.,-2.+sin(time*2.)*.125,0.);
+
+
+
+float m;
+float mb=0.;
+
+bool bound = false;
+/////////////
+
+rayMarch(p,ray,epsilon1,maxSteps,finalPosition,finalDistance,stepsTaken);
+
+vec3 objColor= map_color(finalPosition);
+
+
+float objectShine=14.;
+
+
+vec3 diffuse1;
+vec3 specular1;
+
+vec3 diffuse2;
+vec3 specular2;
+
+vec3 diffuse3;
+vec3 specular3;
+
+vec3 diffuse4;
+vec3 specular4;
+
+if (finalDistance<epsilon1){
+
+
+finalPosition = finalPosition+(ray*epsilon1*-2.0);
+vec3 normal = getSurfaceNormal(finalPosition,epsilon1);
+
+
+
+float lightBrightness = 1400.;
+float specMult = 2.0;
+
+calcLight(
+finalPosition,
+objectShine,
+vec3(30.0,40.0,-40.0),//lightposition
+cameraPosition,//observation position
+vec3(1.,.9,.8),//light color
+lightBrightness*1.55,//light bright
+
+normal,
+epsilon1,
+1.,
+diffuse1,
+specular1
+);
+
+/*
+calcLight(
+finalPosition,
+objectShine,
+vec3(-30.0,40.0,-40.0),//lightposition
+eye+cameraPosition,//observation position
+vec3(1.7,.325,0.)*.5,//light color
+lightBrightness*1.5,//light bright
+normal,
+epsilon1,
+1.,
+diffuse2,
+specular2
+);
+
+
+
+calcLight(
+finalPosition,
+objectShine,
+vec3(0.0,30.0,-40.0),//lightposition
+eye+cameraPosition,//observation position
+vec3(.35,1.5,.4)*.5,//light color
+lightBrightness*.75,//light bright
+normal,
+epsilon1,
+.5,
+diffuse3,
+specular3
+);
+*/
+/*
+calcLight(
+finalPosition,
+objectShine,
+vec3(130.0,30.0,-480.0),//lightposition
+eye+cameraPosition,//observation position
+vec3(1.,.9,.3)*.5,//light color
+lightBrightness*5.,//light bright
+normal,
+epsilon1,
+diffuse3,
+specular3
+);
+*/
+
+
+/*
+calcLight(
+finalPosition,
+objectShine,
+vec3(0.0,10.0,-5.0),//lightposition
+eye+cameraPosition,//observation position
+vec3(1.,.8,.5)*.5,//light color
+lightBrightness/20000.,//light bright
+normal,
+epsilon1,
+diffuse4,
+specular4
+);
+*/
+
+
+
+
+vec3 col1=objColor*max(diffuse1,0.0);
+col1+=specular1*specMult;
+
+vec3 col2=objColor*max(diffuse2,0.0);
+col2+=specular2*specMult;
+
+vec3 col3=objColor*max(diffuse3,0.0);
+col3+=specular3*specMult;
+
+
+vec3 colFinal = min(col1+col2+col3,1.);
+colFinal=power(colFinal,.9);
+
+
+
+colFinal = pow(colFinal,vec3(.75,.74,.73));
+
+fragColor = vec4(colFinal,1.0);
+
+}
+else{
+fragColor = vec4(.2,0,0,1.0);
+
+}
+
+
+
+
+}
+
+void AntiAlias3( out vec4 fragColor, in vec2 fragCoord, float aaLevel){
+vec2 uv = fragCoord/iResolution.xy;
+
+float subPixel = 1.0/aaLevel;
+vec4 result = vec4(0,0,0,1);
+for (float x=fragCoord.x;x<fragCoord.x+1.0;x+=subPixel){
+for (float y=fragCoord.y;y<fragCoord.y+1.0;y+=subPixel){
+vec4 temp;
+mainImage1(temp,vec2(x,y));
+result+=temp;
+}
+}
+
+
+fragColor = result/(aaLevel*aaLevel);
+
+
+}
+
+void mainImage ( out vec4 fragColor, in vec2 fragCoord){
+if (true){
+AntiAlias3(fragColor, fragCoord,2.);
+}
+else{
+vec4 result = vec4(0,0,0,1);
+mainImage1(result,fragCoord);
+fragColor=result;
+}
+fragColor.xyz = pow(fragColor.xyz,vec3(1.2,1.,.7));
+}
+		  
+
+			
+			
+	   
+			//******************************closing   **********************//
+			//******************************closing   **********************//
+			
+			
+						
+						
+					
+		</script>
+
+	</head> 
+	<body> 
+		<script src="shader_class.js"></script>
+
+		<canvas></canvas>
+		<div id="info"></div> 
+ 
+               
+		<script>
+        
+			//The window.requestAnimationFrame() method tells the browser you wish to perform an animation.
+			//It requests the browser to call a user-supplied callback function before the next repaint.
+			//The following sets up a standard method in a cross-browser way...
+			//requestAnimationFrameInit();
+			var shader;
+		
+			var canvasx = document.querySelector( 'canvas' );
+			//window.alert(canvasx);
+			var fragmentShaderCode = document.getElementById('fs').textContent;
+			shader = new CJMShader(fragmentShaderCode,canvasx,"shader");
+			shader.start();
+				
+                        
+ 
+		</script> 
+ 
+	</body> 
+</html>
