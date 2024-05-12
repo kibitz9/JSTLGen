@@ -18,8 +18,7 @@
 				height: 100%;
 			}
 		</style> 
-		<script src="shader_includes.js"></script>
-
+		
 
 
 
@@ -58,7 +57,8 @@
 
 	</head> 
 	<body> 
- 
+		<script src="shader_class.js"></script>
+
 		<canvas></canvas>
 		<div id="info"></div> 
  
@@ -68,25 +68,27 @@
 			//The window.requestAnimationFrame() method tells the browser you wish to perform an animation.
 			//It requests the browser to call a user-supplied callback function before the next repaint.
 			//The following sets up a standard method in a cross-browser way...
-			requestAnimationFrameInit();
-
- 
-			var 
-			    vertex_position,
-			    timeLocation,
-			    resolutionLocation,
-				iResolutionLocation,
-				iMouseLocation,
-			    parameters = {  start_time  : new Date().getTime(), 
-			                    iTime        : 0, 
-			                    screenWidth : 0, 
-			                    screenHeight: 0 };
-                window.mouseevents = window.mouseevents ||  function(){};
-				
-				canvasx = document.querySelector( 'canvas' );
-				
-				shaderInit(document.getElementById('fs').textContent,canvasx);
-				animate(canvasx);
+			//requestAnimationFrameInit();
+			var shader;
+			//try{
+				var canvasx = document.querySelector( 'canvas' );
+				//window.alert(canvasx);
+				var fragmentShaderCode = document.getElementById('fs').textContent;
+				shader = new CJMShader(fragmentShaderCode,canvasx);
+				shader.start();
+				//window.setTimeout(function(){window.alert(shader.counter);shader.start();},3000);
+				//shader.start();
+				//window.setTimeout(function(){window.alert(shader.counter);shader.start();},3000);
+				//window.alert(shader);
+				//shader.start();
+				//window.setTimeout(window.shader.start,1000);
+				//shader.start();
+					//shader.shaderInit(canvasx);
+					//shader.animate(canvasx);
+			//}
+			//catch(error){
+			//	window.alert(error);
+			//}
                         
  
 		</script> 

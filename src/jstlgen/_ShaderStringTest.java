@@ -357,7 +357,7 @@ public class _ShaderStringTest {
         
         SignedDistanceField3d final1 = mb3;
         
-        final1 = sphere;
+        final1 = mb3;
         
         String initialVarName = "p";
         ShaderString ss2 = final1.toShaderString(initialVarName);

@@ -131,6 +131,9 @@ public abstract class SoftwareShader {
             double startTimeInMicros = startTimeInNanos/1000;
             //double startTimeInSeconds = startTimeInMicros/1000000d;
             ParallelThread[] ts = new ParallelThread[softwareThreads];
+            
+             
+            boolean first = true;
             while(running){
                 long frameStartTime=System.nanoTime();
                 iTime = (frameStartTime-startTimeInNanos)/1000;
@@ -140,22 +143,32 @@ public abstract class SoftwareShader {
                 
                 for (int a=0;a<softwareThreads;a++){
                     ts[a]=new ParallelThread(a,softwareThreads);
+                   
                     ts[a].start();
                 }
-                
+               
                 for (int a=0;a<softwareThreads;a++){
                     //boolean done = false;
+                    long x = 0;
                     while (true){
-                       
-                        try{
-                            ts[a].join();
-                            if (ts[a].done){
-                                break;
+                        
+                            try{
+                                //if (first){
+                                //    first=false;
+                                ts[a].join();
+                                //}
+                                //ts[a].join();
+                                if (ts[a].done){
+                                   
+                                    break;
+                                }
+                                //Thread.currentThread().wait(1);//we could add this instead of a join.
                             }
-                        }
-                        catch(java.lang.InterruptedException err){
-                            //nop
-                        }
+                            catch(java.lang.Exception err){
+                            //catch(java.lang.InterruptedException err){
+                                //nop
+                            }
+                       
                     }
                         
                 }
@@ -203,8 +216,9 @@ public abstract class SoftwareShader {
                         }
                     }
                     pixel=pixel.Scale(aaLevelSquaredInverted);
-                    
+                    //if (y%2==0){
                     array[y*scansize + x]=pixel.ToARGBInt();
+                    //}
                 }
             }
             done = true;

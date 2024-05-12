@@ -24,7 +24,16 @@
 		<canvas></canvas>
 		<div id="info"></div> 
  
-               
+                <script>
+                    vsHeader=`#version 300 es
+                        #ifdef GL_ES
+                            precision highp float;
+                            precision highp int;
+                            precision mediump sampler3D;
+                        #endif
+                        `;
+                    document.vsHeader=vsHeader;
+                </script>
                 
                  <script id="vsHeader" type="x-shader/vertex">#version 300 es
                         #ifdef GL_ES
@@ -987,8 +996,8 @@ void mainImage ( out vec4 fragColor, in vec2 fragCoord){
                             */
                         }
 			function init() {
- 
-                                vertex_header_source = document.getElementById('vsHeader').textContent;
+                                vertex_header_source = document.vsHeader;
+                                //vertex_header_source = document.getElementById('vsHeader').textContent;
                                 fragment_header_source=document.getElementById('fsHeader').textContent;
 				vertex_shader_source = document.getElementById('vs').textContent;
 				fragment_shader_source = document.getElementById('fs').textContent;
